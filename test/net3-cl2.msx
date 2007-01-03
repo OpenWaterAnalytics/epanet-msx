@@ -1,0 +1,44 @@
+[TITLE]
+Two-Source Chlorine Decay Model
+
+[OPTIONS]
+AREA_UNITS  FT2
+RATE_UNITS  DAY
+SOLVER      EUL
+TIMESTEP    300
+RTOL        0.001
+ATOL        0.001
+
+
+[SPECIES]
+BULK        S1    MG    ;source 1
+BULK        S2    MG    ;source 2
+BULK        CL2   MG    ;chlorine
+
+[COEFFICIENTS]
+CONSTANT       k1   1.3    ;source 1 decay const.
+CONSTANT       k2   17.7   ;source 2 decay const.
+
+[TERMS]
+K   S1*k1 + S2*k2
+
+[PIPE]
+RATE        S1     0.0
+RATE        S2     0.0
+RATE        CL2    -K*CL2
+
+; Note: TANK reactions default to PIPE reactions
+
+[QUALITY]
+NODE      4    CL2   1.0
+NODE      5    CL2   1.0
+NODE      4    S1    1.0
+NODE      4    S2    0.0
+NODE      5    S1    0.0
+NODE      5    S2    1.0
+
+[REPORT]
+NODE    197
+SPECIE  CL2  YES
+SPECIE  S1   YES
+SPECIE  S2   YES
