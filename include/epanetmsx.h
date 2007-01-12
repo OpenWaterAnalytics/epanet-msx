@@ -11,6 +11,9 @@
 #ifndef EPANETMSX_H
 #define EPANETMSX_H
 
+/* These are codes used by the API functions */
+#define ENMSX_SPECIESCOUNT    0     /* Component counts */
+
 #ifdef __cplusplus
 #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
 #else
@@ -31,5 +34,6 @@ int  DLLEXPORT ENMSXsaveoutfile(char *fname);
 int  DLLEXPORT ENMSXreport(void);
 int  DLLEXPORT ENMSXclose(void);
 int  DLLEXPORT ENMSXgeterror(int errcode, char *errmsg, int n);
+int  DLLEXPORT ENMSXgetcount(int code, int *count);
 
 #endif

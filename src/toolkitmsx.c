@@ -221,6 +221,28 @@ int  DLLEXPORT  ENMSXgetspecieID(int index, char *id)
 }
 
 //=============================================================================
+int  DLLEXPORT  ENMSXgetcount(int code, int *count)
+/*
+**  Purpose: retrieves the number of components of a
+**           given type in the network
+**
+**  Input:   code = component code (see EPANETMSX.H)
+**
+**  Output:  *count = number of components in network
+**
+**  Returns: error code
+*/
+{
+    *count = 0;
+    switch (code)
+    {
+    case ENMSX_SPECIESCOUNT:    *count = Nobjects[SPECIE];    break;
+    default: return(ERR_PARAM_CODE);
+    }
+    return(0);
+}
+
+//=============================================================================
 
 int DLLEXPORT  ENMSXgetspecietype(int index, int *code)
 /*

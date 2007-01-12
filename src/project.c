@@ -39,7 +39,9 @@ static char * Errmsg[] =
      "could not open algebraic solver"
      "could not open binary results file",
      "read/write error on binary results file",
-     "numerical integration error"};
+     "numerical integration error",
+     "convergence error when balancing equilibrium expressions",
+     "function call contains invalid parameter code"};
 
 //  Imported functions
 //--------------------

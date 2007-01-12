@@ -310,4 +310,5 @@ typedef struct                         // FILE OBJECT
            ERR_IO_OUT_FILE,            // 512
            ERR_INTEGRATOR,             // 513
            ERR_NEWTON,                 // 514
+           ERR_PARAM_CODE,             // 515
            ERR_MAX};
