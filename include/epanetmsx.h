@@ -55,5 +55,7 @@ int  DLLEXPORT ENMSXgetpatternvalue(int index, int period, double *value);
 int  DLLEXPORT ENMSXsetpattern(int index, double *f, int n);
 int  DLLEXPORT ENMSXsetpatternvalue(int index, int period, double value);
 int  DLLEXPORT ENMSXcreatepattern(char *id);
+int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value);
+int  DLLEXPORT  ENMSXsetlinkqual(int link, int specie, int code, double value);
 
 #endif
