@@ -5,6 +5,7 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 Copyright 2007 All rights reserved.
 **  VERSION:       1.00
 **  LAST UPDATE:   11/9/06
 *******************************************************************************/
