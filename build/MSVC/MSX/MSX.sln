@@ -1,0 +1,40 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSXLibrary", "MSX.vcproj", "{63B988AF-1425-47B3-8C70-8492B7AA73FA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135} = {0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EpanetLib", "..\..\..\..\..\BASE\trunk\build\MSVC\EpanetLib\EpanetLib.vcproj", "{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EpanetMSXrun", "..\EpanetMSXrun\EpanetMSXrun.vcproj", "{1F0FC3E5-8301-41D8-A34D-F2EF294C2870}"
+	ProjectSection(ProjectDependencies) = postProject
+		{63B988AF-1425-47B3-8C70-8492B7AA73FA} = {63B988AF-1425-47B3-8C70-8492B7AA73FA}
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135} = {0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{63B988AF-1425-47B3-8C70-8492B7AA73FA}.Debug.ActiveCfg = Debug|Win32
+		{63B988AF-1425-47B3-8C70-8492B7AA73FA}.Debug.Build.0 = Debug|Win32
+		{63B988AF-1425-47B3-8C70-8492B7AA73FA}.Release.ActiveCfg = Release|Win32
+		{63B988AF-1425-47B3-8C70-8492B7AA73FA}.Release.Build.0 = Release|Win32
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}.Debug.ActiveCfg = Debug|Win32
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}.Debug.Build.0 = Debug|Win32
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}.Release.ActiveCfg = Release|Win32
+		{0B2334F0-D2D3-4F11-AA93-D8E2AED5F135}.Release.Build.0 = Release|Win32
+		{1F0FC3E5-8301-41D8-A34D-F2EF294C2870}.Debug.ActiveCfg = Debug|Win32
+		{1F0FC3E5-8301-41D8-A34D-F2EF294C2870}.Debug.Build.0 = Debug|Win32
+		{1F0FC3E5-8301-41D8-A34D-F2EF294C2870}.Release.ActiveCfg = Release|Win32
+		{1F0FC3E5-8301-41D8-A34D-F2EF294C2870}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

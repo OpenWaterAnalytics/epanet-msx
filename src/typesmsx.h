@@ -311,4 +311,9 @@ typedef struct                         // FILE OBJECT
            ERR_INTEGRATOR,             // 513
            ERR_NEWTON,                 // 514
            ERR_PARAM_CODE,             // 515
+           ERR_NO_PROJECT,             // 516
+           ERR_PROJECT_OPENED,         // 517
+           ERR_TIME_PATTERN,           // 518
+           ERR_NUM_VALUE,              // 519
+           ERR_INDEX_VALUE,            // 520
            ERR_MAX};

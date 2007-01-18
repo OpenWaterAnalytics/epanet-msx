@@ -36,12 +36,17 @@ static char * Errmsg[] =
      "too few pipe reaction expressions",
      "too few tank reaction expressions",
      "could not open ODE solver",
-     "could not open algebraic solver"
+     "could not open algebraic solver",
      "could not open binary results file",
      "read/write error on binary results file",
      "numerical integration error",
      "convergence error when balancing equilibrium expressions",
-     "function call contains invalid parameter code"};
+     "function call contains invalid parameter code",
+     "could not find an open MSX project",
+     "an MSX project is already open",
+     "undefined time pattern in function call",
+     "illegal numeric value in function call",
+     "function call contains invalid node, link, pattern, or specie index"};
 
 //  Imported functions
 //--------------------
@@ -115,6 +120,7 @@ int  project_open(char *fname)
 // --- close input file
 
     if ( InpFile.file ) fclose(InpFile.file);
+    InpFile.file = NULL;
     if ( !errcode ) ProjectOpened = TRUE;
     return errcode;
 }
@@ -138,6 +144,7 @@ void project_close()
     OutFile.file = NULL;
     deleteObjects();
     deleteHashTables();
+    ProjectOpened = FALSE;
 }
 
 //=============================================================================

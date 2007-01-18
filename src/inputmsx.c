@@ -90,15 +90,15 @@ int    input_countENobjects(void);
 int    input_readENdata(void);
 int    input_readMSdata(void);
 void   input_getSpecieUnits(int m, char *units);
+int    getNewSection(char *tok, char *sectWords[], int *sect);
+int    addPattern(char *id);
 
 //  Local functions
 //-----------------
 static int    getLineLength(char *line);
-static int    getNewSection(char *tok, char *sectWords[], int *sect);
 static int    addSpecie(char *line);
 static int    addCoeff(char *line);
 static int    addTerm(char *id);
-static int    addPattern(char *id);
 static int    checkID(char *id);
 static int    parseLine(int sect, char *line);
 static int    parseOption(void);

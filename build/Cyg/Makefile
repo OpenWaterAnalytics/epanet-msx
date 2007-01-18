@@ -117,7 +117,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 # Files for the shared object library
 epanetmsx_objs=chemistry.o hashmsx.o inputmsx.o mathexpr.o mempool.o newton.o outputmsx.o \
-	           project.o qualitymsx.o reportmsx.o rk5.o ros2.o toolkitmsx.o utils.o
+	           project.o qualitymsx.o reportmsx.o rk5.o ros2.o toolkitmsx.o utils.o msxfile.o
 # Epanetmsx main program
 epanetmsx_main_obj=epanetmsx.o
 # Epanetmsx header files
