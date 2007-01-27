@@ -576,6 +576,66 @@ int  DLLEXPORT  ENMSXgetlinkqual(int link, int specie, double *c)
 }
 
 //=============================================================================
+
+int  DLLEXPORT  ENMSXgetsourcequal(int node, int specie, int code, double *value)
+/*
+**  Purpose:
+**    retrieves source properties associated with a water quality analysis.
+**
+**  Input:
+**    node = node index (base 1).
+**    specie = index of BULK water quality specie (base 1).
+**    code = parameter code (see EPANETMSX.H)
+**    value = value to set associated with parameter code
+**      (see EPANETMSX.H for valid source type values)
+**
+**  Output:
+**    Value associated with parameter code for the specified source.
+**
+**  Returns:
+**    an error code (or 0 for no error).
+**
+**  Note:
+**    If no source exists for node and specie, a new CONCEN source is created
+**    with no pattern and zero strength.
+*/
+{
+    Psource source=NULL;
+
+    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if ( node <= 0 || node > Nobjects[NODE] ||
+        specie <= 0 || specie > Nobjects[SPECIE] )
+        return(ERR_INDEX_VALUE);
+    if ( Specie[specie].type != BULK ) return(ERR_INDEX_VALUE);
+
+    switch (code)
+    {
+    case ENMSX_SOURCEQUAL:
+    case ENMSX_SOURCEPAT:
+    case ENMSX_SOURCETYPE:
+        source = Node[node].sources;
+
+        // --- find the source for this specie
+
+        while ( source )
+        {
+            if ( source->specie == specie ) break;
+            source = source->next;
+        }
+        if ( source == NULL ) return(ERR_INDEX_VALUE);
+
+        // --- get source's properties
+
+        if ( code == ENMSX_SOURCEQUAL ) *value = source->c0;
+        else if ( code == ENMSX_SOURCEPAT ) *value = source->pat;
+        else if ( code == ENMSX_SOURCETYPE ) *value = source->type;
+        break;
+    default: return(ERR_PARAM_CODE);
+    }
+    return 0;
+}
+
+//=============================================================================
 //   Functions for modifying network data
 //=============================================================================
 
@@ -601,8 +661,6 @@ int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value)
 **    If no source exists for node and specie, a new CONCEN source is created
 */
 {
-    Psource source=NULL;
-
     if (!ProjectOpened) return(ERR_NO_PROJECT);
     if ( node <= 0 || node > Nobjects[NODE] ||
         specie <= 0 || specie > Nobjects[SPECIE] )
@@ -613,47 +671,6 @@ int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value)
     {
     case ENMSX_INITQUAL:       
         Node[node].c0[specie] = value;    
-        break;
-    case ENMSX_SOURCEQUAL:
-    case ENMSX_SOURCEPAT:
-    case ENMSX_SOURCETYPE:
-        source = Node[node].sources;
-
-        // --- check if a source for this specie already exists
-
-        while ( source )
-        {
-            if ( source->specie == specie ) break;
-            source = source->next;
-        }
-
-        // --- otherwise create a new source object
-        //     default is concen source with zero strength and no pattern
-
-        if ( source == NULL )
-        {
-            source = (struct Ssource *) malloc(sizeof(struct Ssource));
-            if ( source == NULL ) return 101;
-            source->next = Node[node].sources;
-            Node[node].sources = source;
-            
-            source->c0 = 0.0;
-            source->pat = 0;
-            source->specie = specie;
-            source->type = CONCEN;
-        }
-
-        // --- save source's properties
-
-        if ( code == ENMSX_SOURCEQUAL ) source->c0 = value;
-        else if ( code == ENMSX_SOURCEPAT )  {
-            if ( (int)value < 1 || (int)value > Nobjects[TIME_PATTERN] ) return(ERR_INDEX_VALUE);
-            source->pat = (int)value;
-        }
-        else if ( code == ENMSX_SOURCETYPE ) {
-            if ( (int)value < CONCEN || (int)value > FLOWPACED ) return(ERR_PARAM_CODE);
-            source->type = (int)value;
-        }
         break;
     default: return(ERR_PARAM_CODE);
     }
@@ -700,6 +717,84 @@ int  DLLEXPORT  ENMSXsetlinkqual(int link, int specie, int code, double value)
 }
 
 //=============================================================================
+int  DLLEXPORT  ENMSXsetsourcequal(int node, int specie, int code, double value)
+/*
+**  Purpose:
+**    sets source properties associated with a water quality analysis.
+**
+**  Input:
+**    node = node index (base 1).
+**    specie = index of BULK water quality specie (base 1).
+**    code = parameter code (see EPANETMSX.H)
+**    value = value to set associated with parameter code
+**      (see EPANETMSX.H for valid source type values)
+**
+**  Output:
+**    None.
+**
+**  Returns:
+**    an error code (or 0 for no error).
+**
+**  Note:
+**    If no source exists for node and specie, a new CONCEN source is created
+**    with no pattern and zero strength.
+*/
+{
+    Psource source=NULL;
+
+    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if ( node <= 0 || node > Nobjects[NODE] ||
+        specie <= 0 || specie > Nobjects[SPECIE] )
+        return(ERR_INDEX_VALUE);
+    if ( Specie[specie].type != BULK ) return(ERR_INDEX_VALUE);
+
+    switch (code)
+    {
+    case ENMSX_SOURCEQUAL:
+    case ENMSX_SOURCEPAT:
+    case ENMSX_SOURCETYPE:
+        source = Node[node].sources;
+
+        // --- check if a source for this specie already exists
+
+        while ( source )
+        {
+            if ( source->specie == specie ) break;
+            source = source->next;
+        }
+
+        // --- otherwise create a new source object
+        //     default is concen source with zero strength and no pattern
+
+        if ( source == NULL )
+        {
+            source = (struct Ssource *) malloc(sizeof(struct Ssource));
+            if ( source == NULL ) return 101;
+            source->next = Node[node].sources;
+            Node[node].sources = source;
+            
+            source->c0 = 0.0;
+            source->pat = 0;
+            source->specie = specie;
+            source->type = CONCEN;
+        }
+
+        // --- save source's properties
+
+        if ( code == ENMSX_SOURCEQUAL ) source->c0 = value;
+        else if ( code == ENMSX_SOURCEPAT )  {
+            if ( (int)value < 1 || (int)value > Nobjects[TIME_PATTERN] ) return(ERR_INDEX_VALUE);
+            source->pat = (int)value;
+        }
+        else if ( code == ENMSX_SOURCETYPE ) {
+            if ( (int)value < CONCEN || (int)value > FLOWPACED ) return(ERR_PARAM_CODE);
+            source->type = (int)value;
+        }
+        break;
+    default: return(ERR_PARAM_CODE);
+    }
+    return 0;
+}
 
 int  DLLEXPORT  ENMSXsetpattern(int index, double *f, int n)
 /*----------------------------------------------------------------

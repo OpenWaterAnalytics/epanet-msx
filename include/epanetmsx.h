@@ -17,10 +17,10 @@
 #define ENMSX_PARAMCOUNT      2
 #define ENMSX_CONSTCOUNT      3
 #define ENMSX_PATCOUNT        4
-#define ENMSX_INITQUAL        0     /* Node values */
-#define ENMSX_SOURCEQUAL      1
-#define ENMSX_SOURCEPAT       2
-#define ENMSX_SOURCETYPE      3
+#define ENMSX_INITQUAL        0     /* Node and Link values */
+#define ENMSX_SOURCEQUAL      0     /* Source values */
+#define ENMSX_SOURCEPAT       1
+#define ENMSX_SOURCETYPE      2
 #define ENMSX_CONCEN          0     /* Source types */
 #define ENMSX_MASS            1
 #define ENMSX_SETPOINT        2

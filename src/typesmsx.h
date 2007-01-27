@@ -294,7 +294,7 @@ typedef struct                         // FILE OBJECT
                   s_OPTION,
                   s_REPORT};
 
- enum ErrorCodeType                    // Error codes (501-515)
+ enum ErrorCodeType                    // Error codes (501-520)
           {ERR_FIRST = 500,
            ERR_MEMORY,                 // 501
            ERR_NO_EPANET_FILE,         // 502

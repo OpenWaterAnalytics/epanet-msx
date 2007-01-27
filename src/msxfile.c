@@ -26,7 +26,7 @@ static char *MSsectWords[] = {
         "[PIPE",  "[TANK",    "[SOURCE", "[QUALITY",
         "[PARAM", "[PATTERN", "[OPTION",
         "[REPORT", NULL};
-static char *SourceTypeWords[] = {"CONC", "MASS", "FLOW", "SETPOINT", NULL};
+static char *SourceTypeWords[] = {"CONC", "MASS", "SETPOINT", "FLOW", NULL};
 
 // Exported Functions
 // ------------------
