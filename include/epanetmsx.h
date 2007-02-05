@@ -41,6 +41,7 @@ int  DLLEXPORT ENMSXgetlinkqual(int n, int specie, double *c);
 int  DLLEXPORT ENMSXgetspecieindex(char *id, int *index);
 int  DLLEXPORT ENMSXgetspecieID(int index, char *id);
 int  DLLEXPORT ENMSXgetspecietype(int index, int *code);
+int  DLLEXPORT ENMSXgetsourcequal(int node, int specie, int code, double *value);
 int  DLLEXPORT ENMSXstep(long *t, long *tleft);
 int  DLLEXPORT ENMSXsaveoutfile(char *fname);
 int  DLLEXPORT ENMSXreport(void);
@@ -55,7 +56,8 @@ int  DLLEXPORT ENMSXgetpatternvalue(int index, int period, double *value);
 int  DLLEXPORT ENMSXsetpattern(int index, double *f, int n);
 int  DLLEXPORT ENMSXsetpatternvalue(int index, int period, double value);
 int  DLLEXPORT ENMSXcreatepattern(char *id);
-int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value);
-int  DLLEXPORT  ENMSXsetlinkqual(int link, int specie, int code, double value);
+int  DLLEXPORT ENMSXsetnodequal(int node, int specie, int code, double value);
+int  DLLEXPORT ENMSXsetlinkqual(int link, int specie, int code, double value);
+int  DLLEXPORT ENMSXsetsourcequal(int node, int specie, int code, double value);
 
 #endif

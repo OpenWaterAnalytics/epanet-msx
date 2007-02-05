@@ -657,8 +657,6 @@ int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value)
 **  Returns:
 **    an error code (or 0 for no error).
 **
-**  Note:
-**    If no source exists for node and specie, a new CONCEN source is created
 */
 {
     if (!ProjectOpened) return(ERR_NO_PROJECT);
