@@ -160,7 +160,7 @@ typedef struct Sseg *Pseg;
 
 typedef struct                         // FILE OBJECT
 {
-   char          name[L_tmpnam];       // file name
+   char          name[FILENAME_MAX];   // file name
    char          mode;                 // see FileModeType enumeration below
    FILE*         file;                 // FILE structure pointer
 }  TFile;

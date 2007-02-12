@@ -179,11 +179,10 @@ Writes network data to text file.
     if (ftmp != NULL)
     {
         fseek(ftmp, 0, SEEK_SET);
-        do
+        while ( ( j = fgetc(ftmp) ) != EOF )
         {
-            j = fgetc(ftmp);
             fputc(j, f);
-        }  while (j != EOF);
+        }
         fclose(ftmp);
     } 
 
