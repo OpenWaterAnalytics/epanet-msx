@@ -4,7 +4,7 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00 
+**  VERSION:       1.00
 **  LAST UPDATE:   10/5/06
 *******************************************************************************/
 
@@ -26,10 +26,14 @@
 #define ENMSX_SETPOINT        2
 #define ENMSX_FLOWPACED       3
 
-#ifdef __cplusplus
-#define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
+#ifdef WIN32
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
+  #else
+  #define DLLEXPORT __declspec(dllexport) __stdcall
+  #endif
 #else
-#define DLLEXPORT __declspec(dllexport) __stdcall
+#define DLLEXPORT
 #endif
 
 int  DLLEXPORT ENMSXopen(char *fname);
