@@ -88,12 +88,12 @@ INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
 
 # Files for the shared object library
-epanetmsx_objs=chemistry.o hashmsx.o inputmsx.o mathexpr.o mempool.o newton.o outputmsx.o \
+epanetmsx_objs=chemistry.o hash.o inputmsx.o mathexpr.o mempool.o newton.o outputmsx.o \
 	           project.o qualitymsx.o reportmsx.o rk5.o ros2.o toolkitmsx.o utils.o msxfile.o
 # Epanetmsx main program
 epanetmsx_main_obj=epanetmsx.o
 # Epanetmsx header files
-epanetmsx_heads=globals.h hashmsx.h mathexpr.h mempool.h newton.h rk5.h ros2.h typesmsx.h utils.h \
+epanetmsx_heads=globals.h hash.h mathexpr.h mempool.h newton.h rk5.h ros2.h typesmsx.h utils.h \
 	               $(epanetmsxincludedir)/epanetmsx.h
 # Epanetmsx main program header files
 epanetmsx_main_heads = $(epanetmsxincludedir)/epanetmsx.h

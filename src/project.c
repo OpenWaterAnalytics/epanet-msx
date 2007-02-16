@@ -18,7 +18,7 @@
 #include "globals.h"
 #include "utils.h"
 #include "mempool.h"
-#include "hashmsx.h"
+#include "hash.h"
 
 //  Local variables
 //-----------------
