@@ -22,9 +22,9 @@
 // Macros to identify upstream & downstream nodes of a link
 // under the current flow and to compute link volume
 //
-#define   UP_NODE(x)   ( (FlowDir[(x)]=='+') ? Link[(x)].n1 : Link[(x)].n2 )
-#define   DOWN_NODE(x) ( (FlowDir[(x)]=='+') ? Link[(x)].n2 : Link[(x)].n1 )
-#define   LINKVOL(k)   ( 0.785398*Link[(k)].len*SQR(Link[(k)].diam) )
+#define   UP_NODE(x)   ( (FlowDir[(x)]=='+') ? MSXLink[(x)].n1 : MSXLink[(x)].n2 )
+#define   DOWN_NODE(x) ( (FlowDir[(x)]=='+') ? MSXLink[(x)].n2 : MSXLink[(x)].n1 )
+#define   LINKVOL(k)   ( 0.785398*MSXLink[(k)].len*SQR(MSXLink[(k)].diam) )
 
 //  Exported variables
 //--------------------
@@ -102,10 +102,10 @@ int  quality_open()
     int n;
 
 // --- set flags
-    QualityOpened = FALSE;
+    MSXQualityOpened = FALSE;
     OutOfMemory = FALSE;
     HasWallSpecies = FALSE;
-    Saveflag = 0;
+    MSXSaveflag = 0;
 
 // --- initialize array pointers to null
 
@@ -130,13 +130,13 @@ int  quality_open()
 
 // --- allocate memory used for species concentrations
 
-    X  = createMatrix(Nobjects[NODE]+1, Nobjects[SPECIE]+1);
-    C1 = (double *) calloc(Nobjects[SPECIE]+1, sizeof(double));
+    X  = createMatrix(MSXNobjects[NODE]+1, MSXNobjects[SPECIE]+1);
+    C1 = (double *) calloc(MSXNobjects[SPECIE]+1, sizeof(double));
 
 // --- allocate memory used for pointers to the first, last,
 //     and new WQ segments in each link and tank
 
-    n        = Nobjects[LINK] + Nobjects[TANK] + 1;
+    n        = MSXNobjects[LINK] + MSXNobjects[TANK] + 1;
     FirstSeg = (Pseg *) calloc(n, sizeof(Pseg));
     LastSeg  = (Pseg *) calloc(n, sizeof(Pseg));
     NewSeg   = (Pseg *) calloc(n, sizeof(Pseg));
@@ -148,9 +148,9 @@ int  quality_open()
 // --- allocate memory used to accumulate mass and volume
 //     inflows to each node
 
-    n        = Nobjects[NODE] + 1;
+    n        = MSXNobjects[NODE] + 1;
     VolIn    = (double *) calloc(n, sizeof(double));
-    MassIn   = createMatrix(n, Nobjects[SPECIE]+1);
+    MassIn   = createMatrix(n, MSXNobjects[SPECIE]+1);
 
 // --- check for successful memory allocation
 
@@ -165,11 +165,11 @@ int  quality_open()
 
 // --- check if wall species are present
 
-    for (n=1; n<=Nobjects[SPECIE]; n++)
+    for (n=1; n<=MSXNobjects[SPECIE]; n++)
     {
-        if ( Specie[n].type == WALL ) HasWallSpecies = TRUE;
+        if ( MSXSpecie[n].type == WALL ) HasWallSpecies = TRUE;
     }
-    if ( !errcode ) QualityOpened = TRUE;
+    if ( !errcode ) MSXQualityOpened = TRUE;
     return(errcode);
 }
 
@@ -192,36 +192,36 @@ int  quality_init()
 
 // --- initialize node concentrations, tank volumes, & source mass flows
 
-    for (i=1; i<=Nobjects[NODE]; i++)
+    for (i=1; i<=MSXNobjects[NODE]; i++)
     {
-        for (m=1; m<=Nobjects[SPECIE]; m++) Node[i].c[m] = Node[i].c0[m];
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) MSXNode[i].c[m] = MSXNode[i].c0[m];
     }
-    for (i=1; i<=Nobjects[TANK]; i++)
+    for (i=1; i<=MSXNobjects[TANK]; i++)
     {
-        Tank[i].hstep = 0.0;
-        Tank[i].v = Tank[i].v0;
-        n = Tank[i].node;
-        for (m=1; m<=Nobjects[SPECIE]; m++) Tank[i].c[m] = Node[n].c0[m];
+        MSXTank[i].hstep = 0.0;
+        MSXTank[i].v = MSXTank[i].v0;
+        n = MSXTank[i].node;
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) MSXTank[i].c[m] = MSXNode[n].c0[m];
     }
-    for (i=1; i<=Nobjects[TIME_PATTERN]; i++)
+    for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
     {
-        Pattern[i].interval = 0;
-        Pattern[i].current = Pattern[i].first;
+        MSXPattern[i].interval = 0;
+        MSXPattern[i].current = MSXPattern[i].first;
     }
 
 // --- check if a separate WQ report is required
 
-    Rptflag = 0;
+    MSXRptflag = 0;
     n = 0;
-    for (i=1; i<=Nobjects[NODE]; i++) n += Node[i].rpt;
-    for (i=1; i<=Nobjects[LINK]; i++) n += Link[i].rpt;
+    for (i=1; i<=MSXNobjects[NODE]; i++) n += MSXNode[i].rpt;
+    for (i=1; i<=MSXNobjects[LINK]; i++) n += MSXLink[i].rpt;
     if ( n > 0 )
     {
         n = 0;
-        for (m=1; m<=Nobjects[SPECIE]; m++) n += Specie[m].rpt;
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) n += MSXSpecie[m].rpt;
     }
-    if ( n > 0 ) Rptflag = 1;
-    if ( Rptflag ) Saveflag = 1;
+    if ( n > 0 ) MSXRptflag = 1;
+    if ( MSXRptflag ) MSXSaveflag = 1;
 
 // --- reset memory pool
 
@@ -231,18 +231,18 @@ int  quality_init()
 
 // --- re-position hydraulics file
 
-    fseek(HydFile.file, HydOffset, SEEK_SET);
+    fseek(MSXHydFile.file, MSXHydOffset, SEEK_SET);
 
 // --- set elapsed times to zero
 
-    Htime = 0;                         //Hydraulic solution time
-    Qtime = 0;                         //Quality routing time
-    Rtime = Rstart;                    //Reporting time
-    Nperiods = 0;                      //Number fo reporting periods
+    MSXHtime = 0;                         //Hydraulic solution time
+    MSXQtime = 0;                         //Quality routing time
+    MSXRtime = MSXRstart;                 //Reporting time
+    MSXNperiods = 0;                      //Number fo reporting periods
 
 // --- open binary output file if results are to be saved
 
-    if ( Saveflag ) errcode = output_open();
+    if ( MSXSaveflag ) errcode = output_open();
     return errcode;
 }
 
@@ -275,7 +275,7 @@ int quality_step(long *t, long *tleft)
 //     and the overall time step to nominal WQ time step
 
     AllocSetPool(QualPool);
-    tstep = Qstep;
+    tstep = MSXQstep;
 
 // --- repeat until the end of the time step
 
@@ -283,7 +283,7 @@ int quality_step(long *t, long *tleft)
     {
     // --- find the time until the next hydraulic event occurs
         dt = tstep;
-        hstep = Htime - Qtime;
+        hstep = MSXHtime - MSXQtime;
 
     // --- check if next hydraulic event occurs within the current time step
 
@@ -295,17 +295,17 @@ int quality_step(long *t, long *tleft)
 
         // --- route WQ over this time step
             if ( dt > 0 ) ERRCODE(transport(dt));
-            Qtime += dt;
+            MSXQtime += dt;
 
         // --- retrieve new hydraulic solution
-            if ( Qtime == Htime ) ERRCODE(getHydVars());
+            if ( MSXQtime == MSXHtime ) ERRCODE(getHydVars());
 
         // --- report results if its time to do so
-            if (Saveflag && Qtime == Rtime)
+            if (MSXSaveflag && MSXQtime == MSXRtime)
             {
                 ERRCODE(output_saveResults());
-                Rtime += Rstep;
-                Nperiods++;
+                MSXRtime += MSXRstep;
+                MSXNperiods++;
             }
         }
 
@@ -314,7 +314,7 @@ int quality_step(long *t, long *tleft)
         else
         {
             ERRCODE(transport(dt));
-            Qtime += dt;
+            MSXQtime += dt;
         }
 
     // --- reduce overall time step by the size of the current time step
@@ -325,12 +325,12 @@ int quality_step(long *t, long *tleft)
 
 // --- update the current time into the simulation and the amount remaining
 
-    *t = Qtime;
-    *tleft = Dur - Qtime;
+    *t = MSXQtime;
+    *tleft = MSXDur - MSXQtime;
 
 // --- if there's no time remaining, then save the final records to output file
 
-    if ( *tleft <= 0 && Saveflag )
+    if ( *tleft <= 0 && MSXSaveflag )
     {
         ERRCODE(output_saveFinalResults());
     }
@@ -356,20 +356,20 @@ double  quality_getNodeQual(int j, int m)
 
 // --- return 0 for WALL species
 
-    if ( Specie[m].type == WALL ) return 0.0;
+    if ( MSXSpecie[m].type == WALL ) return 0.0;
 
 // --- if node is a tank, return its internal concentration
 
-    k = Node[j].tank;
-    if (k > 0 && Tank[k].a > 0.0)
+    k = MSXNode[j].tank;
+    if (k > 0 && MSXTank[k].a > 0.0)
     {
-        return Tank[k].c[m];
+        return MSXTank[k].c[m];
     }
 
 // --- otherwise return node's concentration (which includes
 //     any contribution from external sources)
 
-    return Node[j].c[m];
+    return MSXNode[j].c[m];
 }
 
 //=============================================================================
@@ -401,8 +401,8 @@ double  quality_getLinkQual(int k, int m)
     if (vsum > 0.0) return(msum/vsum);
     else
     {
-        return (quality_getNodeQual(Link[k].n1, m) +
-                quality_getNodeQual(Link[k].n2, m)) / 2.0;
+        return (quality_getNodeQual(MSXLink[k].n1, m) +
+                quality_getNodeQual(MSXLink[k].n2, m)) / 2.0;
     }
 }
 
@@ -421,7 +421,7 @@ int quality_close()
 */
 {
     int errcode = 0;
-    if ( !ProjectOpened ) return 0;
+    if ( !MSXProjectOpened ) return 0;
     chemistry_close();
     FREE(FirstSeg);
     FREE(LastSeg);
@@ -436,7 +436,7 @@ int quality_close()
         AllocSetPool(QualPool);
         AllocFreePool();
     }
-    QualityOpened = FALSE;
+    MSXQualityOpened = FALSE;
     return errcode;
 }
 
@@ -456,8 +456,8 @@ int  getHydVars()
 **
 **   NOTE:
 **     A hydraulic solution consists of the current time
-**     (hydtime), nodal demands (D) and heads (H), link
-**     flows (Q), and link status values and settings (which are not used).
+**     (hydtime), nodal demands (MSXD) and heads (MSXH), link
+**     flows (MSXQ), and link status values and settings (which are not used).
 */
 {
     int n, errcode = 0;
@@ -465,31 +465,31 @@ int  getHydVars()
 
 // --- read hydraulic time, demands, heads, and flows from the file
 
-    if (fread(&hydtime, sizeof(long), 1, HydFile.file) < 1)  return 307;
-    n = Nobjects[NODE];
-    if (fread(D+1, sizeof(float), n, HydFile.file) < (unsigned)n) return 307;
-    if (fread(H+1, sizeof(float), n, HydFile.file) < (unsigned)n) return 307;
-    n = Nobjects[LINK];
-    if (fread(Q+1, sizeof(float), n, HydFile.file) < (unsigned)n) return 307;
+    if (fread(&hydtime, sizeof(long), 1, MSXHydFile.file) < 1)  return 307;
+    n = MSXNobjects[NODE];
+    if (fread(MSXD+1, sizeof(float), n, MSXHydFile.file) < (unsigned)n) return 307;
+    if (fread(MSXH+1, sizeof(float), n, MSXHydFile.file) < (unsigned)n) return 307;
+    n = MSXNobjects[LINK];
+    if (fread(MSXQ+1, sizeof(float), n, MSXHydFile.file) < (unsigned)n) return 307;
 
 // --- skip over link status and settings
 
-    fseek(HydFile.file, 2*n*sizeof(float), SEEK_CUR);
+    fseek(MSXHydFile.file, 2*n*sizeof(float), SEEK_CUR);
 
 // --- read time step until next hydraulic event
 
-    if (fread(&hydstep, sizeof(long), 1, HydFile.file) < 1) return 307;
+    if (fread(&hydstep, sizeof(long), 1, MSXHydFile.file) < 1) return 307;
 
 // --- update elapsed time until next hydraulic event
 
-    Htime = hydtime + hydstep;
+    MSXHtime = hydtime + hydstep;
 
 // --- initialize pipe segments (at time 0) or else re-orient segments
 //     to accommodate any flow reversals
 
-    if (Qtime < Dur)
+    if (MSXQtime < MSXDur)
     {
-        if (Qtime == 0) initSegs();
+        if (MSXQtime == 0) initSegs();
         else reorientSegs();
     }
     return(errcode);
@@ -519,8 +519,8 @@ int  transport(long tstep)
     while (!OutOfMemory &&
            !errcode &&
            qtime < tstep)
-    {                                  // Qstep is nominal quality time step
-        dt = MIN(Qstep, tstep-qtime);  // get actual time step
+    {                                  // MSXQstep is nominal quality time step
+        dt = MIN(MSXQstep, tstep-qtime);  // get actual time step
         qtime += dt;                   // update amount of input tstep taken
         errcode = chemistry_react(dt); // react species in each pipe & tank
         if ( errcode ) return errcode;
@@ -549,12 +549,12 @@ void  initSegs()
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
     // --- establish flow direction
 
         FlowDir[k] = '+';
-        if (Q[k] < 0.) FlowDir[k] = '-';
+        if (MSXQ[k] < 0.) FlowDir[k] = '-';
 
     // --- start with no segments
 
@@ -566,10 +566,10 @@ void  initSegs()
     //     if no initial link quality supplied
 
         j = DOWN_NODE(k);
-        for (m=1; m<=Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( Link[k].c0[m] != MISSING )    C1[m] = Link[k].c0[m];
-            else if ( Specie[m].type == BULK ) C1[m] = Node[j].c0[m];
+            if ( MSXLink[k].c0[m] != MISSING )    C1[m] = MSXLink[k].c0[m];
+            else if ( MSXSpecie[m].type == BULK ) C1[m] = MSXNode[j].c0[m];
             else                               C1[m] = 0.0;
         }
 
@@ -581,28 +581,28 @@ void  initSegs()
 
 // --- initialize segments in tanks that use them
 
-    for (j=1; j<=Nobjects[TANK]; j++)
+    for (j=1; j<=MSXNobjects[TANK]; j++)
     {
     // --- skip reservoirs & complete mix tanks
 
-        if (Tank[j].a == 0.0
-        ||  Tank[j].mixModel == MIX1) continue;
+        if (MSXTank[j].a == 0.0
+        ||  MSXTank[j].mixModel == MIX1) continue;
 
     // --- tank segment pointers are stored after those for links
 
-        k = Tank[j].node;
-        for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = Node[k].c0[m];
-        k = Nobjects[LINK] + j;
+        k = MSXTank[j].node;
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = MSXNode[k].c0[m];
+        k = MSXNobjects[LINK] + j;
         LastSeg[k] = NULL;
         FirstSeg[k] = NULL;
 
     // --- add 2 segments for 2-compartment model
 
-        if (Tank[j].mixModel == MIX2)
+        if (MSXTank[j].mixModel == MIX2)
         {
-            v = MAX(0, Tank[j].v-Tank[j].v1max);
+            v = MAX(0, MSXTank[j].v-MSXTank[j].v1max);
             addSeg(k, getFreeSeg(v, C1));
-            v = Tank[j].v - v;
+            v = MSXTank[j].v - v;
             addSeg(k, getFreeSeg(v, C1));
         }
 
@@ -610,7 +610,7 @@ void  initSegs()
 
         else
         {
-            v = Tank[j].v;
+            v = MSXTank[j].v;
             addSeg(k, getFreeSeg(v, C1));
         }
     }
@@ -633,13 +633,13 @@ void  reorientSegs()
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
     // --- find new flow direction
 
         newdir = '+';
-        if (Q[k] == 0.0)     newdir = FlowDir[k];
-        else if (Q[k] < 0.0) newdir = '-';
+        if (MSXQ[k] == 0.0)     newdir = FlowDir[k];
+        else if (MSXQ[k] < 0.0) newdir = '-';
 
     // --- if direction changes, then reverse the order of segments
     //     (first to last) and save new direction
@@ -738,7 +738,7 @@ Pseg getFreeSeg(double v, double c[])
             OutOfMemory = TRUE;
             return NULL;
         }
-        seg->c = (double *) Alloc((Nobjects[SPECIE]+1)*sizeof(double));
+        seg->c = (double *) Alloc((MSXNobjects[SPECIE]+1)*sizeof(double));
         if ( seg->c == NULL )
         {
             OutOfMemory = TRUE;
@@ -749,7 +749,7 @@ Pseg getFreeSeg(double v, double c[])
 // --- assign volume, WQ, & integration time step to the new segment
 
     seg->v = v;
-    for (m=1; m<=Nobjects[SPECIE]; m++) seg->c[m] = c[m];
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) seg->c[m] = c[m];
     seg->hstep = 0.0;
     return seg;
 }
@@ -792,11 +792,11 @@ void advectSegs(long dt)
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
     // --- zero out WQ in new segment to be added at entrance of link
 
-        for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = 0.0;
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = 0.0;
 
     // --- get a free segment to add to entrance of link
 
@@ -805,7 +805,7 @@ void advectSegs(long dt)
     // --- skip zero-length links (pumps & valves) & no-flow links
 
         if ( NewSeg[k] == NULL ||
-             Link[(k)].len == 0.0 || Q[k] == 0.0 ) continue;
+             MSXLink[(k)].len == 0.0 || MSXQ[k] == 0.0 ) continue;
 
     // --- find conc. of wall species in new segment to be added
     //     and adjust conc. of wall species to reflect shifted
@@ -825,16 +825,16 @@ void mixWallQual(int k, Pseg newseg)
     int m;
     Pseg  seg;
 
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].type == WALL ) newseg->c[m] = quality_getLinkQual(k, m);
+        if ( MSXSpecie[m].type == WALL ) newseg->c[m] = quality_getLinkQual(k, m);
     }
     seg = FirstSeg[k];
     while (seg != NULL)
     {
-        for (m=1; m<=Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( Specie[m].type == WALL ) seg->c[m] = newseg->c[m];
+            if ( MSXSpecie[m].type == WALL ) seg->c[m] = newseg->c[m];
         }
         seg = seg->prev;
     }
@@ -865,7 +865,7 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
     if ( newseg == NULL ) return;
     v = LINKVOL(k);
-	vin = ABS(Q[k])*dt;
+	vin = ABS(MSXQ[k])*dt;
     if (vin > v) vin = v;
 
 // --- start at last (most upstream) existing WQ segment
@@ -873,9 +873,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 	seg = LastSeg[k];
 	vsum = 0.0;
     vleft = vin;
-    for (m = 1; m <= Nobjects[SPECIE]; m++)
+    for (m = 1; m <= MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].type == WALL ) newseg->c[m] = 0.0;
+        if ( MSXSpecie[m].type == WALL ) newseg->c[m] = 0.0;
     }
 
 // --- repeat while some inflow volume still remains
@@ -895,9 +895,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
     // --- add wall species mass contributed by this segment to new segment
 
-        for (m = 1; m <= Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSXNobjects[SPECIE]; m++)
         {
-            if ( Specie[m].type == WALL ) newseg->c[m] += vadded*seg->c[m];
+            if ( MSXSpecie[m].type == WALL ) newseg->c[m] += vadded*seg->c[m];
         }
 
     // --- move to next downstream WQ segment
@@ -909,9 +909,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
     if ( vsum > 0.0 )
     {
-        for (m = 1; m <= Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSXNobjects[SPECIE]; m++)
         {
-            if ( Specie[m].type == WALL ) newseg->c[m] /= vsum;
+            if ( MSXSpecie[m].type == WALL ) newseg->c[m] /= vsum;
         }
     }
 }
@@ -936,7 +936,7 @@ void shiftSegWallQual(int k, long dt)
 // --- find volume of water displaced in pipe
 
     v = LINKVOL(k);
-	vin = ABS(Q[k])*dt;
+	vin = ABS(MSXQ[k])*dt;
     if (vin > v) vin = v;
 
 // --- set future start position (measured by pipe volume) of original last segment
@@ -949,7 +949,7 @@ void shiftSegWallQual(int k, long dt)
     {
     // --- initialize a "mixture" WQ
 
-        for (m = 1; m <= Nobjects[SPECIE]; m++) C1[m] = 0.0;
+        for (m = 1; m <= MSXNobjects[SPECIE]; m++) C1[m] = 0.0;
 
     // --- find the future end position of this segment
 
@@ -966,9 +966,9 @@ void shiftSegWallQual(int k, long dt)
             vsum += seg2->v;
             if ( vsum >= vstart && vsum <= vend )
             {
-                for (m = 1; m <= Nobjects[SPECIE]; m++)
+                for (m = 1; m <= MSXNobjects[SPECIE]; m++)
                 {
-                    if ( Specie[m].type == WALL )
+                    if ( MSXSpecie[m].type == WALL )
                         C1[m] += (vsum - vcur) * seg2->c[m];
                 }
                 vcur = vsum;
@@ -978,9 +978,9 @@ void shiftSegWallQual(int k, long dt)
 
     // --- update the wall specie concentrations in the segment
 
-        for (m = 1; m <= Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSXNobjects[SPECIE]; m++)
         {
-            if ( Specie[m].type != WALL ) continue;
+            if ( MSXSpecie[m].type != WALL ) continue;
             if (seg2 != NULL) C1[m] += (vend - vcur) * seg2->c[m];
             seg1->c[m] = C1[m] / (vend - vstart);
             if ( seg1->c[m] < 0.0 ) seg1->c[m] = 0.0;
@@ -1015,17 +1015,17 @@ void accumulate(long dt)
 
 // --- reset cumlulative inflow to each node to zero
 
-    memset(VolIn, 0, (Nobjects[NODE]+1)*sizeof(double));
-    n = (Nobjects[NODE]+1)*(Nobjects[SPECIE]+1);
+    memset(VolIn, 0, (MSXNobjects[NODE]+1)*sizeof(double));
+    n = (MSXNobjects[NODE]+1)*(MSXNobjects[SPECIE]+1);
     memset(MassIn[0], 0, n*sizeof(double));
 
 // --- move mass from first segment of each link into link's downstream node
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
         i = UP_NODE(k);               // upstream node
         j = DOWN_NODE(k);             // downstream node
-        v = ABS(Q[k])*dt;             // flow volume
+        v = ABS(MSXQ[k])*dt;             // flow volume
 
     // --- if link volume < flow volume, then transport upstream node's
     //     quality to downstream node and remove all link segments
@@ -1034,10 +1034,10 @@ void accumulate(long dt)
         {
             VolIn[j] += v;
             seg = FirstSeg[k];
-            for (m=1; m<=Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSXNobjects[SPECIE]; m++)
             {
-                if ( Specie[m].type != BULK ) continue;
-                cseg = Node[i].c[m];
+                if ( MSXSpecie[m].type != BULK ) continue;
+                cseg = MSXNode[i].c[m];
                 if (seg != NULL) cseg = seg->c[m];
                 MassIn[j][m] += v*cseg;
              }
@@ -1064,9 +1064,9 @@ void accumulate(long dt)
 
         // --- update volume & mass entering downstream node
 
-            for (m=1; m<=Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSXNobjects[SPECIE]; m++)
             {
-                if ( Specie[m].type != BULK ) continue;
+                if ( MSXSpecie[m].type != BULK ) continue;
                 cseg = seg->c[m];
                 MassIn[j][m] += vseg*cseg;
             }
@@ -1115,21 +1115,21 @@ void getIncidentConcen()
 
 // --- zero-out memory used to store accumulated totals
 
-    memset(VolIn, 0, (Nobjects[NODE]+1)*sizeof(double));
-    n = (Nobjects[NODE]+1)*(Nobjects[SPECIE]+1);
+    memset(VolIn, 0, (MSXNobjects[NODE]+1)*sizeof(double));
+    n = (MSXNobjects[NODE]+1)*(MSXNobjects[SPECIE]+1);
     memset(MassIn[0], 0, n*sizeof(double));
     memset(X[0], 0, n*sizeof(double));
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
         j = DOWN_NODE(k);             // downstream node
         if (FirstSeg[k] != NULL)      // accumulate concentrations
         {
-            for (m=1; m<=Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSXNobjects[SPECIE]; m++)
             {
-                if ( Specie[m].type == BULK )
+                if ( MSXSpecie[m].type == BULK )
                   MassIn[j][m] += FirstSeg[k]->c[m];
             }
             VolIn[j]++;
@@ -1137,9 +1137,9 @@ void getIncidentConcen()
         j = UP_NODE(k);              // upstream node
         if (LastSeg[k] != NULL)      // accumulate concentrations
         {
-            for (m=1; m<=Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSXNobjects[SPECIE]; m++)
             {
-                if ( Specie[m].type == BULK )
+                if ( MSXSpecie[m].type == BULK )
                     MassIn[j][m] += LastSeg[k]->c[m];
             }
             VolIn[j]++;
@@ -1148,11 +1148,11 @@ void getIncidentConcen()
 
 // --- compute avg. incident concen. at each node
 
-    for (k=1; k<=Nobjects[NODE]; k++)
+    for (k=1; k<=MSXNobjects[NODE]; k++)
     {
         if (VolIn[k] > 0.0)
         {
-            for (m=1; m<=Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSXNobjects[SPECIE]; m++)
                 X[k][m] = MassIn[k][m]/VolIn[k];
         }
     }
@@ -1179,25 +1179,25 @@ void updateNodes(long dt)
 
 // --- examine each node
 
-    for (i=1; i<=Nobjects[NODE]; i++)
+    for (i=1; i<=MSXNobjects[NODE]; i++)
     {
     // --- node is a junction
 
-        j = Node[i].tank;
+        j = MSXNode[i].tank;
         if (j <= 0)
         {
         // --- add any external inflow (i.e., negative demand)
         //     to total inflow volume
 
-            if (D[i] < 0.0) VolIn[i] -= D[i]*dt;
+            if (MSXD[i] < 0.0) VolIn[i] -= MSXD[i]*dt;
 
         // --- if inflow volume is non-zero, then compute the mixture
         //     concentration resulting at the node
 
             if (VolIn[i] > 0.0)
             {
-                for (m=1; m<=Nobjects[SPECIE]; m++)
-                    Node[i].c[m] = MassIn[i][m]/VolIn[i];
+                for (m=1; m<=MSXNobjects[SPECIE]; m++)
+                    MSXNode[i].c[m] = MassIn[i][m]/VolIn[i];
             }
 
         // --- otherwise use the avg. of the concentrations in the
@@ -1205,13 +1205,13 @@ void updateNodes(long dt)
 
             else
             {
-                for (m=1; m<=Nobjects[SPECIE]; m++)
-                    Node[i].c[m] = X[i][m];
+                for (m=1; m<=MSXNobjects[SPECIE]; m++)
+                    MSXNode[i].c[m] = X[i][m];
             }
 
         // --- compute new equilibrium mixture
 
-            chemistry_equil(NODE, Node[i].c);
+            chemistry_equil(NODE, MSXNode[i].c);
         }
 
     // --- node is a tank
@@ -1220,15 +1220,15 @@ void updateNodes(long dt)
         {
         // --- use initial quality for reservoirs
 
-            if (Tank[j].a == 0.0)
+            if (MSXTank[j].a == 0.0)
             {
-                for (m=1; m<=Nobjects[SPECIE]; m++)
-                    Node[i].c[m] = Node[i].c0[m];
+                for (m=1; m<=MSXNobjects[SPECIE]; m++)
+                    MSXNode[i].c[m] = MSXNode[i].c0[m];
             }
 
         // --- otherwise update tank WQ based on mixing model
 
-            else switch(Tank[j].mixModel)
+            else switch(MSXTank[j].mixModel)
             {
             //case MIX2: tankmix2(i,dt); break;
             //case FIFO: tankmix3(i,dt); break;
@@ -1261,17 +1261,17 @@ void sourceInput(long dt)
 
 // --- consider each node
 
-    for (n=1; n<=Nobjects[NODE]; n++)
+    for (n=1; n<=MSXNobjects[NODE]; n++)
     {
     // --- skip node if no WQ source
 
-        source = Node[n].sources;
+        source = MSXNode[n].sources;
         if (source == NULL) continue;
 
     // --- find total flow volume leaving node
 
-        if (Node[n].tank == 0) volout = VolIn[n];  // Junctions
-        else volout = VolIn[n] - D[n]*dt;          // Tanks
+        if (MSXNode[n].tank == 0) volout = VolIn[n];  // Junctions
+        else volout = VolIn[n] - MSXD[n]*dt;          // Tanks
         qout = volout / (double) dt;
 
     // --- evaluate source input only if node outflow > cutoff flow
@@ -1288,7 +1288,7 @@ void sourceInput(long dt)
 
     // --- compute a new chemical equilibrium at the source node
 
-        chemistry_equil(NODE, Node[n].c);
+        chemistry_equil(NODE, MSXNode[n].c);
     }
 }
 
@@ -1313,7 +1313,7 @@ void addSource(int n, Psource source, double volout, long dt)
 
     m = source->specie;
     massadded = 0.0;
-    if (source->c0 > 0.0 && Specie[m].type == BULK)
+    if (source->c0 > 0.0 && MSXSpecie[m].type == BULK)
     {
 
     // --- mass added depends on type of source
@@ -1328,12 +1328,12 @@ void addSource(int n, Psource source, double volout, long dt)
 
           // Only add source mass if demand is negative
 
-              if (D[n] < 0.0) massadded = -s*D[n]*dt;
+              if (MSXD[n] < 0.0) massadded = -s*MSXD[n]*dt;
 
           // If node is a tank then set concen. to 0.
           // (It will be re-set to true value later on)
 
-              if (Node[n].tank > 0) Node[n].c[m] = 0.0;
+              if (MSXNode[n].tank > 0) MSXNode[n].c[m] = 0.0;
               break;
 
         // Mass Inflow Booster Source:
@@ -1347,7 +1347,7 @@ void addSource(int n, Psource source, double volout, long dt)
         // & node concen. times outflow volume
 
           case SETPOINT:
-              if (s > Node[n].c[m]) massadded = (s - Node[n].c[m])*volout;
+              if (s > MSXNode[n].c[m]) massadded = (s - MSXNode[n].c[m])*volout;
               break;
 
         // Flow-Paced Booster Source:
@@ -1360,7 +1360,7 @@ void addSource(int n, Psource source, double volout, long dt)
 
     // --- adjust nodal concentration to reflect source addition
 
-        Node[n].c[m] += massadded/volout;
+        MSXNode[n].c[m] += massadded/volout;
     }
 }
 
@@ -1382,11 +1382,11 @@ void release(long dt)
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
     // --- ignore links with no flow
 
-        if (Q[k] == 0.0)
+        if (MSXQ[k] == 0.0)
         {
             removeSeg(NewSeg[k]);
             continue;
@@ -1396,14 +1396,14 @@ void release(long dt)
     //     (NOTE: Flow volume is allowed to be > link volume.)
 
         n = UP_NODE(k);
-        q = ABS(Q[k]);
+        q = ABS(MSXQ[k]);
         v = q*dt;
 
     // --- place bulk WQ at upstream node in new segment identified for link
 
-        for (m=1; m<=Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( Specie[m].type == BULK ) NewSeg[k]->c[m] = Node[n].c[m];
+            if ( MSXSpecie[m].type == BULK ) NewSeg[k]->c[m] = MSXNode[n].c[m];
         }
 
     // --- if link has no last segment, then we must add a new one
@@ -1415,9 +1415,9 @@ void release(long dt)
     // --- otherwise check if quality in last segment
     //     differs from that of the new segment
 
-        else for (m=1; m<=Nobjects[SPECIE]; m++)
+        else for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( ABS(seg->c[m] - NewSeg[k]->c[m]) >= Specie[m].aTol )
+            if ( ABS(seg->c[m] - NewSeg[k]->c[m]) >= MSXSpecie[m].aTol )
             {
                 useNewSeg = 1;
                 break;
@@ -1462,27 +1462,27 @@ void  tankMix1(int i, long dt)
 
 // --- blend inflow with contents
 
-    n = Tank[i].node;
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    n = MSXTank[i].node;
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].type != BULK ) continue;
-        c = Tank[i].c[m];
+        if ( MSXSpecie[m].type != BULK ) continue;
+        c = MSXTank[i].c[m];
         cin = 0.0;
         if (VolIn[n] > 0.0) cin = MassIn[n][m]/VolIn[n];
-        if (Tank[i].v > 0.0) c = c + (cin - c)*VolIn[n]/Tank[i].v;
+        if (MSXTank[i].v > 0.0) c = c + (cin - c)*VolIn[n]/MSXTank[i].v;
         else c = cin;
         c = MAX(0.0, c);
-        Tank[i].c[m] = c;
+        MSXTank[i].c[m] = c;
     }
 
 // --- update species equilibrium
 
-    if ( VolIn[n] > 0.0 ) chemistry_equil(NODE, Tank[i].c);
-    for (m=1; m<=Nobjects[SPECIE]; m++) Node[n].c[m] = Tank[i].c[m];
+    if ( VolIn[n] > 0.0 ) chemistry_equil(NODE, MSXTank[i].c);
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) MSXNode[n].c[m] = MSXTank[i].c[m];
 
 // --- update tank volume
 
-    Tank[i].v += D[n]*dt;
+    MSXTank[i].v += MSXD[n]*dt;
 }
 
 //=============================================================================
@@ -1507,20 +1507,20 @@ double  getSourceQual(Psource source)
 // --- apply time pattern if assigned
     i = source->pat;
     if (i == 0) return(c);
-    k = ((Qtime+Pstart)/Pstep) % Pattern[i].length;
-    if (k != Pattern[i].interval)
+    k = ((MSXQtime+MSXPstart)/MSXPstep) % MSXPattern[i].length;
+    if (k != MSXPattern[i].interval)
     {
-        if ( k < Pattern[i].interval )
+        if ( k < MSXPattern[i].interval )
         {
-            Pattern[i].current = Pattern[i].first;
-            Pattern[i].interval = 0;
+            MSXPattern[i].current = MSXPattern[i].first;
+            MSXPattern[i].interval = 0;
         }
-        while (Pattern[i].current && Pattern[i].interval < k)
+        while (MSXPattern[i].current && MSXPattern[i].interval < k)
         {
-             Pattern[i].current = Pattern[i].current->next;
-             Pattern[i].interval++;
+             MSXPattern[i].current = MSXPattern[i].current->next;
+             MSXPattern[i].interval++;
         }
     }
-    if (Pattern[i].current) f = Pattern[i].current->value;
+    if (MSXPattern[i].current) f = MSXPattern[i].current->value;
     return c*f;
 }

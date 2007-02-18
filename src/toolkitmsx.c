@@ -62,7 +62,7 @@ int  DLLEXPORT  ENMSXopen(char *fname)
 */
 {
     int errcode = 0;
-    if (ProjectOpened) return(ERR_PROJECT_OPENED);
+    if (MSXProjectOpened) return(ERR_PROJECT_OPENED);
     ERRCODE(project_open(fname));
     ERRCODE(quality_open());
     return errcode;
@@ -82,7 +82,7 @@ int  DLLEXPORT  ENMSXclose()
 **    an error code (or 0 for no error).
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
     quality_close();
     project_close();
     return 0;
@@ -105,7 +105,7 @@ int DLLEXPORT ENMSXsavemsxfile(char *filename)
 **    error code
 */
 {
-   if (!ProjectOpened) return(ERR_NO_PROJECT);
+   if (!MSXProjectOpened) return(ERR_NO_PROJECT);
    return(savemsxfile(filename));
 }
 
@@ -127,30 +127,30 @@ int   DLLEXPORT  ENMSXsolveH()
 {
     int errcode = 0;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
 
 // --- close & remove any existing hydraulics file
 
-    if ( HydFile.file )
+    if ( MSXHydFile.file )
     {
-        fclose(HydFile.file);
-        HydFile.file = NULL;
+        fclose(MSXHydFile.file);
+        MSXHydFile.file = NULL;
     }
-    if ( HydFile.mode == SCRATCH_FILE ) remove(HydFile.name);
+    if ( MSXHydFile.mode == SCRATCH_FILE ) remove(MSXHydFile.name);
 
 // --- create a temporary hydraulics file
 
-    tmpnam(HydFile.name);
+    tmpnam(MSXHydFile.name);
 
 // --- use EPANET to solve for & save hydraulics results
 
     ERRCODE(ENsolveH());
-    ERRCODE(ENsavehydfile(HydFile.name));
-    ERRCODE(ENMSXusehydfile(HydFile.name));
+    ERRCODE(ENsavehydfile(MSXHydFile.name));
+    ERRCODE(ENMSXusehydfile(MSXHydFile.name));
 
 // --- make sure file is declared temporary
 
-    HydFile.mode = SCRATCH_FILE;
+    MSXHydFile.mode = SCRATCH_FILE;
     return errcode;
 }
 
@@ -172,31 +172,31 @@ int   DLLEXPORT  ENMSXusehydfile(char *fname)
     int version;
     int n;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
 
 // --- open hydraulics file
 
-    if ( HydFile.file ) fclose(HydFile.file);
-    HydFile.mode = USED_FILE;
-    HydFile.file = fopen(fname, "rb");
-    if (!HydFile.file) return 504;
+    if ( MSXHydFile.file ) fclose(MSXHydFile.file);
+    MSXHydFile.mode = USED_FILE;
+    MSXHydFile.file = fopen(fname, "rb");
+    if (!MSXHydFile.file) return 504;
 
 // --- check that file is really a hydraulics file for current project
 
-    fread(&magic, sizeof(int), 1, HydFile.file);
+    fread(&magic, sizeof(int), 1, MSXHydFile.file);
     if ( magic != MAGICNUMBER ) return 505;
-    fread(&version, sizeof(int), 1, HydFile.file);
+    fread(&version, sizeof(int), 1, MSXHydFile.file);
     //if ( version != VERSION ) return 505;
-    fread(&n, sizeof(int), 1, HydFile.file);
-    if ( n != Nobjects[NODE] ) return 505;
-    fread(&n, sizeof(int), 1, HydFile.file);
-    if ( n != Nobjects[LINK] ) return 505;
-    fseek(HydFile.file, 3*sizeof(int), SEEK_CUR);
+    fread(&n, sizeof(int), 1, MSXHydFile.file);
+    if ( n != MSXNobjects[NODE] ) return 505;
+    fread(&n, sizeof(int), 1, MSXHydFile.file);
+    if ( n != MSXNobjects[LINK] ) return 505;
+    fseek(MSXHydFile.file, 3*sizeof(int), SEEK_CUR);
 
 // --- read length of simulation period covered by file
 
-    fread(&Dur, sizeof(int), 1, HydFile.file);
-    HydOffset = ftell(HydFile.file);
+    fread(&MSXDur, sizeof(int), 1, MSXHydFile.file);
+    MSXHydOffset = ftell(MSXHydFile.file);
     return 0;
 }
 
@@ -215,8 +215,8 @@ int  DLLEXPORT  ENMSXinit(int saveFlag)
 */
 {
     int errcode = 0;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    Saveflag = saveFlag;
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    MSXSaveflag = saveFlag;
     ERRCODE(quality_init());
     return errcode;
 }
@@ -239,7 +239,7 @@ int  DLLEXPORT  ENMSXstep(long *t, long *tleft)
 **    an error code (or 0 for no error).
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
     return quality_step(t, tleft);
 }
 
@@ -264,8 +264,8 @@ int  DLLEXPORT  ENMSXreport()
 **    the MSX input file.
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( Rptflag ) return report_write();
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( MSXRptflag ) return report_write();
     else return 0;
 }
 
@@ -286,11 +286,11 @@ int  DLLEXPORT  ENMSXsaveoutfile(char *fname)
     FILE *f;
     int   c;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( !OutFile.file ) return 511;
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( !MSXOutFile.file ) return 511;
     if ( (f = fopen(fname,"w+b") ) == NULL) return 511;
-    fseek(OutFile.file, 0, SEEK_SET);
-    while ( (c = fgetc(OutFile.file)) != EOF) fputc(c, f);
+    fseek(MSXOutFile.file, 0, SEEK_SET);
+    while ( (c = fgetc(MSXOutFile.file)) != EOF) fputc(c, f);
     fclose(f);
     return 0;
 }
@@ -304,7 +304,7 @@ int  DLLEXPORT  ENMSXgetcount(int code, int *count)
 **  Purpose: retrieves the number of components of a
 **           given type in the network
 **
-**  Input:   code = component code (see EPANETMSX.H)
+**  Input:   code = component code (see EPANETMSX.MSXH)
 **
 **  Output:  *count = number of components in network
 **
@@ -312,14 +312,14 @@ int  DLLEXPORT  ENMSXgetcount(int code, int *count)
 */
 {
     *count = 0;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
     switch (code)
     {
-    case ENMSX_SPECIESCOUNT:    *count = Nobjects[SPECIE];    break;
-    case ENMSX_TERMCOUNT:       *count = Nobjects[TERM];    break;
-    case ENMSX_PARAMCOUNT:      *count = Nobjects[PARAMETER];    break;
-    case ENMSX_CONSTCOUNT:      *count = Nobjects[CONSTANT];    break;
-    case ENMSX_PATCOUNT:        *count = Nobjects[TIME_PATTERN];    break;
+    case ENMSX_SPECIESCOUNT:    *count = MSXNobjects[SPECIE];    break;
+    case ENMSX_TERMCOUNT:       *count = MSXNobjects[TERM];    break;
+    case ENMSX_PARAMCOUNT:      *count = MSXNobjects[PARAMETER];    break;
+    case ENMSX_CONSTCOUNT:      *count = MSXNobjects[CONSTANT];    break;
+    case ENMSX_PATCOUNT:        *count = MSXNobjects[TIME_PATTERN];    break;
     default: return(ERR_PARAM_CODE);
     }
     return(0);
@@ -365,7 +365,7 @@ int  DLLEXPORT  ENMSXgetspecieindex(char *id, int *index)
 */
 {
     int i;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
     i = project_findObject(SPECIE, id);
     *index = 0;
     if (i >= 1) *index = i;
@@ -393,10 +393,10 @@ int  DLLEXPORT  ENMSXgetspecieID(int index, char *id)
 **    up to 16 characters.
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( index >= 1 && index <= Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( index >= 1 && index <= MSXNobjects[SPECIE] )
     {
-        strcpy(id, Specie[index].id);
+        strcpy(id, MSXSpecie[index].id);
     }
     else strcpy(id, "");
     return 0;
@@ -419,10 +419,10 @@ int DLLEXPORT  ENMSXgetspecietype(int index, int *code)
 **    an error code (or 0 for no error).
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( index >= 1 && index <= Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( index >= 1 && index <= MSXNobjects[SPECIE] )
     {
-        *code = Specie[index].type;
+        *code = MSXSpecie[index].type;
     }
     else *code = 0;
     return 0;
@@ -441,10 +441,10 @@ int  DLLEXPORT  ENMSXgetpatternindex(char *id, int *index)
 {
     int i;
     *index = 0;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    for (i=1; i<=Nobjects[TIME_PATTERN]; i++)
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
     {
-        if (strcmp(id, Pattern[i].id) == 0)
+        if (strcmp(id, MSXPattern[i].id) == 0)
         {
             *index = i;
             return(0);
@@ -468,9 +468,9 @@ int DLLEXPORT ENMSXgetpatternid(int index, char *id)
 */
 {
     strcpy(id,"");
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if (index < 1 || index > Nobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
-    strcpy(id,Pattern[index].id);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if (index < 1 || index > MSXNobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
+    strcpy(id,MSXPattern[index].id);
     return(0);
 }
 
@@ -485,9 +485,9 @@ int DLLEXPORT ENMSXgetpatternlen(int index, int *len)
 **----------------------------------------------------------------
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if (index < 1 || index > Nobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
-    *len = Pattern[index].length;
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if (index < 1 || index > MSXNobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
+    *len = MSXPattern[index].length;
     return(0);
 }
 
@@ -506,10 +506,10 @@ int DLLEXPORT ENMSXgetpatternvalue(int index, int period, double *value)
 {
     SnumList *p;
     int j;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if (index < 1 || index > Nobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
-    if (period < 1 || period > Pattern[index].length) return(ERR_PARAM_CODE);
-    p = Pattern[index].first;
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if (index < 1 || index > MSXNobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
+    if (period < 1 || period > MSXPattern[index].length) return(ERR_PARAM_CODE);
+    p = MSXPattern[index].first;
     for ( j = 1; j < period; j++) {p=p->next;}
     *value = p->value;
     return(0);
@@ -537,9 +537,9 @@ int  DLLEXPORT  ENMSXgetnodequal(int node, int specie, double *c)
 */
 {
     *c = 0.0;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( node > 0 && node <= Nobjects[NODE] &&
-         specie > 0 && specie <= Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( node > 0 && node <= MSXNobjects[NODE] &&
+         specie > 0 && specie <= MSXNobjects[SPECIE] )
     {
         *c = quality_getNodeQual(node, specie);
     }
@@ -566,9 +566,9 @@ int  DLLEXPORT  ENMSXgetlinkqual(int link, int specie, double *c)
 */
 {
     *c = 0.0;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( link > 0 && link <= Nobjects[LINK] &&
-        specie > 0 && specie <= Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( link > 0 && link <= MSXNobjects[LINK] &&
+        specie > 0 && specie <= MSXNobjects[SPECIE] )
     {
         *c = quality_getLinkQual(link, specie);
     }
@@ -585,9 +585,9 @@ int  DLLEXPORT  ENMSXgetsourcequal(int node, int specie, int code, double *value
 **  Input:
 **    node = node index (base 1).
 **    specie = index of BULK water quality specie (base 1).
-**    code = parameter code (see EPANETMSX.H)
+**    code = parameter code (see EPANETMSX.MSXH)
 **    value = value to set associated with parameter code
-**      (see EPANETMSX.H for valid source type values)
+**      (see EPANETMSX.MSXH for valid source type values)
 **
 **  Output:
 **    Value associated with parameter code for the specified source.
@@ -602,18 +602,18 @@ int  DLLEXPORT  ENMSXgetsourcequal(int node, int specie, int code, double *value
 {
     Psource source=NULL;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( node <= 0 || node > Nobjects[NODE] ||
-        specie <= 0 || specie > Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( node <= 0 || node > MSXNobjects[NODE] ||
+        specie <= 0 || specie > MSXNobjects[SPECIE] )
         return(ERR_INDEX_VALUE);
-    if ( Specie[specie].type != BULK ) return(ERR_INDEX_VALUE);
+    if ( MSXSpecie[specie].type != BULK ) return(ERR_INDEX_VALUE);
 
     switch (code)
     {
     case ENMSX_SOURCEQUAL:
     case ENMSX_SOURCEPAT:
     case ENMSX_SOURCETYPE:
-        source = Node[node].sources;
+        source = MSXNode[node].sources;
 
         // --- find the source for this specie
 
@@ -647,9 +647,9 @@ int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value)
 **  Input:
 **    node = node index (base 1).
 **    specie = index of BULK water quality specie (base 1).
-**    code = parameter code (see EPANETMSX.H)
+**    code = parameter code (see EPANETMSX.MSXH)
 **    value = value to set associated with parameter code
-**      (see EPANETMSX.H for valid source type values)
+**      (see EPANETMSX.MSXH for valid source type values)
 **
 **  Output:
 **    None.
@@ -659,16 +659,16 @@ int  DLLEXPORT  ENMSXsetnodequal(int node, int specie, int code, double value)
 **
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( node <= 0 || node > Nobjects[NODE] ||
-        specie <= 0 || specie > Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( node <= 0 || node > MSXNobjects[NODE] ||
+        specie <= 0 || specie > MSXNobjects[SPECIE] )
         return(ERR_INDEX_VALUE);
-    if ( Specie[specie].type != BULK ) return(ERR_INDEX_VALUE);
+    if ( MSXSpecie[specie].type != BULK ) return(ERR_INDEX_VALUE);
 
     switch (code)
     {
     case ENMSX_INITQUAL:       
-        Node[node].c0[specie] = value;    
+        MSXNode[node].c0[specie] = value;    
         break;
     default: return(ERR_PARAM_CODE);
     }
@@ -685,9 +685,9 @@ int  DLLEXPORT  ENMSXsetlinkqual(int link, int specie, int code, double value)
 **  Input:
 **    link = link index (base 1).
 **    specie = index of WALL water quality specie (base 1).
-**    code = parameter code (see EPANETMSX.H)
+**    code = parameter code (see EPANETMSX.MSXH)
 **    value = value to set associated with parameter code
-**      (see EPANETMSX.H for valid source type values)
+**      (see EPANETMSX.MSXH for valid source type values)
 **
 **  Output:
 **    None.
@@ -696,18 +696,18 @@ int  DLLEXPORT  ENMSXsetlinkqual(int link, int specie, int code, double value)
 **    an error code (or 0 for no error).
 */
 {
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( link <= 0 || link > Nobjects[LINK] ||
-        specie <= 0 || specie > Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( link <= 0 || link > MSXNobjects[LINK] ||
+        specie <= 0 || specie > MSXNobjects[SPECIE] )
         return(ERR_INDEX_VALUE);
-    if ( Specie[specie].type != WALL ) return(ERR_INDEX_VALUE);
+    if ( MSXSpecie[specie].type != WALL ) return(ERR_INDEX_VALUE);
 
     switch (code)
     {
         // --- Should allow for setting link-specific parameter values
         //     Requires ENMSXgetparamid(), ENMSXgetparamindex()
     case ENMSX_INITQUAL:       
-        Link[link].c0[specie] = value;    
+        MSXLink[link].c0[specie] = value;    
         break;
     default: return(ERR_PARAM_CODE);
     }
@@ -723,9 +723,9 @@ int  DLLEXPORT  ENMSXsetsourcequal(int node, int specie, int code, double value)
 **  Input:
 **    node = node index (base 1).
 **    specie = index of BULK water quality specie (base 1).
-**    code = parameter code (see EPANETMSX.H)
+**    code = parameter code (see EPANETMSX.MSXH)
 **    value = value to set associated with parameter code
-**      (see EPANETMSX.H for valid source type values)
+**      (see EPANETMSX.MSXH for valid source type values)
 **
 **  Output:
 **    None.
@@ -740,18 +740,18 @@ int  DLLEXPORT  ENMSXsetsourcequal(int node, int specie, int code, double value)
 {
     Psource source=NULL;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( node <= 0 || node > Nobjects[NODE] ||
-        specie <= 0 || specie > Nobjects[SPECIE] )
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( node <= 0 || node > MSXNobjects[NODE] ||
+        specie <= 0 || specie > MSXNobjects[SPECIE] )
         return(ERR_INDEX_VALUE);
-    if ( Specie[specie].type != BULK ) return(ERR_INDEX_VALUE);
+    if ( MSXSpecie[specie].type != BULK ) return(ERR_INDEX_VALUE);
 
     switch (code)
     {
     case ENMSX_SOURCEQUAL:
     case ENMSX_SOURCEPAT:
     case ENMSX_SOURCETYPE:
-        source = Node[node].sources;
+        source = MSXNode[node].sources;
 
         // --- check if a source for this specie already exists
 
@@ -768,8 +768,8 @@ int  DLLEXPORT  ENMSXsetsourcequal(int node, int specie, int code, double value)
         {
             source = (struct Ssource *) malloc(sizeof(struct Ssource));
             if ( source == NULL ) return 101;
-            source->next = Node[node].sources;
-            Node[node].sources = source;
+            source->next = MSXNode[node].sources;
+            MSXNode[node].sources = source;
             
             source->c0 = 0.0;
             source->pat = 0;
@@ -781,7 +781,7 @@ int  DLLEXPORT  ENMSXsetsourcequal(int node, int specie, int code, double value)
 
         if ( code == ENMSX_SOURCEQUAL ) source->c0 = value;
         else if ( code == ENMSX_SOURCEPAT )  {
-            if ( (int)value < 1 || (int)value > Nobjects[TIME_PATTERN] ) return(ERR_INDEX_VALUE);
+            if ( (int)value < 1 || (int)value > MSXNobjects[TIME_PATTERN] ) return(ERR_INDEX_VALUE);
             source->pat = (int)value;
         }
         else if ( code == ENMSX_SOURCETYPE ) {
@@ -809,35 +809,35 @@ int  DLLEXPORT  ENMSXsetpattern(int index, double *f, int n)
     SnumList *listItem;
 
     /* Check for valid arguments */
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if (index <= 0 || index > Nobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if (index <= 0 || index > MSXNobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
     if (n <= 0) return(ERR_NUM_VALUE);
 
     /* Free memory used by pattern values */
-    listItem = Pattern[index].first;
+    listItem = MSXPattern[index].first;
     while (listItem)
     {
-        Pattern[index].first = listItem->next;
+        MSXPattern[index].first = listItem->next;
         free(listItem);
-        listItem = Pattern[index].first;
+        listItem = MSXPattern[index].first;
     }
 
     /* Re-set number of time periods & load new pattern values */
-    Pattern[index].length = n;
+    MSXPattern[index].length = n;
     listItem = (SnumList *) malloc(sizeof(SnumList));
     if ( listItem == NULL ) return 101;
     listItem->value = f[k++];
     listItem->next = NULL;
-    Pattern[index].current = listItem;
-    Pattern[index].first = listItem;
+    MSXPattern[index].current = listItem;
+    MSXPattern[index].first = listItem;
     while ( k < n )
     {
         listItem = (SnumList *) malloc(sizeof(SnumList));
         if ( listItem == NULL ) return 101;
         listItem->value = f[k++];
         listItem->next = NULL;
-        Pattern[index].current->next = listItem;
-        Pattern[index].current = listItem;
+        MSXPattern[index].current->next = listItem;
+        MSXPattern[index].current = listItem;
     }
     return(0);
 }
@@ -858,10 +858,10 @@ int  DLLEXPORT  ENMSXsetpatternvalue(int index, int period, double value)
     SnumList *p;
     int j;
 
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if (index < 1 || index > Nobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
-    if (period < 1 || period > Pattern[index].length) return(ERR_PARAM_CODE);
-    p = Pattern[index].first;
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if (index < 1 || index > MSXNobjects[TIME_PATTERN]) return(ERR_TIME_PATTERN);
+    if (period < 1 || period > MSXPattern[index].length) return(ERR_PARAM_CODE);
+    p = MSXPattern[index].first;
     for ( j = 1; j < period; j++) {p=p->next;}
     p->value = value;
     return(0);
@@ -883,14 +883,14 @@ int  DLLEXPORT  ENMSXcreatepattern(char *id)
 */
 {
     int i;
-    if (!ProjectOpened) return(ERR_NO_PROJECT);
-    if ( addPattern( id ) ) return(ERR_PARAM_CODE);  // Increments Nobjects[TIME_PATTERN]
-    Pattern = (Spattern *) realloc(Pattern, (Nobjects[TIME_PATTERN]+1)*sizeof(Spattern));
-    if (Pattern == NULL) return(101);
-    i = Nobjects[TIME_PATTERN];
-    Pattern[i].current = NULL;
-    Pattern[i].first = NULL;
-    Pattern[i].length = 0;
-	Pattern[i].id = project_findID(TIME_PATTERN, id);
+    if (!MSXProjectOpened) return(ERR_NO_PROJECT);
+    if ( addPattern( id ) ) return(ERR_PARAM_CODE);  // Increments MSXNobjects[TIME_PATTERN]
+    MSXPattern = (MSXSpattern *) realloc(MSXPattern, (MSXNobjects[TIME_PATTERN]+1)*sizeof(MSXSpattern));
+    if (MSXPattern == NULL) return(101);
+    i = MSXNobjects[TIME_PATTERN];
+    MSXPattern[i].current = NULL;
+    MSXPattern[i].first = NULL;
+    MSXPattern[i].length = 0;
+	MSXPattern[i].id = project_findID(TIME_PATTERN, id);
     return(0);
 }

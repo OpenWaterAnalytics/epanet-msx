@@ -51,52 +51,52 @@
  
 #define   SEPSTR    " \t\n\r"          // Token separator characters
 
-EXTERN_MSX TFile  HydFile,             // EPANET hydraulics file
-                  InpFile,             // MSX input file
-                  OutFile,             // MSX binary output file
-                  RptFile;             // MSX report file
+EXTERN_MSX MSXTFile  MSXHydFile,             // EPANET hydraulics file
+                     MSXInpFile,             // MSX input file
+                     MSXOutFile,             // MSX binary output file
+                     MSXRptFile;             // MSX report file
 
-EXTERN_MSX char   Title[MAXLINE+1],    // Project title
-                  Msg[MAXLINE+1];      // Message string
+EXTERN_MSX char   MSXTitle[MAXLINE+1],    // Project title
+                  MSXMsg[MAXLINE+1];      // Message string
 
-EXTERN_MSX int    Nobjects[MAX_OBJECTS],  // Numbers of objects
-                  Unitsflag,           // Unit system flag
-                  Flowflag,            // Flow units flag
-                  Saveflag,            // Save results flag
-                  Rptflag,             // Report results flag
-                  AreaUnits,           // Surface area units
-                  RateUnits,           // Reaction rate time units
-                  Solver,              // Choice of ODE solver
-                  PageSize,            // Lines per page in report
-                  Nperiods,            // Number of reporting periods
-                  ErrCode,             // Error code
-                  ProjectOpened,       // Project opened flag
-                  QualityOpened;       // Water quality system opened flag
+EXTERN_MSX int    MSXNobjects[MAX_OBJECTS],  // Numbers of objects
+                  MSXUnitsflag,           // Unit system flag
+                  MSXFlowflag,            // Flow units flag
+                  MSXSaveflag,            // Save results flag
+                  MSXRptflag,             // Report results flag
+                  MSXAreaUnits,           // Surface area units
+                  MSXRateUnits,           // Reaction rate time units
+                  MSXSolver,              // Choice of ODE solver
+                  MSXPageSize,            // Lines per page in report
+                  MSXNperiods,            // Number of reporting periods
+                  MSXErrCode,             // Error code
+                  MSXProjectOpened,       // Project opened flag
+                  MSXQualityOpened;       // Water quality system opened flag
 
-EXTERN_MSX long   HydOffset,           // Hydraulics file byte offset
-                  Qstep,               // Quality time step (sec)
-                  Pstep,               // Time pattern time step (sec)
-                  Pstart,              // Starting pattern time (sec)
-                  Rstep,               // Reporting time step (sec)
-                  Rstart,              // Time when reporting starts
-                  Rtime,               // Next reporting time (sec)
-                  Htime,               // Current hydraulic time (sec)
-                  Qtime,               // Current quality time (sec)
-                  Dur;                 // Duration of simulation (sec)
+EXTERN_MSX long   MSXHydOffset,           // Hydraulics file byte offset
+                  MSXQstep,               // Quality time step (sec)
+                  MSXPstep,               // Time pattern time step (sec)
+                  MSXPstart,              // Starting pattern time (sec)
+                  MSXRstep,               // Reporting time step (sec)
+                  MSXRstart,              // Time when reporting starts
+                  MSXRtime,               // Next reporting time (sec)
+                  MSXHtime,               // Current hydraulic time (sec)
+                  MSXQtime,               // Current quality time (sec)
+                  MSXDur;                 // Duration of simulation (sec)
 
-EXTERN_MSX float  *D,                  // Node demands
-                  *H,                  // Node heads
-                  *Q;                  // Link flows
+EXTERN_MSX float  *MSXD,                  // Node demands
+                  *MSXH,                  // Node heads
+                  *MSXQ;                  // Link flows
 
-EXTERN_MSX double Ucf[MAX_UNIT_TYPES], // Unit conversion factors
-                  DefRtol,             // Default relative error tolerance
-                  DefAtol;             // Default absolute error tolerance
+EXTERN_MSX double MSXUcf[MAX_UNIT_TYPES], // Unit conversion factors
+                  MSXDefRtol,             // Default relative error tolerance
+                  MSXDefAtol;             // Default absolute error tolerance
 
-EXTERN_MSX Sspecie  *Specie;           // WQ species data
-EXTERN_MSX Sparam   *Param;            // Expression parameters
-EXTERN_MSX Sconst   *Const;            // Expression constants
-EXTERN_MSX Sterm    *Term;             // Intermediate terms
-EXTERN_MSX Snode    *Node;             // Node data
-EXTERN_MSX Slink    *Link;             // Link data
-EXTERN_MSX Stank    *Tank;             // Tank data
-EXTERN_MSX Spattern *Pattern;          // Pattern data
+EXTERN_MSX MSXSspecie  *MSXSpecie;           // WQ species data
+EXTERN_MSX MSXSparam   *MSXParam;            // Expression parameters
+EXTERN_MSX MSXSconst   *MSXConst;            // Expression constants
+EXTERN_MSX MSXSterm    *MSXTerm;             // Intermediate terms
+EXTERN_MSX MSXSnode    *MSXNode;             // Node data
+EXTERN_MSX MSXSlink    *MSXLink;             // Link data
+EXTERN_MSX MSXStank    *MSXTank;             // Tank data
+EXTERN_MSX MSXSpattern *MSXPattern;          // Pattern data

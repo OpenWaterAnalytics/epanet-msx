@@ -109,7 +109,7 @@ int  chemistry_open()
     Atol = NULL;
     Rtol = NULL;
     Y = NULL;
-    m = Nobjects[SPECIE] + 1;
+    m = MSXNobjects[SPECIE] + 1;
     PipeRateSpecies = (int *) calloc(m, sizeof(int));
     TankRateSpecies = (int *) calloc(m, sizeof(int));
     PipeEquilSpecies = (int *) calloc(m, sizeof(int));
@@ -144,26 +144,26 @@ int  chemistry_open()
 
     numWallSpecies = 0;
     numBulkSpecies = 0;
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].type == WALL ) numWallSpecies++;
-        if ( Specie[m].type == BULK ) numBulkSpecies++;
+        if ( MSXSpecie[m].type == WALL ) numWallSpecies++;
+        if ( MSXSpecie[m].type == BULK ) numBulkSpecies++;
     }
-    if ( numPipeExpr != Nobjects[SPECIE] ) return ERR_NUM_PIPE_EXPR;
+    if ( numPipeExpr != MSXNobjects[SPECIE] ) return ERR_NUM_PIPE_EXPR;
     if ( numTankExpr != numBulkSpecies   ) return ERR_NUM_TANK_EXPR;
 
 // --- open the diff. eqn. solver: arguments are max. number of ODE's,
 //     max. number of steps to be taken,
 //     1 if automatic step sizing used (or 0 if not used),
 
-    if ( Solver == RK5 )
+    if ( MSXSolver == RK5 )
     {
-        if ( rk5_open(Nobjects[SPECIE], 1000, 1) == FALSE )
+        if ( rk5_open(MSXNobjects[SPECIE], 1000, 1) == FALSE )
             return ERR_ODE_OPEN;
     }
-    if ( Solver == ROS2 )
+    if ( MSXSolver == ROS2 )
     {
-        if ( ros2_open(Nobjects[SPECIE], 1) == FALSE )
+        if ( ros2_open(MSXNobjects[SPECIE], 1) == FALSE )
             return ERR_ODE_OPEN;
     }
 
@@ -174,10 +174,10 @@ int  chemistry_open()
 
 // --- assign entries to LastIndex array
 
-    LastIndex[SPECIE] = Nobjects[SPECIE];
-    LastIndex[TERM] = LastIndex[SPECIE] + Nobjects[TERM];
-    LastIndex[PARAMETER] = LastIndex[TERM] + Nobjects[PARAMETER];
-    LastIndex[CONSTANT] = LastIndex[PARAMETER] + Nobjects[CONSTANT];
+    LastIndex[SPECIE] = MSXNobjects[SPECIE];
+    LastIndex[TERM] = LastIndex[SPECIE] + MSXNobjects[TERM];
+    LastIndex[PARAMETER] = LastIndex[TERM] + MSXNobjects[PARAMETER];
+    LastIndex[CONSTANT] = LastIndex[PARAMETER] + MSXNobjects[CONSTANT];
     return 0;
 }
 
@@ -192,8 +192,8 @@ void chemistry_close()
 **    none.
 */
 {
-    if ( Solver == RK5 ) rk5_close();
-    if ( Solver == ROS2 ) ros2_close();
+    if ( MSXSolver == RK5 ) rk5_close();
+    if ( MSXSolver == ROS2 ) ros2_close();
     newton_close();
     FREE(PipeRateSpecies);
     FREE(TankRateSpecies);
@@ -226,17 +226,17 @@ int chemistry_react(long dt)
     for (k=1; k<=NumPipeRateSpecies; k++)
     {
         m = PipeRateSpecies[k];
-        Atol[k] = Specie[m].aTol;
-        Rtol[k] = Specie[m].rTol;
+        Atol[k] = MSXSpecie[m].aTol;
+        Rtol[k] = MSXSpecie[m].rTol;
     }
 
 // --- examine each link
 
-    for (k=1; k<=Nobjects[LINK]; k++)
+    for (k=1; k<=MSXNobjects[LINK]; k++)
     {
     // --- skip non-pipe links
 
-        if ( Link[k].len == 0.0 ) continue;
+        if ( MSXLink[k].len == 0.0 ) continue;
 
     // --- evaluate hydraulic variables
 
@@ -254,17 +254,17 @@ int chemistry_react(long dt)
     for (k=1; k<=NumTankRateSpecies; k++)
     {
         m = TankRateSpecies[k];
-        Atol[k] = Specie[m].aTol;
-        Rtol[k] = Specie[m].rTol;
+        Atol[k] = MSXSpecie[m].aTol;
+        Rtol[k] = MSXSpecie[m].rTol;
     }
 
 // --- examine each tank
 
-    for (k=1; k<=Nobjects[TANK]; k++)
+    for (k=1; k<=MSXNobjects[TANK]; k++)
     {
     // --- skip reservoirs
 
-        if (Tank[k].a == 0.0) continue;
+        if (MSXTank[k].a == 0.0) continue;
 
     // --- compute tank reactions
 
@@ -328,9 +328,9 @@ void setSpeciesChemistry()
     NumTankRateSpecies = 0;
     NumTankFormulaSpecies = 0;
     NumTankEquilSpecies = 0;
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        switch ( Specie[m].pipeExprType )
+        switch ( MSXSpecie[m].pipeExprType )
         {
           case RATE:
             NumPipeRateSpecies++;
@@ -346,7 +346,7 @@ void setSpeciesChemistry()
             PipeEquilSpecies[NumPipeEquilSpecies] = m;
             break;
         }
-        switch ( Specie[m].tankExprType )
+        switch ( MSXSpecie[m].tankExprType )
         {
           case RATE:
             NumTankRateSpecies++;
@@ -381,10 +381,10 @@ void setTankChemistry()
 */
 {
     int m;
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        Specie[m].tankExpr = Specie[m].pipeExpr;
-        Specie[m].tankExprType = Specie[m].pipeExprType;
+        MSXSpecie[m].tankExpr = MSXSpecie[m].pipeExpr;
+        MSXSpecie[m].tankExprType = MSXSpecie[m].pipeExprType;
     }
     NumTankRateSpecies = NumPipeRateSpecies;
     for (m=1; m<=NumTankRateSpecies; m++)
@@ -415,31 +415,31 @@ void evalHydVariables(int k)
 */
 {
     double dh;                         // headloss in ft
-    double diam = Link[k].diam;        // diameter in ft
+    double diam = MSXLink[k].diam;        // diameter in ft
     double av;                         // area per unit volume
 
 // --- pipe diameter in user's units (ft or m)
-    HydVar[DIAMETER] = diam * Ucf[LENGTH_UNITS];
+    HydVar[DIAMETER] = diam * MSXUcf[LENGTH_UNITS];
 
 // --- flow rate in user's units
-    HydVar[FLOW] = fabs(Q[k]) * Ucf[FLOW_UNITS];
+    HydVar[FLOW] = fabs(MSXQ[k]) * MSXUcf[FLOW_UNITS];
 
 // --- flow velocity in ft/sec
     if ( diam == 0.0 ) HydVar[VELOCITY] = 0.0;
-    else HydVar[VELOCITY] = fabs(Q[k]) * 4.0 / PI / SQR(diam);
+    else HydVar[VELOCITY] = fabs(MSXQ[k]) * 4.0 / PI / SQR(diam);
 
 // --- Reynolds number
     HydVar[REYNOLDS] = HydVar[VELOCITY] * diam / VISCOS;
 
 // --- flow velocity in user's units (ft/sec or m/sec)
-    HydVar[VELOCITY] *= Ucf[LENGTH_UNITS];
+    HydVar[VELOCITY] *= MSXUcf[LENGTH_UNITS];
 
 // --- Darcy Weisbach friction factor
-    if ( Link[k].len == 0.0 ) HydVar[FRICTION] = 0.0;
+    if ( MSXLink[k].len == 0.0 ) HydVar[FRICTION] = 0.0;
     else
     {
-        dh = ABS(H[Link[k].n1] - H[Link[k].n2]);
-        HydVar[FRICTION] = 39.725*dh*pow(diam,5)/Link[k].len/SQR(Q[k]);
+        dh = ABS(MSXH[MSXLink[k].n1] - MSXH[MSXLink[k].n2]);
+        HydVar[FRICTION] = 39.725*dh*pow(diam,5)/MSXLink[k].len/SQR(MSXQ[k]);
     }
 
 // --- shear velocity in user's units (ft/sec or m/sec)
@@ -450,7 +450,7 @@ void evalHydVariables(int k)
     if ( diam > 0.0 )
     {
         av  = 4.0/diam;                // ft2/ft3
-        av *= Ucf[AREA_UNITS];         // area_units/ft3
+        av *= MSXUcf[AREA_UNITS];         // area_units/ft3
         av /= LperFT3;                 // area_units/L
         HydVar[AREAVOL] = av;
     }
@@ -478,7 +478,7 @@ int evalPipeReactions(int k, long dt)
 {
     int i, m;
     int errcode = 0, ierr = 0;
-    double tstep = (double)dt / Ucf[RATE_UNITS];
+    double tstep = (double)dt / MSXUcf[RATE_UNITS];
     double c, dc, dh;
 
 // --- start with the most downstream pipe segment
@@ -489,7 +489,7 @@ int evalPipeReactions(int k, long dt)
     {
     // --- store all segment specie concentrations in C1
 
-        for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = TheSeg->c[m];
+        for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = TheSeg->c[m];
         ierr = 0;
 
     // --- react each reacting specie over the time step
@@ -498,12 +498,12 @@ int evalPipeReactions(int k, long dt)
         {
         // --- Euler integrator
 
-            if ( Solver == EUL )
+            if ( MSXSolver == EUL )
             {
                 for (i=1; i<=NumPipeRateSpecies; i++)
                 {
                     m = PipeRateSpecies[i];
-                    dc = mathexpr_eval(Specie[m].pipeExpr, getPipeVariableValue)
+                    dc = mathexpr_eval(MSXSpecie[m].pipeExpr, getPipeVariableValue)
                          * tstep;
                     c = TheSeg->c[m] + dc;
                     TheSeg->c[m] = MAX(c, 0.0);
@@ -526,13 +526,13 @@ int evalPipeReactions(int k, long dt)
 
             // --- Runge-Kutta integrator
 
-                if ( Solver == RK5 )
+                if ( MSXSolver == RK5 )
                     ierr = rk5_integrate(Y, NumPipeRateSpecies, 0, tstep,
                                          &dh, Atol, Rtol, getPipeDcDt);
 
             // --- Rosenbrock integrator
 
-                if ( Solver == ROS2 )
+                if ( MSXSolver == ROS2 )
                     ierr = ros2_integrate(Y, NumPipeRateSpecies, 0, tstep,
                                           &dh, Atol, Rtol, getPipeDcDt);
 
@@ -573,7 +573,7 @@ int evalTankReactions(int k, long dt)
 **    dt = time step (sec).
 **
 **  Output:
-**    updates values in the concentration vector Tank[k].c[]
+**    updates values in the concentration vector MSXTank[k].c[]
 **    for tank k.
 **
 **  Returns:
@@ -582,27 +582,27 @@ int evalTankReactions(int k, long dt)
 {
     int i, m;
     int errcode = 0, ierr = 0;
-    double tstep = (double)dt / Ucf[RATE_UNITS];
+    double tstep = (double)dt / MSXUcf[RATE_UNITS];
     double c, dc, dh;
 
 // --- store all tank specie concentrations in C1
 
-    for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = Tank[k].c[m];
-    TheNode = Tank[k].node;
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = MSXTank[k].c[m];
+    TheNode = MSXTank[k].node;
     ierr = 0;
 
 // --- react each reacting specie over the time step
 
     if ( dt > 0.0 )
     {
-        if ( Solver == EUL)
+        if ( MSXSolver == EUL)
         {
             for (i=1; i<=NumTankRateSpecies; i++)
             {
                 m = TankRateSpecies[i];
-                dc = tstep*mathexpr_eval(Specie[m].tankExpr, getTankVariableValue);
-                c = Tank[k].c[m] + dc;
-                Tank[k].c[m] = MAX(c, 0.0);
+                dc = tstep*mathexpr_eval(MSXSpecie[m].tankExpr, getTankVariableValue);
+                c = MSXTank[k].c[m] + dc;
+                MSXTank[k].c[m] = MAX(c, 0.0);
             }
         }
 
@@ -611,31 +611,31 @@ int evalTankReactions(int k, long dt)
             for (i=1; i<=NumTankRateSpecies; i++)
             {
                 m = TankRateSpecies[i];
-                Y[i] = Tank[k].c[m];
+                Y[i] = MSXTank[k].c[m];
             }
-            dh = Tank[k].hstep;
+            dh = MSXTank[k].hstep;
 
-            if ( Solver == RK5 )
+            if ( MSXSolver == RK5 )
                 ierr = rk5_integrate(Y, NumTankRateSpecies, 0, tstep,
                                      &dh, Atol, Rtol, getTankDcDt);
 
-            if ( Solver == ROS2 )
+            if ( MSXSolver == ROS2 )
                 ierr = ros2_integrate(Y, NumTankRateSpecies, 0, tstep,
                                       &dh, Atol, Rtol, getTankDcDt);
 
             for (i=1; i<=NumTankRateSpecies; i++)
             {
                 m = TankRateSpecies[i];
-                Tank[k].c[m] = MAX(Y[i], 0.0);
+                MSXTank[k].c[m] = MAX(Y[i], 0.0);
             }
-            Tank[k].hstep = dh;
+            MSXTank[k].hstep = dh;
         }
         if ( ierr < 0 ) return ERR_INTEGRATOR;
     }
 
 // --- compute new equilibrium concentrations within the tank
 
-    errcode = chemistry_equil(NODE, Tank[k].c);
+    errcode = chemistry_equil(NODE, MSXTank[k].c);
     return errcode;
 }
 
@@ -658,7 +658,7 @@ int evalPipeEquil(double *c)
 {
     int i, m;
     int errcode;
-    for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = c[m];
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = c[m];
     for (i=1; i<=NumPipeEquilSpecies; i++)
     {
         m = PipeEquilSpecies[i];
@@ -694,7 +694,7 @@ int evalTankEquil(double *c)
 {
     int i, m;
     int errcode;
-    for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = c[m];
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = c[m];
     for (i=1; i<=NumTankEquilSpecies; i++)
     {
         m = TankEquilSpecies[i];
@@ -726,12 +726,12 @@ void evalPipeFormulas(double *c)
 */
 {
     int m;
-    for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = c[m];
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = c[m];
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].pipeExprType == FORMULA )
+        if ( MSXSpecie[m].pipeExprType == FORMULA )
         {
-            c[m] = mathexpr_eval(Specie[m].pipeExpr, getPipeVariableValue);
+            c[m] = mathexpr_eval(MSXSpecie[m].pipeExpr, getPipeVariableValue);
         }
     }
 }
@@ -752,12 +752,12 @@ void evalTankFormulas(double *c)
 */
 {
     int m;
-    for (m=1; m<=Nobjects[SPECIE]; m++) C1[m] = c[m];
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++) C1[m] = c[m];
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].tankExprType == FORMULA )
+        if ( MSXSpecie[m].tankExprType == FORMULA )
         {
-            c[m] = mathexpr_eval(Specie[m].tankExpr, getTankVariableValue);
+            c[m] = mathexpr_eval(MSXSpecie[m].tankExpr, getTankVariableValue);
         }
     }
 }
@@ -784,9 +784,9 @@ double getPipeVariableValue(int i)
     {
     // --- if specie represented by a formula then evaluate it
 
-        if ( Specie[i].pipeExprType == FORMULA )
+        if ( MSXSpecie[i].pipeExprType == FORMULA )
         {
-            return mathexpr_eval(Specie[i].pipeExpr, getPipeVariableValue);
+            return mathexpr_eval(MSXSpecie[i].pipeExpr, getPipeVariableValue);
         }
 
     // --- otherwise return the current concentration
@@ -799,7 +799,7 @@ double getPipeVariableValue(int i)
     else if ( i <= LastIndex[TERM] )
     {
         i -= LastIndex[TERM-1];
-        return mathexpr_eval(Term[i].expr, getPipeVariableValue);
+        return mathexpr_eval(MSXTerm[i].expr, getPipeVariableValue);
     }
 
 // --- reaction parameter indexes come after that
@@ -807,7 +807,7 @@ double getPipeVariableValue(int i)
     else if ( i <= LastIndex[PARAMETER] )
     {
         i -= LastIndex[PARAMETER-1];
-        return Link[TheLink].param[i];
+        return MSXLink[TheLink].param[i];
     }
 
 // --- followed by constants
@@ -815,7 +815,7 @@ double getPipeVariableValue(int i)
     else if ( i <= LastIndex[CONSTANT] )
     {
         i -= LastIndex[CONSTANT-1];
-        return Const[i].value;
+        return MSXConst[i].value;
     }
 
 // --- and finally by hydraulic variables
@@ -852,9 +852,9 @@ double getTankVariableValue(int i)
     {
     // --- if specie represented by a formula then evaluate it
 
-        if ( Specie[i].tankExprType == FORMULA )
+        if ( MSXSpecie[i].tankExprType == FORMULA )
         {
-            return mathexpr_eval(Specie[i].tankExpr, getTankVariableValue);
+            return mathexpr_eval(MSXSpecie[i].tankExpr, getTankVariableValue);
         }
 
     // --- otherwise return the current concentration
@@ -867,18 +867,18 @@ double getTankVariableValue(int i)
     else if ( i <= LastIndex[TERM] )
     {
         i -= LastIndex[TERM-1];
-        return mathexpr_eval(Term[i].expr, getTankVariableValue);
+        return mathexpr_eval(MSXTerm[i].expr, getTankVariableValue);
     }
 
-// --- next come reaction parameters associated with Tank nodes
+// --- next come reaction parameters associated with MSXTank nodes
 
     else if (i <= LastIndex[PARAMETER] )
     {
         i -= LastIndex[PARAMETER-1];
-        j = Node[TheNode].tank;
+        j = MSXNode[TheNode].tank;
         if ( j > 0 )
         {
-            return Tank[j].param[i];
+            return MSXTank[j].param[i];
         }
         else return 0.0;
     }
@@ -888,7 +888,7 @@ double getTankVariableValue(int i)
     else if (i <= LastIndex[CONSTANT] )
     {
         i -= LastIndex[CONSTANT-1];
-        return Const[i].value;
+        return MSXConst[i].value;
     }
     else return 0.0;
 }
@@ -925,7 +925,7 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
     for (i=1; i<=n; i++)
     {
         m = PipeRateSpecies[i];
-        deriv[i] = mathexpr_eval(Specie[m].pipeExpr, getPipeVariableValue);
+        deriv[i] = mathexpr_eval(MSXSpecie[m].pipeExpr, getPipeVariableValue);
     }
 }
 
@@ -961,7 +961,7 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
     for (i=1; i<=n; i++)
     {
         m = TankRateSpecies[i];
-        deriv[i] = mathexpr_eval(Specie[m].tankExpr, getTankVariableValue);
+        deriv[i] = mathexpr_eval(MSXSpecie[m].tankExpr, getTankVariableValue);
     }
 }
 
@@ -997,7 +997,7 @@ void getPipeEquil(double t, double y[], int n, double f[])
     for (i=1; i<=n; i++)
     {
         m = PipeEquilSpecies[i];
-        f[i] = mathexpr_eval(Specie[m].pipeExpr, getPipeVariableValue);
+        f[i] = mathexpr_eval(MSXSpecie[m].pipeExpr, getPipeVariableValue);
     }
 }
 
@@ -1033,6 +1033,6 @@ void getTankEquil(double t, double y[], int n, double f[])
     for (i=1; i<=n; i++)
     {
         m = TankEquilSpecies[i];
-        f[i] = mathexpr_eval(Specie[m].tankExpr, getTankVariableValue);
+        f[i] = mathexpr_eval(MSXSpecie[m].tankExpr, getTankVariableValue);
     }
 }

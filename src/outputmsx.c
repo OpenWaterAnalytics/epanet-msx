@@ -53,18 +53,18 @@ int output_open()
 {
 // --- close output file if already opened
 
-    if (OutFile.file != NULL) fclose(OutFile.file);
+    if (MSXOutFile.file != NULL) fclose(MSXOutFile.file);
 
 // --- try to open the file
 
-    if ( (OutFile.file = fopen(OutFile.name, "w+b")) == NULL)
+    if ( (MSXOutFile.file = fopen(MSXOutFile.name, "w+b")) == NULL)
     {
         return ERR_OPEN_OUT_FILE;
     }
 
 // --- write initial results to file
 
-    Nperiods = 0;
+    MSXNperiods = 0;
     output_saveInitialResults();
     return 0;
 }
@@ -87,26 +87,26 @@ int output_saveInitialResults()
     INT4 magic = MAGICNUMBER;
     INT4 version = VERSION;
 
-    rewind(OutFile.file);
-    fwrite(&magic, sizeof(INT4), 1, OutFile.file);              //Magic number
-    fwrite(&version, sizeof(INT4), 1, OutFile.file);            //Version number
-    fwrite(&Nobjects[NODE], sizeof(INT4), 1, OutFile.file);     //Number of nodes
-    fwrite(&Nobjects[LINK], sizeof(INT4), 1, OutFile.file);     //Number of links
-    fwrite(&Nobjects[SPECIE], sizeof(INT4), 1, OutFile.file);   //Number of species
-    fwrite(&Rstep, sizeof(INT4), 1, OutFile.file);              //Reporting step size
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    rewind(MSXOutFile.file);
+    fwrite(&magic, sizeof(INT4), 1, MSXOutFile.file);              //Magic number
+    fwrite(&version, sizeof(INT4), 1, MSXOutFile.file);            //Version number
+    fwrite(&MSXNobjects[NODE], sizeof(INT4), 1, MSXOutFile.file);     //Number of nodes
+    fwrite(&MSXNobjects[LINK], sizeof(INT4), 1, MSXOutFile.file);     //Number of links
+    fwrite(&MSXNobjects[SPECIE], sizeof(INT4), 1, MSXOutFile.file);   //Number of species
+    fwrite(&MSXRstep, sizeof(INT4), 1, MSXOutFile.file);              //Reporting step size
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        n = strlen(Specie[m].id);
-        fwrite(&n, sizeof(INT4), 1, OutFile.file);              //Length of specie ID
-        fwrite(Specie[m].id, sizeof(char), n, OutFile.file);    //Specie ID string
+        n = strlen(MSXSpecie[m].id);
+        fwrite(&n, sizeof(INT4), 1, MSXOutFile.file);              //Length of specie ID
+        fwrite(MSXSpecie[m].id, sizeof(char), n, MSXOutFile.file);    //MSXSpecie ID string
     }
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        fwrite(&Specie[m].units, sizeof(INT4), 1, OutFile.file);  //Specie units string
+        fwrite(&MSXSpecie[m].units, sizeof(INT4), 1, MSXOutFile.file);  //MSXSpecie units string
     }
-    ResultsOffset = ftell(OutFile.file);
-    NodeBytesPerPeriod = Nobjects[NODE]*Nobjects[SPECIE]*sizeof(float);
-    LinkBytesPerPeriod = Nobjects[LINK]*Nobjects[SPECIE]*sizeof(float);
+    ResultsOffset = ftell(MSXOutFile.file);
+    NodeBytesPerPeriod = MSXNobjects[NODE]*MSXNobjects[SPECIE]*sizeof(float);
+    LinkBytesPerPeriod = MSXNobjects[LINK]*MSXNobjects[SPECIE]*sizeof(float);
     return 0;
 }
 
@@ -129,21 +129,21 @@ int output_saveResults()
     int   m, j;
     float x;
 
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        for (j=1; j<=Nobjects[NODE]; j++)
+        for (j=1; j<=MSXNobjects[NODE]; j++)
         {
             x = (float)quality_getNodeQual(j, m);
-            fwrite(&x, sizeof(float), 1, OutFile.file);
+            fwrite(&x, sizeof(float), 1, MSXOutFile.file);
         }
     }
 
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        for (j=1; j<=Nobjects[LINK]; j++)
+        for (j=1; j<=MSXNobjects[LINK]; j++)
         {
             x = (float)quality_getLinkQual(j, m);
-            fwrite(&x, sizeof(float), 1, OutFile.file);
+            fwrite(&x, sizeof(float), 1, MSXOutFile.file);
         }
     }
     return 0;
@@ -169,10 +169,10 @@ int output_saveFinalResults()
 {
     INT4 magic = MAGICNUMBER;
 
-    fwrite(&ResultsOffset, sizeof(INT4), 1, OutFile.file);
-    fwrite(&Nperiods, sizeof(INT4), 1, OutFile.file);
-    fwrite(&ErrCode, sizeof(INT4), 1, OutFile.file);
-    fwrite(&magic, sizeof(INT4), 1, OutFile.file);
+    fwrite(&ResultsOffset, sizeof(INT4), 1, MSXOutFile.file);
+    fwrite(&MSXNperiods, sizeof(INT4), 1, MSXOutFile.file);
+    fwrite(&MSXErrCode, sizeof(INT4), 1, MSXOutFile.file);
+    fwrite(&magic, sizeof(INT4), 1, MSXOutFile.file);
     return 0;
 }
 
@@ -194,9 +194,9 @@ float output_getNodeQual(int k, int j, int m)
 {
     float c;
     long bp = ResultsOffset + k * (NodeBytesPerPeriod + LinkBytesPerPeriod);
-    bp += ((m-1)*Nobjects[NODE] + (j-1)) * sizeof(float);
-    fseek(OutFile.file, bp, SEEK_SET);
-    fread(&c, sizeof(float), 1, OutFile.file);
+    bp += ((m-1)*MSXNobjects[NODE] + (j-1)) * sizeof(float);
+    fseek(MSXOutFile.file, bp, SEEK_SET);
+    fread(&c, sizeof(float), 1, MSXOutFile.file);
     return c;
 }
 
@@ -218,8 +218,8 @@ float output_getLinkQual(int k, int j, int m)
 {
     float c;
     long bp = ResultsOffset + ((k+1)*NodeBytesPerPeriod) + (k*LinkBytesPerPeriod);
-    bp += ((m-1)*Nobjects[LINK] + (j-1)) * sizeof(float);
-    fseek(OutFile.file, bp, SEEK_SET);
-    fread(&c, sizeof(float), 1, OutFile.file);
+    bp += ((m-1)*MSXNobjects[LINK] + (j-1)) * sizeof(float);
+    fseek(MSXOutFile.file, bp, SEEK_SET);
+    fread(&c, sizeof(float), 1, MSXOutFile.file);
     return c;
 }

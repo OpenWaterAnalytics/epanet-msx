@@ -77,10 +77,10 @@ int  report_write()
 
 // --- check that results are available
 
-    if ( Nperiods < 1 )    return 0;
-    if ( OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
-    fseek(OutFile.file, -RECORDSIZE, SEEK_END);
-    fread(&magic, sizeof(INT4), 1, OutFile.file);
+    if ( MSXNperiods < 1 )    return 0;
+    if ( MSXOutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
+    fseek(MSXOutFile.file, -RECORDSIZE, SEEK_END);
+    fread(&magic, sizeof(INT4), 1, MSXOutFile.file);
     if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
 
 // --- write program logo & project title
@@ -91,13 +91,13 @@ int  report_write()
     newPage();
     for (j=0; j<=5; j++) writeLine(Logo[j]);
     writeLine("");
-    writeLine(Title);
+    writeLine(MSXTitle);
 
 // --- report on all requested nodes
 
-    for (j=1; j<=Nobjects[NODE]; j++)
+    for (j=1; j<=MSXNobjects[NODE]; j++)
     {
-        if ( !Node[j].rpt ) continue;
+        if ( !MSXNode[j].rpt ) continue;
         ENgetnodeid(j, IDname);
         createTableHdr(NODE);
         writeNodeTable(j);
@@ -105,9 +105,9 @@ int  report_write()
 
 // --- report on all requested links
 
-    for (j=1; j<=Nobjects[LINK]; j++)
+    for (j=1; j<=MSXNobjects[LINK]; j++)
     {
-        if ( !Link[j].rpt ) continue;
+        if ( !MSXLink[j].rpt ) continue;
         ENgetlinkid(j, IDname);
         createTableHdr(LINK);
         writeLinkTable(j);
@@ -131,18 +131,18 @@ void createTableHdr(int tableType)
     strcpy(TableHdr.Line2, "Time   ");
     strcpy(TableHdr.Line3, "hr:min ");
     strcpy(TableHdr.Line4, "-------");
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( !Specie[m].rpt ) continue;
-        if ( tableType == NODE && Specie[m].type == WALL ) continue;
-        sprintf(s1, "  %10s", Specie[m].id);
+        if ( !MSXSpecie[m].rpt ) continue;
+        if ( tableType == NODE && MSXSpecie[m].type == WALL ) continue;
+        sprintf(s1, "  %10s", MSXSpecie[m].id);
         strcat(TableHdr.Line2, s1);
         strcat(TableHdr.Line4, "  ----------");
         input_getSpecieUnits(m, s1);
         sprintf(s2, "  %10s", s1);
         strcat(TableHdr.Line3, s2);
     }
-    if ( PageSize > 0 && PageSize - LineNum < 8 ) newPage();
+    if ( MSXPageSize > 0 && MSXPageSize - LineNum < 8 ) newPage();
     else writeTableHdr();
 }
 
@@ -150,7 +150,7 @@ void createTableHdr(int tableType)
 
 void  writeTableHdr()
 {
-    if ( PageSize > 0 && PageSize - LineNum < 6 ) newPage();
+    if ( MSXPageSize > 0 && MSXPageSize - LineNum < 6 ) newPage();
     writeLine("");
     writeLine(TableHdr.Line1);
     writeLine("");
@@ -167,16 +167,16 @@ void  writeNodeTable(int j)
     char  s[MAXLINE+1];
     float c;
 
-    for (k=0; k<Nperiods; k++)
+    for (k=0; k<MSXNperiods; k++)
     {
         getHrsMins(k, &hrs, &mins);
         sprintf(Line, "%4d:%02d", hrs, mins);
-        for (m=1; m<=Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( !Specie[m].rpt ) continue;
-            if ( Specie[m].type == WALL ) continue;
+            if ( !MSXSpecie[m].rpt ) continue;
+            if ( MSXSpecie[m].type == WALL ) continue;
             c = output_getNodeQual(k, j, m);
-            sprintf(s, "  %10.*f", Specie[m].precision, c);
+            sprintf(s, "  %10.*f", MSXSpecie[m].precision, c);
             strcat(Line, s);
         }
         writeLine(Line);
@@ -191,15 +191,15 @@ void  writeLinkTable(int j)
     char  s[MAXLINE+1];
     float c;
 
-    for (k=0; k<Nperiods; k++)
+    for (k=0; k<MSXNperiods; k++)
     {
         getHrsMins(k, &hrs, &mins);
         sprintf(Line, "%4d:%02d", hrs, mins);
-        for (m=1; m<=Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( !Specie[m].rpt ) continue;
+            if ( !MSXSpecie[m].rpt ) continue;
             c = output_getLinkQual(k, j, m);
-            sprintf(s, "  %10.*f", Specie[m].precision, c);
+            sprintf(s, "  %10.*f", MSXSpecie[m].precision, c);
             strcat(Line, s);
         }
         writeLine(Line);
@@ -212,7 +212,7 @@ void getHrsMins(int k, int *hrs, int *mins)
 {
     long m, h;
 
-    m = (Rstart + k*Rstep) / 60;
+    m = (MSXRstart + k*MSXRstep) / 60;
     h = m / 60;
     m = m - 60*h;
     *hrs = h;
@@ -238,8 +238,8 @@ void  newPage()
 
 void  writeLine(char *line)
 {
-    if ( LineNum == PageSize ) newPage();
-    if ( RptFile.file ) fprintf(RptFile.file, "  %s", line);
+    if ( LineNum == MSXPageSize ) newPage();
+    if ( MSXRptFile.file ) fprintf(MSXRptFile.file, "  %s", line);
     else ENwriteline(line);
     LineNum++;
 }

@@ -60,7 +60,7 @@ typedef struct                         // TIME PATTERN OBJECT
    long     interval;                  // current time interval
    SnumList *first;                    // first mutiplier
    SnumList *current;                  // current multiplier
-}  Spattern;
+}  MSXSpattern;
 
 
 struct Ssource                         // WATER QUALITY SOURCE OBJECT
@@ -82,7 +82,7 @@ typedef struct                         // NODE OBJECT
    double  *c0;                        // initial species concentrations
    int     tank;                       // tank index
    char    rpt;                        // reporting flag
-}  Snode;
+}  MSXSnode;
 
 
 typedef struct                         // LINK OBJECT
@@ -94,7 +94,7 @@ typedef struct                         // LINK OBJECT
    char   rpt;                         // reporting flag
    double *c0;                         // initial species concentrations
    double *param;                      // kinetic parameter values
-}  Slink;
+}  MSXSlink;
 
 
 typedef struct                         // TANK OBJECT
@@ -108,7 +108,7 @@ typedef struct                         // TANK OBJECT
    double v1max;                       // mixing compartment size
    double *param;                      // kinetic parameter values
    double *c;                          // current species concentrations
-}  Stank;
+}  MSXStank;
 
 
 typedef struct                         // CHEMICAL SPECIE OBJECT
@@ -124,28 +124,28 @@ typedef struct                         // CHEMICAL SPECIE OBJECT
     char      rpt;                     // reporting flag
     MathExpr  *pipeExpr;               // pipe chemistry expression
     MathExpr  *tankExpr;               // tank chemistry expression
-}   Sspecie;
+}   MSXSspecie;
 
 
 typedef struct                         // INTERMEDIATE TERM OBJECT
 {
     char      *id;                     // name
     MathExpr  *expr;                   // math expression for term
-}   Sterm;
+}   MSXSterm;
 
 
 typedef struct                         // REACTION RATE PARAMETER OBJECT
 {
     char       *id;                    // name
     double     value;                  // value
-}   Sparam;
+}   MSXSparam;
 
 
 typedef struct                         // MATH EXPRESSION CONSTANT OBJECT
 {
     char       *id;                    // name
     double     value;                  // value
-}   Sconst;
+}   MSXSconst;
 
 
 struct Sseg                            // WATER QUALITY SEGMENT OBJECT
@@ -163,7 +163,7 @@ typedef struct                         // FILE OBJECT
    char          name[FILENAME_MAX];   // file name
    char          mode;                 // see FileModeType enumeration below
    FILE*         file;                 // FILE structure pointer
-}  TFile;
+}  MSXTFile;
 
 
 //  Global Enumeration Variables

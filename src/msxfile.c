@@ -54,7 +54,7 @@ SOURCE, and TITLE
     char  line[MAXLINE+1];
     char  s[MAXLINE+1];
 
-    while (fgets(line,MAXLINE,InpFile.file) != NULL)
+    while (fgets(line,MAXLINE,MSXInpFile.file) != NULL)
     {
         strcpy(s,line);
         tok = strtok(line,SEPSTR);
@@ -113,11 +113,11 @@ Writes network data to text file.
 
     /* Copy sections from original input file to new input file */
 
-    if ((InpFile.file = fopen(InpFile.name,"rt")) == NULL) return 302;
+    if ((MSXInpFile.file = fopen(MSXInpFile.name,"rt")) == NULL) return 302;
     ftmp = tmpfile();
     if (ftmp) copymsxsections(ftmp);
-    fclose(InpFile.file);
-    InpFile.file = NULL;
+    fclose(MSXInpFile.file);
+    MSXInpFile.file = NULL;
 
     /* Open text file */
 
@@ -130,19 +130,19 @@ Writes network data to text file.
     /* Write [TITLE] section */
 
     fprintf(f,"[TITLE]");
-    if (strlen(Title) > 0) fprintf(f,"\n%s",Title);
+    if (strlen(MSXTitle) > 0) fprintf(f,"\n%s",MSXTitle);
 
     /* Write [PATTERNS] section */
     /* (Use 6 pattern factors per line) */
 
     fprintf(f, "\n\n[PATTERNS]");
-    for (i=1; i<=Nobjects[TIME_PATTERN]; i++)
+    for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
     {
-        SnumList *p=Pattern[i].first;
+        SnumList *p=MSXPattern[i].first;
         int j=0;
         while ( p )
         {
-            if (j % 6 == 0) fprintf(f,"\n %-15s",Pattern[i].id);
+            if (j % 6 == 0) fprintf(f,"\n %-15s",MSXPattern[i].id);
             fprintf(f," %12.4f",p->value);
 
             j++;
@@ -153,9 +153,9 @@ Writes network data to text file.
     /* Write [SOURCES] section */
 
     fprintf(f, "\n\n[SOURCES]");
-    for (i=1; i<=Nobjects[NODE]; i++)
+    for (i=1; i<=MSXNobjects[NODE]; i++)
     {
-        Psource source = Node[i].sources;
+        Psource source = MSXNode[i].sources;
         while ( source )
         {
             err = ENgetnodeid(i,nid);
@@ -163,10 +163,10 @@ Writes network data to text file.
             sprintf(s," %-8s %-15s %-15s %12.2f",
                 SourceTypeWords[source->type],
                 nid,
-                Specie[source->specie].id,
+                MSXSpecie[source->specie].id,
                 source->c0);
             if ((j = source->pat) > 0)
-                sprintf(s1,"%s",Pattern[j].id);
+                sprintf(s1,"%s",MSXPattern[j].id);
             else strcpy(s1,"");
             fprintf(f,"\n%s %s",s,s1);
 

@@ -89,14 +89,14 @@ int  project_open(char *fname)
 // --- initialize data to default values
 
     int errcode = 0;
-    ProjectOpened = FALSE;
-    QualityOpened = FALSE;
+    MSXProjectOpened = FALSE;
+    MSXQualityOpened = FALSE;
     setDefaults();
 
 // --- open the MSX input file
 
-    strcpy(InpFile.name, fname);
-    if ((InpFile.file = fopen(fname,"rt")) == NULL) return 302;
+    strcpy(MSXInpFile.name, fname);
+    if ((MSXInpFile.file = fopen(fname,"rt")) == NULL) return 302;
 
 // --- create hash tables to look up object ID names
 
@@ -119,9 +119,9 @@ int  project_open(char *fname)
 
 // --- close input file
 
-    if ( InpFile.file ) fclose(InpFile.file);
-    InpFile.file = NULL;
-    if ( !errcode ) ProjectOpened = TRUE;
+    if ( MSXInpFile.file ) fclose(MSXInpFile.file);
+    MSXInpFile.file = NULL;
+    if ( !errcode ) MSXProjectOpened = TRUE;
     return errcode;
 }
 
@@ -136,15 +136,15 @@ void project_close()
 **    none
 */
 {
-    if ( HydFile.file ) fclose(HydFile.file);
-    if ( HydFile.mode == SCRATCH_FILE ) remove(HydFile.name);
-    if ( OutFile.file ) fclose(OutFile.file);
-    if ( OutFile.mode == SCRATCH_FILE ) remove(OutFile.name);
-    HydFile.file = NULL;
-    OutFile.file = NULL;
+    if ( MSXHydFile.file ) fclose(MSXHydFile.file);
+    if ( MSXHydFile.mode == SCRATCH_FILE ) remove(MSXHydFile.name);
+    if ( MSXOutFile.file ) fclose(MSXOutFile.file);
+    if ( MSXOutFile.mode == SCRATCH_FILE ) remove(MSXOutFile.name);
+    MSXHydFile.file = NULL;
+    MSXOutFile.file = NULL;
     deleteObjects();
     deleteHashTables();
-    ProjectOpened = FALSE;
+    MSXProjectOpened = FALSE;
 }
 
 //=============================================================================
@@ -251,37 +251,37 @@ void setDefaults()
 */
 {
     int i;
-    HydFile.file = NULL;
-    HydFile.mode = USED_FILE;
-    OutFile.file = NULL;
-    OutFile.mode = SCRATCH_FILE;
-    tmpnam(OutFile.name);
-    strcpy(RptFile.name, "");
-    strcpy(Title, "");
-    Rptflag = 0;
-    for (i=0; i<MAX_OBJECTS; i++) Nobjects[i] = 0;
-    strcpy(Title, "");
-    Unitsflag = US;
-    Flowflag = GPM;
-    DefRtol = 0.001;
-    DefAtol = 0.01;
-    Solver = EUL;
-    AreaUnits = FT2;
-    RateUnits = DAYS;
-    Qstep = 300;
-    Rstep = 3600;
-    Rstart = 0;
-    Dur = 0;
-    Node = NULL;
-    Link = NULL;
-    Tank = NULL;
-    D = NULL;
-    Q = NULL;
-    H = NULL;
-    Specie = NULL;
-    Term = NULL;
-    Const = NULL;
-    Pattern = NULL;
+    MSXHydFile.file = NULL;
+    MSXHydFile.mode = USED_FILE;
+    MSXOutFile.file = NULL;
+    MSXOutFile.mode = SCRATCH_FILE;
+    tmpnam(MSXOutFile.name);
+    strcpy(MSXRptFile.name, "");
+    strcpy(MSXTitle, "");
+    MSXRptflag = 0;
+    for (i=0; i<MAX_OBJECTS; i++) MSXNobjects[i] = 0;
+    strcpy(MSXTitle, "");
+    MSXUnitsflag = US;
+    MSXFlowflag = GPM;
+    MSXDefRtol = 0.001;
+    MSXDefAtol = 0.01;
+    MSXSolver = EUL;
+    MSXAreaUnits = FT2;
+    MSXRateUnits = DAYS;
+    MSXQstep = 300;
+    MSXRstep = 3600;
+    MSXRstart = 0;
+    MSXDur = 0;
+    MSXNode = NULL;
+    MSXLink = NULL;
+    MSXTank = NULL;
+    MSXD = NULL;
+    MSXQ = NULL;
+    MSXH = NULL;
+    MSXSpecie = NULL;
+    MSXTerm = NULL;
+    MSXConst = NULL;
+    MSXPattern = NULL;
 }
 
 //=============================================================================
@@ -309,58 +309,58 @@ int convertUnits()
 
 // --- conversions for length & tank volume
 
-    if ( Unitsflag == US )
+    if ( MSXUnitsflag == US )
     {
-        Ucf[LENGTH_UNITS] = 1.0;
-        Ucf[DIAM_UNITS]   = 12.0;
-        Ucf[VOL_UNITS]    = 1.0;
+        MSXUcf[LENGTH_UNITS] = 1.0;
+        MSXUcf[DIAM_UNITS]   = 12.0;
+        MSXUcf[VOL_UNITS]    = 1.0;
     }
     else
     {
-        Ucf[LENGTH_UNITS] = MperFT;
-        Ucf[DIAM_UNITS]   = 1000.0*MperFT;
-        Ucf[VOL_UNITS]    = M3perFT3;
+        MSXUcf[LENGTH_UNITS] = MperFT;
+        MSXUcf[DIAM_UNITS]   = 1000.0*MperFT;
+        MSXUcf[VOL_UNITS]    = M3perFT3;
     }
 
 // --- conversion for surface area
 
-    Ucf[AREA_UNITS] = 1.0;
-    switch (AreaUnits)
+    MSXUcf[AREA_UNITS] = 1.0;
+    switch (MSXAreaUnits)
     {
-        case M2:  Ucf[AREA_UNITS] = M2perFT2;  break;
-        case CM2: Ucf[AREA_UNITS] = CM2perFT2; break;
+        case M2:  MSXUcf[AREA_UNITS] = M2perFT2;  break;
+        case CM2: MSXUcf[AREA_UNITS] = CM2perFT2; break;
     }
 
 // --- conversion for flow rate
 
-    Ucf[FLOW_UNITS] = fcf[Flowflag];
-    Ucf[CONC_UNITS] = LperFT3;
+    MSXUcf[FLOW_UNITS] = fcf[MSXFlowflag];
+    MSXUcf[CONC_UNITS] = LperFT3;
 
 // --- conversion for reaction rate time
 
-    Ucf[RATE_UNITS] = rcf[RateUnits];
+    MSXUcf[RATE_UNITS] = rcf[MSXRateUnits];
 
 // --- convert pipe diameter & length
 
-    for (i=1; i<=Nobjects[LINK]; i++)
+    for (i=1; i<=MSXNobjects[LINK]; i++)
     {
-        Link[i].diam /= Ucf[DIAM_UNITS];
-        Link[i].len /=  Ucf[LENGTH_UNITS];
+        MSXLink[i].diam /= MSXUcf[DIAM_UNITS];
+        MSXLink[i].len /=  MSXUcf[LENGTH_UNITS];
     }
 
 // --- convert initial tank volumes
 
-    for (i=1; i<=Nobjects[TANK]; i++)
+    for (i=1; i<=MSXNobjects[TANK]; i++)
     {
-        Tank[i].v0 /= Ucf[VOL_UNITS];
+        MSXTank[i].v0 /= MSXUcf[VOL_UNITS];
     }
 
 // --- assign default tolerances to species
 
-    for (m=1; m<=Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSXNobjects[SPECIE]; m++)
     {
-        if ( Specie[m].rTol == 0.0 ) Specie[m].rTol = DefRtol;
-        if ( Specie[m].aTol == 0.0 ) Specie[m].aTol = DefAtol;
+        if ( MSXSpecie[m].rTol == 0.0 ) MSXSpecie[m].rTol = MSXDefRtol;
+        if ( MSXSpecie[m].aTol == 0.0 ) MSXSpecie[m].aTol = MSXDefAtol;
     }
     return errcode;
 }
@@ -384,74 +384,74 @@ int createObjects()
 
 // --- create nodes, links, & tanks
 
-    Node = (Snode *) calloc(Nobjects[NODE]+1, sizeof(Snode));
-    Link = (Slink *) calloc(Nobjects[LINK]+1, sizeof(Slink));
-    Tank = (Stank *) calloc(Nobjects[TANK]+1, sizeof(Stank));
+    MSXNode = (MSXSnode *) calloc(MSXNobjects[NODE]+1, sizeof(MSXSnode));
+    MSXLink = (MSXSlink *) calloc(MSXNobjects[LINK]+1, sizeof(MSXSlink));
+    MSXTank = (MSXStank *) calloc(MSXNobjects[TANK]+1, sizeof(MSXStank));
 
 // --- create species, terms, parameters, constants & time patterns
 
-    Specie = (Sspecie *) calloc(Nobjects[SPECIE]+1, sizeof(Sspecie));
-    Term   = (Sterm *)  calloc(Nobjects[TERM]+1,  sizeof(Sterm));
-    Param  = (Sparam *) calloc(Nobjects[PARAMETER]+1, sizeof(Sparam));
-    Const  = (Sconst *) calloc(Nobjects[CONSTANT]+1, sizeof(Sconst));
-    Pattern = (Spattern *) calloc(Nobjects[TIME_PATTERN]+1, sizeof(Spattern));
+    MSXSpecie = (MSXSspecie *) calloc(MSXNobjects[SPECIE]+1, sizeof(MSXSspecie));
+    MSXTerm   = (MSXSterm *)  calloc(MSXNobjects[TERM]+1,  sizeof(MSXSterm));
+    MSXParam  = (MSXSparam *) calloc(MSXNobjects[PARAMETER]+1, sizeof(MSXSparam));
+    MSXConst  = (MSXSconst *) calloc(MSXNobjects[CONSTANT]+1, sizeof(MSXSconst));
+    MSXPattern = (MSXSpattern *) calloc(MSXNobjects[TIME_PATTERN]+1, sizeof(MSXSpattern));
 
 // --- create arrays for demands, heads, & flows
 
-    D = (float *) calloc(Nobjects[NODE]+1, sizeof(float));
-    H = (float *) calloc(Nobjects[NODE]+1, sizeof(float));
-    Q = (float *) calloc(Nobjects[LINK]+1, sizeof(float));
+    MSXD = (float *) calloc(MSXNobjects[NODE]+1, sizeof(float));
+    MSXH = (float *) calloc(MSXNobjects[NODE]+1, sizeof(float));
+    MSXQ = (float *) calloc(MSXNobjects[LINK]+1, sizeof(float));
 
 // --- create arrays for current & initial concen. of each specie for each node
 
-    for (i=1; i<=Nobjects[NODE]; i++)
+    for (i=1; i<=MSXNobjects[NODE]; i++)
     {
-        Node[i].c = (double *) calloc(Nobjects[SPECIE]+1, sizeof(double));
-        Node[i].c0 = (double *) calloc(Nobjects[SPECIE]+1, sizeof(double));
-        Node[i].rpt = 0;
+        MSXNode[i].c = (double *) calloc(MSXNobjects[SPECIE]+1, sizeof(double));
+        MSXNode[i].c0 = (double *) calloc(MSXNobjects[SPECIE]+1, sizeof(double));
+        MSXNode[i].rpt = 0;
     }
 
 // --- create arrays for init. concen. & kinetic parameter values for each link
 
-    for (i=1; i<=Nobjects[LINK]; i++)
+    for (i=1; i<=MSXNobjects[LINK]; i++)
     {
-        Link[i].c0 = (double *) calloc(Nobjects[SPECIE]+1, sizeof(double));
-        Link[i].param = (double *) calloc(Nobjects[PARAMETER]+1, sizeof(double));
-        Link[i].rpt = 0;
+        MSXLink[i].c0 = (double *) calloc(MSXNobjects[SPECIE]+1, sizeof(double));
+        MSXLink[i].param = (double *) calloc(MSXNobjects[PARAMETER]+1, sizeof(double));
+        MSXLink[i].rpt = 0;
     }
 
 // --- create arrays for kinetic parameter values & current concen. for each tank
 
-    for (i=1; i<=Nobjects[TANK]; i++)
+    for (i=1; i<=MSXNobjects[TANK]; i++)
     {
-        Tank[i].param = (double *) calloc(Nobjects[PARAMETER]+1, sizeof(double));
-        Tank[i].c = (double *) calloc(Nobjects[SPECIE]+1, sizeof(double));
+        MSXTank[i].param = (double *) calloc(MSXNobjects[PARAMETER]+1, sizeof(double));
+        MSXTank[i].c = (double *) calloc(MSXNobjects[SPECIE]+1, sizeof(double));
     }
 
 // --- initialize contents of each time pattern object
 
-    for (i=1; i<=Nobjects[TIME_PATTERN]; i++)
+    for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
     {
-        Pattern[i].length = 0;
-        Pattern[i].first = NULL;
-        Pattern[i].current = NULL;
+        MSXPattern[i].length = 0;
+        MSXPattern[i].first = NULL;
+        MSXPattern[i].current = NULL;
     }
 
 // --- initialize reaction rate & equil. formulas for each specie
 
-    for (i=1; i<=Nobjects[SPECIE]; i++)
+    for (i=1; i<=MSXNobjects[SPECIE]; i++)
     {
-        Specie[i].pipeExpr     = NULL;
-        Specie[i].tankExpr     = NULL;
-        Specie[i].pipeExprType = NO_EXPR;
-        Specie[i].tankExprType = NO_EXPR;
-        Specie[i].precision    = 2;
-        Specie[i].rpt = 0;
+        MSXSpecie[i].pipeExpr     = NULL;
+        MSXSpecie[i].tankExpr     = NULL;
+        MSXSpecie[i].pipeExprType = NO_EXPR;
+        MSXSpecie[i].tankExprType = NO_EXPR;
+        MSXSpecie[i].precision    = 2;
+        MSXSpecie[i].rpt = 0;
     }
 
 // --- initialize math expressions for each intermediate term
 
-    for (i=1; i<=Nobjects[TERM]; i++) Term[i].expr = NULL;
+    for (i=1; i<=MSXNobjects[TERM]; i++) MSXTerm[i].expr = NULL;
     return 0;
 }
 
@@ -471,70 +471,70 @@ void deleteObjects()
 
 // --- free memory used by nodes, links, and tanks
 
-    if (Node) for (i=1; i<=Nobjects[NODE]; i++)
+    if (MSXNode) for (i=1; i<=MSXNobjects[NODE]; i++)
     {
-        FREE(Node[i].c);
-        FREE(Node[i].c0);
+        FREE(MSXNode[i].c);
+        FREE(MSXNode[i].c0);
     }
-    if (Link) for (i=1; i<=Nobjects[LINK]; i++)
+    if (MSXLink) for (i=1; i<=MSXNobjects[LINK]; i++)
     {
-        FREE(Link[i].c0);
-        FREE(Link[i].param);
+        FREE(MSXLink[i].c0);
+        FREE(MSXLink[i].param);
     }
-    if (Tank) for (i=1; i<=Nobjects[TANK]; i++)
+    if (MSXTank) for (i=1; i<=MSXNobjects[TANK]; i++)
     {
-        FREE(Tank[i].param);
-        FREE(Tank[i].c);
+        FREE(MSXTank[i].param);
+        FREE(MSXTank[i].c);
     }
 
 // --- free memory used by time patterns
 
-    if (Pattern) for (i=1; i<=Nobjects[TIME_PATTERN]; i++)
+    if (MSXPattern) for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
     {
-        listItem = Pattern[i].first;
+        listItem = MSXPattern[i].first;
         while (listItem)
         {
-            Pattern[i].first = listItem->next;
+            MSXPattern[i].first = listItem->next;
             free(listItem);
-            listItem = Pattern[i].first;
+            listItem = MSXPattern[i].first;
         }
     }
 
 // --- free memory used for hydraulics results
 
-    FREE(D);
-    FREE(H);
-    FREE(Q);
+    FREE(MSXD);
+    FREE(MSXH);
+    FREE(MSXQ);
 
 // --- delete all nodes, links, and tanks
 
-    FREE(Node);
-    FREE(Link);
-    FREE(Tank);
+    FREE(MSXNode);
+    FREE(MSXLink);
+    FREE(MSXTank);
 
 // --- free memory used by reaction rate & equilibrium expressions
 
-    if (Specie) for (i=1; i<=Nobjects[SPECIE]; i++)
+    if (MSXSpecie) for (i=1; i<=MSXNobjects[SPECIE]; i++)
     {
     // --- free the specie's tank expression only if it doesn't
     //     already point to the specie's pipe expression
-        if ( Specie[i].tankExpr != Specie[i].pipeExpr )
+        if ( MSXSpecie[i].tankExpr != MSXSpecie[i].pipeExpr )
         {
-            mathexpr_delete(Specie[i].tankExpr);
+            mathexpr_delete(MSXSpecie[i].tankExpr);
         }
-        mathexpr_delete(Specie[i].pipeExpr);
+        mathexpr_delete(MSXSpecie[i].pipeExpr);
     }
 
 // --- delete all species, parameters, and constants
 
-    FREE(Specie);
-    FREE(Param);
-    FREE(Const);
+    FREE(MSXSpecie);
+    FREE(MSXParam);
+    FREE(MSXConst);
 
 // --- free memory used by intermediate terms
 
-    if (Term) for (i=1; i<=Nobjects[TERM]; i++) mathexpr_delete(Term[i].expr);
-    FREE(Term);
+    if (MSXTerm) for (i=1; i<=MSXNobjects[TERM]; i++) mathexpr_delete(MSXTerm[i].expr);
+    FREE(MSXTerm);
 }
 
 //=============================================================================

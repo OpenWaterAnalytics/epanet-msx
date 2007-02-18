@@ -237,7 +237,7 @@ int rk5_integrate(double y[], int n, double t, double tnext,
             // --- computation of hnew
             fac11 = pow(err, expo1);
             fac = fac11/pow(facold, beta);               // LUND-stabilization
-            fac = fmax(facc2, fmin(facc1, (fac/SAFE)));  // must have FAC1 <= HNEW/H <= FAC2
+            fac = fmax(facc2, fmin(facc1, (fac/SAFE)));  // must have FAC1 <= HNEW/MSXH <= FAC2
             hnew = h/fac;
         }
   

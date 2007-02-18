@@ -7,7 +7,7 @@
 **  LAST UPDATE:   8/1/06
 **
 **  This code is based on material presented in:
-**    Verwer, J.G., Spee, E.J., Blom, J.G. and Hundsdorfer, W.H.,
+**    Verwer, J.G., Spee, E.J., Blom, J.G. and Hundsdorfer, W.MSXH.,
 **    "A second order Rosenbrock method applied to photochemical dispersion
 **    problems", SIAM J. Sci. Comput., 20:1456-1480, July 1999.
 *******************************************************************************/
@@ -20,7 +20,7 @@
 //// For debugging purposes
 //#include <stdio.h>
 //#include "epanet2.h"
-//char Msg[250];
+//char MSXMsg[250];
 
 #define fmin(x,y) (((x)<=(y)) ? (x) : (y))     /* minimum of x and y    */
 #define fmax(x,y) (((x)>=(y)) ? (x) : (y))     /* maximum of x and y    */
