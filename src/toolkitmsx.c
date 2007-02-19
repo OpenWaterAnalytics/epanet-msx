@@ -168,9 +168,9 @@ int   DLLEXPORT  ENMSXusehydfile(char *fname)
 **    an error code (or 0 for no error).
 */
 {
-    int magic;
-    int version;
-    int n;
+    INT4 magic;
+    INT4 version;
+    INT4 n;
 
     if (!MSXProjectOpened) return(ERR_NO_PROJECT);
 
@@ -182,20 +182,20 @@ int   DLLEXPORT  ENMSXusehydfile(char *fname)
     if (!MSXHydFile.file) return 504;
 
 // --- check that file is really a hydraulics file for current project
-
-    fread(&magic, sizeof(int), 1, MSXHydFile.file);
+ 
+    fread(&magic, sizeof(INT4), 1, MSXHydFile.file);
     if ( magic != MAGICNUMBER ) return 505;
-    fread(&version, sizeof(int), 1, MSXHydFile.file);
+    fread(&version, sizeof(INT4), 1, MSXHydFile.file);
     //if ( version != VERSION ) return 505;
-    fread(&n, sizeof(int), 1, MSXHydFile.file);
+    fread(&n, sizeof(INT4), 1, MSXHydFile.file);
     if ( n != MSXNobjects[NODE] ) return 505;
-    fread(&n, sizeof(int), 1, MSXHydFile.file);
+    fread(&n, sizeof(INT4), 1, MSXHydFile.file);
     if ( n != MSXNobjects[LINK] ) return 505;
-    fseek(MSXHydFile.file, 3*sizeof(int), SEEK_CUR);
+    fseek(MSXHydFile.file, 3*sizeof(INT4), SEEK_CUR);
 
 // --- read length of simulation period covered by file
 
-    fread(&MSXDur, sizeof(int), 1, MSXHydFile.file);
+    fread(&MSXDur, sizeof(INT4), 1, MSXHydFile.file);
     MSXHydOffset = ftell(MSXHydFile.file);
     return 0;
 }

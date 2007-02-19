@@ -126,7 +126,7 @@
 				RelativePath="..\..\..\src\chemistry.c">
 			</File>
 			<File
-				RelativePath="..\..\..\src\hashmsx.c">
+				RelativePath="..\..\..\..\..\Base\trunk\common\hash.c">
 			</File>
 			<File
 				RelativePath="..\..\..\src\inputmsx.c">
@@ -165,7 +165,7 @@
 				RelativePath="..\..\..\src\toolkitmsx.c">
 			</File>
 			<File
-				RelativePath="..\..\..\src\utils.c">
+				RelativePath="..\..\..\..\..\Base\trunk\common\utils.c">
 			</File>
 		</Filter>
 		<Filter
@@ -179,7 +179,7 @@
 				RelativePath="..\..\..\src\globals.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\hashmsx.h">
+				RelativePath="..\..\..\..\..\Base\trunk\common\hash.h">
 			</File>
 			<File
 				RelativePath="..\..\..\src\mathexpr.h">
@@ -200,7 +200,7 @@
 				RelativePath="..\..\..\src\typesmsx.h">
 			</File>
 			<File
-				RelativePath="..\..\..\src\utils.h">
+				RelativePath="..\..\..\..\..\Base\trunk\common\utils.h">
 			</File>
 		</Filter>
 		<Filter

@@ -74,12 +74,13 @@ int  report_write()
 {
     INT4 magic = 0;
     int  j;
+    int  recordsize=sizeof(INT4);
 
 // --- check that results are available
 
     if ( MSXNperiods < 1 )    return 0;
     if ( MSXOutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
-    fseek(MSXOutFile.file, -RECORDSIZE, SEEK_END);
+    fseek(MSXOutFile.file, -recordsize, SEEK_END);
     fread(&magic, sizeof(INT4), 1, MSXOutFile.file);
     if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
 
