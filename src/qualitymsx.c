@@ -465,7 +465,7 @@ int  getHydVars()
 
 // --- read hydraulic time, demands, heads, and flows from the file
 
-    if (fread(&hydtime, sizeof(long), 1, MSXHydFile.file) < 1)  return 307;
+    if (fread(&hydtime, sizeof(INT4), 1, MSXHydFile.file) < 1)  return 307;
     n = MSXNobjects[NODE];
     if (fread(MSXD+1, sizeof(float), n, MSXHydFile.file) < (unsigned)n) return 307;
     if (fread(MSXH+1, sizeof(float), n, MSXHydFile.file) < (unsigned)n) return 307;
@@ -478,7 +478,7 @@ int  getHydVars()
 
 // --- read time step until next hydraulic event
 
-    if (fread(&hydstep, sizeof(long), 1, MSXHydFile.file) < 1) return 307;
+    if (fread(&hydstep, sizeof(INT4), 1, MSXHydFile.file) < 1) return 307;
 
 // --- update elapsed time until next hydraulic event
 
