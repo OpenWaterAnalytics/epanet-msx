@@ -73,7 +73,7 @@ docdir = $(datarootdir)/doc/epanet
 # Compiler and flags
 # MinGW gcc
 CC = $(MinGWdir)/bin/gcc
-CFLAGS = -g -O3
+CFLAGS = -g -O
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir) -I $(epanetcommondir)
 LDFLAGS =
 

@@ -44,6 +44,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "mathexpr.h"
 
 #define MAX_STACK_SIZE  1024
@@ -187,7 +188,7 @@ double getNumber()
             while (Pos < Len && isDigit(S[Pos]))
             {
                 c[0] = S[Pos];
-                strcat(sNumber, c);  
+                strcat(sNumber, c);
                 Pos++;
             }
         }
@@ -195,7 +196,7 @@ double getNumber()
         /* --- get exponent */
         if (Pos < Len && (S[Pos] == 'e' || S[Pos] == 'E'))
         {
-            strcat(sNumber, "E");  
+            strcat(sNumber, "E");
             Pos++;
             if (Pos >= Len) errflag = 1;
             else
@@ -203,14 +204,14 @@ double getNumber()
                 if (S[Pos] == '-' || S[Pos] == '+')
                 {
                     c[0] = S[Pos];
-                    strcat(sNumber, c);  
+                    strcat(sNumber, c);
                     Pos++;
                 }
                 if (Pos >= Len || !isDigit(S[Pos])) errflag = 1;
                 else while ( Pos < Len && isDigit(S[Pos]))
                 {
                     c[0] = S[Pos];
-                    strcat(sNumber, c);  
+                    strcat(sNumber, c);
                     Pos++;
                 }
             }
@@ -352,7 +353,7 @@ ExprTree * getSingleOp(int *lex)
             left->left = getTree();
             left->opcode = opcode;
         }
-    }   
+    }
     *lex = getLex();
 
     /* --- exponentiation */
@@ -470,7 +471,7 @@ ExprTree * getTree()
         node->right = right;
         node->opcode = opcode;
         left = node;
-    } 
+    }
     return left;
 }
 
@@ -516,7 +517,7 @@ void deleteTree(ExprTree *tree)
 double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 //  Mathematica expression evaluation using a stack
 {
-    
+
 // --- Note: the ExprStack array must be declared locally and not globally
 //     since this function can be called recursively.
 
@@ -530,31 +531,31 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 	{
 		switch (node->opcode)
 		{
-			case 3:  
+			case 3:
 				r1 = ExprStack[stackindex];
 				stackindex--;
 				r2 = ExprStack[stackindex];
 				ExprStack[stackindex] = r2 + r1;
 				break;
-			case 4:  
+			case 4:
 				r1 = ExprStack[stackindex];
 				stackindex--;
 				r2 = ExprStack[stackindex];
 				ExprStack[stackindex] = r2 - r1;
 				break;
-			case 5:  
+			case 5:
 				r1 = ExprStack[stackindex];
 				stackindex--;
 				r2 = ExprStack[stackindex];
 				ExprStack[stackindex] = r2 * r1;
 				break;
-			case 6:  
+			case 6:
 				r1 = ExprStack[stackindex];
 				stackindex--;
 				r2 = ExprStack[stackindex];
 				ExprStack[stackindex] = r2 / r1;
 				break;				
-			case 7:  
+			case 7:
 				stackindex++;
 				ExprStack[stackindex] = node->fvalue;
 				break;
@@ -565,74 +566,74 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				stackindex++;
 				ExprStack[stackindex] = r1;
 				break;
-			case 9: 
+			case 9:
 				ExprStack[stackindex] = -ExprStack[stackindex];
 				break;
-			case 10: 
+			case 10:
 				r1 = ExprStack[stackindex];
 				r2 = cos(r1);
 				ExprStack[stackindex] = r2;
 				break;
-			case 11: 
+			case 11:
 				r1 = ExprStack[stackindex];
 				r2 = sin(r1);
 				ExprStack[stackindex] = r2;
 				break;
-			case 12: 
+			case 12:
 				r1 = ExprStack[stackindex];
 				r2 = tan(r1);
 				ExprStack[stackindex] = r2;
 				break;
-			case 13: 
+			case 13:
 				r1 = ExprStack[stackindex];
-				r2 = 1.0/tan( r1 );    
+				r2 = 1.0/tan( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 14: 
+			case 14:
 				r1 = ExprStack[stackindex];
-				r2 = fabs( r1 );       
+				r2 = fabs( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 15: 
+			case 15:
 				r1 = ExprStack[stackindex];
 				if (r1 < 0.0) r2 = -1.0;
 				else if (r1 > 0.0) r2 = 1.0;
 				else r2 = 0.0;
 				ExprStack[stackindex] = r2;
 				break;
-			case 16: 
+			case 16:
 				r1 = ExprStack[stackindex];
-				r2 = sqrt( r1 );     
+				r2 = sqrt( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 17: 
+			case 17:
 				r1 = ExprStack[stackindex];
 				r2 = log(r1);
 				ExprStack[stackindex] = r2;
 				break;
-			case 18: 
+			case 18:
 				r1 = ExprStack[stackindex];
 				r2 = exp(r1);
 				ExprStack[stackindex] = r2;
 				break;
-			case 19: 
+			case 19:
 				r1 = ExprStack[stackindex];
 				r2 = asin( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 20: 
+			case 20:
 				r1 = ExprStack[stackindex];
-				r2 = acos( r1 );      
+				r2 = acos( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 21: 
+			case 21:
 				r1 = ExprStack[stackindex];
-				r2 = atan( r1 );      
+				r2 = atan( r1 );
 				ExprStack[stackindex] = r2;
 				break;
-			case 22: 
+			case 22:
 				r1 = ExprStack[stackindex];
-				r2 = 1.57079632679489661923 - atan(r1);  
+				r2 = 1.57079632679489661923 - atan(r1);
 				ExprStack[stackindex] = r2;
 				break;
 			case 23:
@@ -640,24 +641,24 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				r2 = (exp(r1)-exp(-r1))/2.0;
 				ExprStack[stackindex] = r2;
 				break;
-			case 24: 
+			case 24:
 				r1 = ExprStack[stackindex];
 				r2 = (exp(r1)+exp(-r1))/2.0;
 				ExprStack[stackindex] = r2;
 				break;
-			case 25: 
+			case 25:
 				r1 = ExprStack[stackindex];
 				r2 = (exp(r1)-exp(-r1))/(exp(r1)+exp(-r1));
 				ExprStack[stackindex] = r2;
 				break;
-			case 26: 
+			case 26:
 				r1 = ExprStack[stackindex];
 				r2 = (exp(r1)+exp(-r1))/(exp(r1)-exp(-r1));
 				ExprStack[stackindex] = r2;
 				break;
-			case 27: 
+			case 27:
 				r1 = ExprStack[stackindex];
-				r2 = log10( r1 );     
+				r2 = log10( r1 );
 				ExprStack[stackindex] = r2;
 				break;
             case 28:
@@ -666,8 +667,8 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				else           r2 = 1.0;
 				ExprStack[stackindex] = r2;
 				break;
-               
-			case 31: 
+
+			case 31:
 				r1 = ExprStack[stackindex];
 				r2 = ExprStack[stackindex-1];
 				r2 = exp(r1*log(r2));
