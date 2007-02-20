@@ -562,15 +562,18 @@ void  initSegs()
         FirstSeg[k] = NULL;
         NewSeg[k] = NULL;
 
-    // --- use quality of downstream node for BULK species
-    //     if no initial link quality supplied
+    // --- use initial quality of downstream node for BULK species
+    //     and initial quality of link for WALL species.
+    //     These are zero if no initial values explicitly assigned
 
         j = DOWN_NODE(k);
         for (m=1; m<=MSXNobjects[SPECIE]; m++)
         {
-            if ( MSXLink[k].c0[m] != MISSING )    C1[m] = MSXLink[k].c0[m];
-            else if ( MSXSpecie[m].type == BULK ) C1[m] = MSXNode[j].c0[m];
-            else                               C1[m] = 0.0;
+            if ( MSXSpecie[m].type == BULK ) {
+                C1[m] = MSXNode[j].c0[m];
+            } else {
+                C1[m] = MSXLink[k].c0[m];
+            }
         }
 
     // --- fill link with a single segment of this quality
