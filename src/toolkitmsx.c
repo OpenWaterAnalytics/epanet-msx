@@ -538,11 +538,11 @@ int  DLLEXPORT  ENMSXgetnodequal(int node, int specie, double *c)
 {
     *c = 0.0;
     if (!MSXProjectOpened) return(ERR_NO_PROJECT);
-    if ( node > 0 && node <= MSXNobjects[NODE] &&
-         specie > 0 && specie <= MSXNobjects[SPECIE] )
-    {
-        *c = quality_getNodeQual(node, specie);
-    }
+    if ( node <= 0 || node > MSXNobjects[NODE] ||
+         specie <= 0 || specie > MSXNobjects[SPECIE] ) return(ERR_INDEX_VALUE);
+
+    *c = quality_getNodeQual(node, specie);
+
     return 0;
 }
 
@@ -567,11 +567,11 @@ int  DLLEXPORT  ENMSXgetlinkqual(int link, int specie, double *c)
 {
     *c = 0.0;
     if (!MSXProjectOpened) return(ERR_NO_PROJECT);
-    if ( link > 0 && link <= MSXNobjects[LINK] &&
-        specie > 0 && specie <= MSXNobjects[SPECIE] )
-    {
-        *c = quality_getLinkQual(link, specie);
-    }
+    if ( link <= 0 || link > MSXNobjects[LINK] ||
+        specie <= 0 || specie > MSXNobjects[SPECIE] ) return(ERR_INDEX_VALUE);
+    
+    *c = quality_getLinkQual(link, specie);
+
     return 0;
 }
 
