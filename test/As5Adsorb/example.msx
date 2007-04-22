@@ -1,0 +1,50 @@
+[TITLE]
+Arsenic Oxidation/Adsorption Example
+
+[OPTIONS]
+  AREA_UNITS  M2         ;Surface concentration is mass/m2
+  RATE_UNITS  HR         ;Reaction rates are concentration/hour
+  SOLVER      RK5        ;Euler integrator
+  TIMESTEP    360        ;360 sec (5 min) time step
+  RTOL        0.001      ;Acceptable relative error
+  ATOL        0.0001     ;Acceptable absolute error
+
+[SPECIES]
+  BULK  As3     UG       ;Dissolved arsenite
+  BULK  As5     UG       ;Dissolved arsenate
+  WALL  As5s    UG       ;Adsorbed arsenate
+  BULK  NHCL    MG       ;Monochloramine
+  BULK  Age     MG       ;Water age
+
+[COEFFICIENTS]
+  CONSTANT  Ka  10       ;Arsenite oxidation rate coeff.
+  CONSTANT  Kb  0.1      ;Monochloramine decay rate coeff.
+  CONSTANT  Ks  5.0      ;Adsorption coefficient       
+  CONSTANT  Smax 50      ;Adsorption saturation limit
+
+[PIPES]
+  RATE  As3   -Ka*As3*NHCL                    ;Arsenite oxidation
+  RATE  As5    Ka*As3*NHCL                    ;Arsenate production
+  RATE  NHCL  -Kb*NHCL                        ;Monochloramine decay
+  EQUIL As5s   Ks*Smax*As5/(1+Ks*As5) - As5s  ;Arsenate adsorption
+  RATE  Age   1                               ;Water age growth
+
+[TANKS]
+  RATE  As3   -Ka*As3*NHCL
+  RATE  As5    Ka*As3*NHCL
+  RATE  NHCL  -Kb*NHCL
+  RATE  Age    1
+
+[QUALITY]
+  ;Initial conditions (= 0 if not specified here)
+  NODE  Source  As3   10.0 
+  NODE  Source  NHCL  2.5
+
+[REPORT]
+  NODES ALL
+  LINKS ALL
+  SPECIE   As3  YES
+  SPECIE   As5  YES
+  SPECIE   As5s YES  4
+  SPECIE   NHCL YES
+  SPECIE   Age  YES

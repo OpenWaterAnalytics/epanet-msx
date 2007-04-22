@@ -1,192 +1,251 @@
 /*******************************************************************************
-**  TITLE:         MSXFILE.C
-**  DESCRIPTION:   Save input function for the EPANET-MSX
-**                 Multi-Species Extension toolkit.
+**  MODULE:        MSXFILE.C
+**  PROJECT:       EPANET-MSX
+**  DESCRIPTION:   writes MSX project data to a MSX input file.
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   1/15/07
+**  LAST UPDATE:   3/13/07
 *******************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
-#include <math.h>
-#include "typesmsx.h"    
-#define  EXTERN_MSX extern
-#include "globals.h"
-#include "utils.h"
+
+#include "msxtypes.h"
+#include "msxutils.h"
+#include "msxdict.h"
 #include "epanet2.h"
 
-// NOTE: the entries in MSsectWords must match the entries in the enumeration
-//       variable SectionType defined in typesmsx.h.
-static char *MSsectWords[] = {
-        "[TITLE", "[SPECIE",  "[COEFF",  "[TERM",
-        "[PIPE",  "[TANK",    "[SOURCE", "[QUALITY",
-        "[PARAM", "[PATTERN", "[OPTION",
-        "[REPORT", NULL};
-static char *SourceTypeWords[] = {"CONC", "MASS", "SETPOINT", "FLOW", NULL};
+//  External variables
+//--------------------
+extern MSXproject  MSX;                // MSX project data
 
-// Exported Functions
-// ------------------
-int  savemsxfile(char *fname);
+//  Exported functions
+//--------------------
+void MSXfile_save(FILE *f);
 
-// Imported Functions
-// ------------------
-int  getNewSection(char *tok, char *sectWords[], int *sect);
+//  Local functions
+//-----------------
+static void  saveSpecies(FILE *f);
+static void  saveCoeffs(FILE *f);
+static void  saveInpSections(FILE *f);
+static void  saveParams(FILE *f);
+static void  saveQuality(FILE *f);
+static void  saveSources(FILE *f);
+static void  savePatterns(FILE *f);
 
-// Local Functions
-// ---------------
-static void copymsxsections(FILE *ftmp);
+//=============================================================================
 
-void  copymsxsections(FILE *ftmp)
+void MSXfile_save(FILE *f)
 /*
--------------------------------------------------
-Writes network data sections to text file.
-All data sections are copied except PATTERN,
-SOURCE, and TITLE
--------------------------------------------------
+**  Purpose:
+**    saves current MSX project data to file.
+**
+**  Input:
+**    f = pointer to MSX file where data are saved.
 */
 {
-    int   sect=-1;
-    char  *tok; 
-    char  line[MAXLINE+1];
-    char  s[MAXLINE+1];
+    fprintf(f, "[TITLE]");
+    fprintf(f, "\n%s\n", MSX.Title);
+    saveSpecies(f);
+    saveCoeffs(f);
+    saveInpSections(f);
+    saveParams(f);
+    saveQuality(f);
+    saveSources(f);
+    savePatterns(f);
+}
 
-    while (fgets(line,MAXLINE,MSXInpFile.file) != NULL)
+//=============================================================================
+
+void  saveSpecies(FILE *f)
+{
+    int  i, n;
+    fprintf(f, "\n[SPECIES]");
+    n = MSX.Nobjects[SPECIE];
+    for (i=1; i<=n; i++)
     {
-        strcpy(s,line);
-        tok = strtok(line,SEPSTR);
-        if (tok == NULL || *tok == ';') continue;
+        if ( MSX.Specie[i].type == BULK ) fprintf(f, "\nBULK    "); 
+        else                          fprintf(f, "\nWALL    ");
+        fprintf(f, "%-32s %-15s %.6f %.6f",
+            MSX.Specie[i].id, MSX.Specie[i].units,
+            MSX.Specie[i].aTol, MSX.Specie[i].rTol);
+    }
+}
 
-        /* Check if line begins with a new section heading */
-        if (*tok == '[')
+//=============================================================================
+
+void  saveCoeffs(FILE *f)
+{
+    int  i, n;
+    fprintf(f, "\n\n[COEFFICIENTS]");
+    n = MSX.Nobjects[CONSTANT];
+    for (i=1; i<=n; i++)
+    {
+        fprintf(f, "\nCONSTANT    %-32s  %.6f",
+            MSX.Const[i].id, MSX.Const[i].value);
+    }
+    n = MSX.Nobjects[PARAMETER];
+    for (i=1; i<=n; i++)
+    {
+        fprintf(f, "\nPARAMETER   %-32s  %.6f",
+            MSX.Param[i].id, MSX.Param[i].value);
+    }
+}
+
+//=============================================================================
+
+void  saveInpSections(FILE *f)
+{
+    char   line[MAXLINE+1];
+    char   writeLine;
+    int    newsect;
+
+    rewind(MSX.MsxFile.file);
+    writeLine = FALSE;
+    while ( fgets(line, MAXLINE, MSX.MsxFile.file) != NULL )
+    {
+        if (*line == '[' )
         {
-            if ( getNewSection(tok, MSsectWords, &sect) )
+            writeLine = TRUE;
+            newsect = MSXutils_findmatch(line, MsxSectWords);
+            if ( newsect >= 0 ) switch(newsect)
             {
-                switch(sect)
-                {
-                case s_SPECIE:
-                case s_COEFF:
-                case s_TERM:
-                case s_PIPE:
-                case s_TANK:
-                case s_QUALITY:
-                case s_PARAMETER:
-                case s_OPTION:
-                case s_REPORT: fwrite(s, sizeof(char), strlen(s), ftmp);
-                }
-                continue;
+              case s_OPTION:
+              case s_TERM:
+              case s_PIPE:
+              case s_TANK:
+              case s_REPORT:
+                fprintf(f, "\n");
+                break;
+              default:
+                writeLine = FALSE;
             }
-            else continue;
         }
+        if ( writeLine) fprintf(f, "\n%s", line);
+    }
+}
 
-        /* Write lines appearing in the section to file */
-        switch(sect)
+//=============================================================================
+
+void  saveParams(FILE *f)
+{
+    int    i, j, k;
+    double x;
+    char   id[MAXLINE+1];
+
+    if ( MSX.Nobjects[PARAMETER] > 0 )
+    {
+        fprintf(f, "\n\n[PARAMETERS]");
+        for (j=1; j<=MSX.Nobjects[PARAMETER]; j++)
         {
-        case s_SPECIE:
-        case s_COEFF:
-        case s_TERM:
-        case s_PIPE:
-        case s_TANK:
-        case s_QUALITY:
-        case s_PARAMETER:
-        case s_OPTION:
-        case s_REPORT: fwrite(s, sizeof(char), strlen(s), ftmp);
+            x = MSX.Param[j].value;
+            for (i=1; i<=MSX.Nobjects[LINK]; i++)
+            {
+                if ( MSX.Link[i].param[j] != x )
+                {
+                    ENgetlinkid(i, id);
+                    fprintf(f, "\nPIPE    %-32s  %-32s  %.6f",
+                        id, MSX.Param[j].id, MSX.Link[i].param[j]);
+                }
+            }
+            for (i=1; i<=MSX.Nobjects[TANK]; i++)
+            {
+                if ( MSX.Tank[i].param[j] != x )
+                {
+                    k = MSX.Tank[i].node;
+                    ENgetnodeid(k, id);
+                    fprintf(f, "\nTANK    %-32s  %-32s  %.6f",
+                        MSX.Param[j].id, MSX.Tank[i].param[j]);
+                }
+            }
         }
     }
 }
 
-int  savemsxfile(char *fname)
-/*
--------------------------------------------------
-Writes network data to text file.
--------------------------------------------------
-*/
+//=============================================================================
+
+void  saveQuality(FILE *f)
 {
-    int   i,j,err;
-    char  s[MAXLINE+1], s1[MAXLINE+1], nid[MAXID+1];
+    int    i, j;
+    char   id[MAXLINE+1];
 
-    FILE  *f;
-    FILE  *ftmp;
-
-    /* Copy sections from original input file to new input file */
-
-    if ((MSXInpFile.file = fopen(MSXInpFile.name,"rt")) == NULL) return 302;
-    ftmp = tmpfile();
-    if (ftmp) copymsxsections(ftmp);
-    fclose(MSXInpFile.file);
-    MSXInpFile.file = NULL;
-
-    /* Open text file */
-
-    if ((f = fopen(fname,"wt")) == NULL)
+    fprintf(f, "\n\n[QUALITY]");
+    for (j=1; j<=MSX.Nobjects[SPECIE]; j++)
     {
-        if (ftmp) fclose(ftmp);
-        return(102);
-    }
-
-    /* Write [TITLE] section */
-
-    fprintf(f,"[TITLE]");
-    if (strlen(MSXTitle) > 0) fprintf(f,"\n%s",MSXTitle);
-
-    /* Write [PATTERNS] section */
-    /* (Use 6 pattern factors per line) */
-
-    fprintf(f, "\n\n[PATTERNS]");
-    for (i=1; i<=MSXNobjects[TIME_PATTERN]; i++)
-    {
-        SnumList *p=MSXPattern[i].first;
-        int j=0;
-        while ( p )
+        for (i=1; i<=MSX.Nobjects[NODE]; i++)
         {
-            if (j % 6 == 0) fprintf(f,"\n %-15s",MSXPattern[i].id);
-            fprintf(f," %12.4f",p->value);
-
-            j++;
-            p=p->next;
+            if ( MSX.Node[i].c0[j] > 0.0 )
+            {
+                ENgetnodeid(i, id);
+                fprintf(f, "\nNODE    %-32s  %-32s  %.6f",
+                    id, MSX.Specie[j].id, MSX.Node[i].c0[j]);
+            }
+        }
+        for (i=1; i<=MSX.Nobjects[LINK]; i++)
+        {
+            if ( MSX.Link[i].c0[j] > 0.0 )
+            {
+                ENgetlinkid(i, id);
+                fprintf(f, "\nLINK    %-32s  %-32s  %.6f",
+                    id, MSX.Specie[j].id, MSX.Link[i].c0[j]);
+            }
         }
     }
+}
 
-    /* Write [SOURCES] section */
+//=============================================================================
+
+void  saveSources(FILE *f)
+{
+    int     i;
+    Psource source;
+    char    id[MAXLINE+1];
 
     fprintf(f, "\n\n[SOURCES]");
-    for (i=1; i<=MSXNobjects[NODE]; i++)
+    for (i=1; i<=MSX.Nobjects[NODE]; i++)
     {
-        Psource source = MSXNode[i].sources;
+        source = MSX.Node[i].sources;
         while ( source )
         {
-            err = ENgetnodeid(i,nid);
-            if(err) return(err);
-            sprintf(s," %-8s %-15s %-15s %12.2f",
-                SourceTypeWords[source->type],
-                nid,
-                MSXSpecie[source->specie].id,
-                source->c0);
-            if ((j = source->pat) > 0)
-                sprintf(s1,"%s",MSXPattern[j].id);
-            else strcpy(s1,"");
-            fprintf(f,"\n%s %s",s,s1);
-
+            if ( source->c0 > 0.0 )
+            {
+                ENgetnodeid(i, id);
+                fprintf(f, "\n%-10s  %-32s  %-32s  %.6f",
+                    SourceTypeWords[source->type], id,
+                    MSX.Specie[source->specie].id, source->c0);
+                if ( source->pat > 0 )
+                    fprintf(f, "  %-32s", MSX.Pattern[source->pat]);
+            }
             source = source->next;
         }
     }
-
-    /* Copy data from scratch file to new input file */
-    fprintf(f,"\n");
-    if (ftmp != NULL)
-    {
-        fseek(ftmp, 0, SEEK_SET);
-        while ( ( j = fgetc(ftmp) ) != EOF )
-        {
-            fputc(j, f);
-        }
-        fclose(ftmp);
-    } 
-
-    fclose(f);
-    return(0);
 }
 
+//=============================================================================
+
+void  savePatterns(FILE *f)
+{
+    int  i, count;
+    SnumList *listItem;
+
+    if ( MSX.Nobjects[PATTERN] > 0 ) fprintf(f, "\n\n[PATTERNS]");
+    for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
+    {
+        count = 0;
+        listItem = MSX.Pattern[i].first;
+        while (listItem)
+        {
+            if ( count % 6 == 0 )
+            {
+                fprintf(f, "\n%-32s", MSX.Pattern[i].id);
+            }
+            fprintf(f, "  %.6f", listItem->value);
+            count++;
+            listItem = listItem->next;
+        }
+    }
+}

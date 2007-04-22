@@ -1,67 +1,101 @@
 /******************************************************************************
-**  TITLE:         EPANETMSX.H
+**  MODULE:        EPANETMSX.H
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   C/C++ header file for EPANET Multi-Species Extension Toolkit
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   10/5/06
+**  VERSION:       1.00 
+**  LAST UPDATE:   3/13/07
 *******************************************************************************/
 
 #ifndef EPANETMSX_H
 #define EPANETMSX_H
 
-/* These are codes used by the API functions */
-#define ENMSX_SPECIESCOUNT    0     /* Component counts */
-#define ENMSX_TERMCOUNT       1
-#define ENMSX_PARAMCOUNT      2
-#define ENMSX_CONSTCOUNT      3
-#define ENMSX_PATCOUNT        4
-#define ENMSX_INITQUAL        0     /* Node and Link values */
-#define ENMSX_SOURCEQUAL      0     /* Source values */
-#define ENMSX_SOURCEPAT       1
-#define ENMSX_SOURCETYPE      2
-#define ENMSX_CONCEN          0     /* Source types */
-#define ENMSX_MASS            1
-#define ENMSX_SETPOINT        2
-#define ENMSX_FLOWPACED       3
+// --- define WINDOWS
 
-#ifdef WIN32
+#undef WINDOWS
+#ifdef _WIN32
+  #define WINDOWS
+#endif
+#ifdef __WIN32__
+  #define WINDOWS
+#endif
+
+// --- define DLLEXPORT
+
+#ifdef WINDOWS
   #ifdef __cplusplus
   #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
   #else
   #define DLLEXPORT __declspec(dllexport) __stdcall
   #endif
 #else
-#define DLLEXPORT
-#endif
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C"
+  #else
+  #define DLLEXPORT
+  #endif
+#endif  
 
-int  DLLEXPORT ENMSXopen(char *fname);
-int  DLLEXPORT ENMSXsolveH(void);
-int  DLLEXPORT ENMSXusehydfile(char *fname);
-int  DLLEXPORT ENMSXinit(int save);
-int  DLLEXPORT ENMSXgetnodequal(int n, int specie, double *c);
-int  DLLEXPORT ENMSXgetlinkqual(int n, int specie, double *c);
-int  DLLEXPORT ENMSXgetspecieindex(char *id, int *index);
-int  DLLEXPORT ENMSXgetspecieID(int index, char *id);
-int  DLLEXPORT ENMSXgetspecietype(int index, int *code);
-int  DLLEXPORT ENMSXgetsourcequal(int node, int specie, int code, double *value);
-int  DLLEXPORT ENMSXstep(long *t, long *tleft);
-int  DLLEXPORT ENMSXsaveoutfile(char *fname);
-int  DLLEXPORT ENMSXreport(void);
-int  DLLEXPORT ENMSXclose(void);
-int  DLLEXPORT ENMSXgeterror(int errcode, char *errmsg, int n);
-int  DLLEXPORT ENMSXgetcount(int code, int *count);
-int  DLLEXPORT ENMSXsavemsxfile(char *filename);
-int  DLLEXPORT ENMSXgetpatternindex(char *id, int *index);
-int  DLLEXPORT ENMSXgetpatternid(int index, char *id);
-int  DLLEXPORT ENMSXgetpatternlen(int index, int *len);
-int  DLLEXPORT ENMSXgetpatternvalue(int index, int period, double *value);
-int  DLLEXPORT ENMSXsetpattern(int index, double *f, int n);
-int  DLLEXPORT ENMSXsetpatternvalue(int index, int period, double value);
-int  DLLEXPORT ENMSXcreatepattern(char *id);
-int  DLLEXPORT ENMSXsetnodequal(int node, int specie, int code, double value);
-int  DLLEXPORT ENMSXsetlinkqual(int link, int specie, int code, double value);
-int  DLLEXPORT ENMSXsetsourcequal(int node, int specie, int code, double value);
+// --- define MSX constants
+
+#define MSX_NODE      0
+#define MSX_LINK      1
+#define MSX_TANK      2
+#define MSX_SPECIE    3
+#define MSX_TERM      4
+#define MSX_PARAMETER 5
+#define MSX_CONSTANT  6
+#define MSX_PATTERN   7
+
+#define MSX_BULK      0
+#define MSX_WALL      1
+
+#define MSX_NOSOURCE  -1
+#define MSX_CONCEN     0
+#define MSX_MASS       1
+#define MSX_SETPOINT   2
+#define MSX_FLOWPACED  3
+
+// --- declare MSX functions
+
+int  DLLEXPORT MSXopen(char *fname);
+int  DLLEXPORT MSXsolveH(void);
+int  DLLEXPORT MSXusehydfile(char *fname);
+int  DLLEXPORT MSXsolveQ(void);
+int  DLLEXPORT MSXinit(int saveFlag);
+int  DLLEXPORT MSXstep(long *t, long *tleft);
+int  DLLEXPORT MSXsaveoutfile(char *fname);
+int  DLLEXPORT MSXsavemsxfile(char *fname);
+int  DLLEXPORT MSXreport(void);
+int  DLLEXPORT MSXclose(void);
+
+int  DLLEXPORT MSXgetindex(int type, char *id, int *index);
+int  DLLEXPORT MSXgetIDlen(int type, int index, int *len);
+int  DLLEXPORT MSXgetID(int type, int index, char *id, int len);
+int  DLLEXPORT MSXgetcount(int type, int *count);
+int  DLLEXPORT MSXgetspecie(int index, int *type, char *units, double *aTol,
+               double *rTol);
+int  DLLEXPORT MSXgetconstant(int index, double *value);
+int  DLLEXPORT MSXgetparameter(int type, int index, int param, double *value);
+int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
+               int *pat);
+int  DLLEXPORT MSXgetpatternlen(int pat, int *len);
+int  DLLEXPORT MSXgetpatternvalue(int pat, int period, double *value);
+int  DLLEXPORT MSXgetinitqual(int type, int index, int specie, double *value);
+int  DLLEXPORT MSXgetqual(int type, int index, int specie, double *value);
+int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
+
+int  DLLEXPORT MSXsetconstant(int index, double value);
+int  DLLEXPORT MSXsetparameter(int type, int index, int param, double value);
+int  DLLEXPORT MSXsetinitqual(int type, int index, int specie, double value);
+int  DLLEXPORT MSXsetsource(int node, int specie, int type, double level,
+               int pat);
+int  DLLEXPORT MSXsetpatternvalue(int pat, int period, double value);
+int  DLLEXPORT MSXsetpattern(int pat, double mult[], int len);
+int  DLLEXPORT MSXaddpattern(char *id);
 
 #endif

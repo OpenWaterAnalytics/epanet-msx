@@ -88,13 +88,13 @@ INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
 
 # Files for the shared object library
-epanetmsx_objs=chemistry.o hash.o inputmsx.o mathexpr.o mempool.o newton.o outputmsx.o \
-	           project.o qualitymsx.o reportmsx.o rk5.o ros2.o toolkitmsx.o utils.o msxfile.o
+epanetmsx_objs=hash.o mempool.o mathexpr.o msxchem.o msxfile.o msxinp.o msxout.o msxproj.o \
+	              msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o
 # Epanetmsx main program
-epanetmsx_main_obj=epanetmsx.o
+epanetmsx_main=msxmain
 # Epanetmsx header files
-epanetmsx_heads=globals.h hash.h mathexpr.h mempool.h newton.h rk5.h ros2.h typesmsx.h utils.h \
-	               $(epanetmsxincludedir)/epanetmsx.h
+epanetmsx_heads=hash.h mempool.h mathexpr.h msxdict.h msxtypes.h msxutils.h \
+	               newton.h rk5.h ros2.h $(epanetmsxincludedir)/epanetmsx.h
 # Epanetmsx main program header files
 epanetmsx_main_heads = $(epanetmsxincludedir)/epanetmsx.h
 
@@ -104,8 +104,9 @@ all: $(soname) $(exename)
 $(soname): $(epanetmsx_objs)
 	$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
-$(exename): $(epanetmsx_main_obj) $(soname) $(epanetmsx_main_heads)
-	$(CC) $(CFLAGS) $< -o $@ -l$(epanetmsxrootname) -l$(epanetrootname) $(LDFLAGS)
+$(exename): $(soname) $(epanetmsx_main_heads)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $(epanetmsxsrcdir)/$(epanetmsx_main).c
+	$(CC) $(CFLAGS) -o $@ $(epanetmsx_main).o -l$(epanetmsxrootname) -l$(epanetrootname) $(LDFLAGS)
 
 $(epanetmsx_objs): $(epanetmsx_heads)
 

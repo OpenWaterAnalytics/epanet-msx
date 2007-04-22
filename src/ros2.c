@@ -1,26 +1,22 @@
 /*******************************************************************************
-**  TITLE:         ROS2.C
+**  MODULE:        ROS2.C
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   a second order Rosenbrock 2(1) method for solving stiff sets of
 **                 ordinary differential equations.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.00
-**  LAST UPDATE:   8/1/06
+**  LAST UPDATE:   3/1/07
 **
 **  This code is based on material presented in:
-**    Verwer, J.G., Spee, E.J., Blom, J.G. and Hundsdorfer, W.MSXH.,
+**    Verwer, J.G., Spee, E.J., Blom, J.G. and Hundsdorfer, W.H.,
 **    "A second order Rosenbrock method applied to photochemical dispersion
 **    problems", SIAM J. Sci. Comput., 20:1456-1480, July 1999.
 *******************************************************************************/
 
 #include <stdlib.h>
 #include <math.h>
-#include "utils.h"
+#include "msxutils.h"
 #include "ros2.h"
-
-//// For debugging purposes
-//#include <stdio.h>
-//#include "epanet2.h"
-//char MSXMsg[250];
 
 #define fmin(x,y) (((x)<=(y)) ? (x) : (y))     /* minimum of x and y    */
 #define fmax(x,y) (((x)>=(y)) ? (x) : (y))     /* maximum of x and y    */

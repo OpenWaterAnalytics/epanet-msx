@@ -1,9 +1,10 @@
 /************************************************************************
-**  TITLE:         ROS2.H
+**  MODULE:        ROS2.H
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Header file for the stiff ODE solver ROS2.C.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.00                                               
-**  LAST UPDATE:   8/1/06
+**  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
 // Opens the ODE solver system

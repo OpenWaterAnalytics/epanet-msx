@@ -1,9 +1,10 @@
 /************************************************************************
-**  TITLE:         RK5.H
+**  MODULE:        RK5.H
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Header file for the ODE solver contained in RK5.C.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.00                                               
-**  LAST UPDATE:   8/1/06
+**  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
 // Opens the ODE solver system

@@ -1,19 +1,23 @@
 /******************************************************************************
-**  TITLE:         NEWTON.C
+**  MODULE:        NEWTON.C
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Newton-Raphson algorithm used to solve a set of nonlinear
 **                 algebraic equations.
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   10/5/06
+**  LAST UPDATE:   3/1/07
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "utils.h"
+#include "msxutils.h"
+#include "newton.h"
 
 // Local declarations
 //-------------------

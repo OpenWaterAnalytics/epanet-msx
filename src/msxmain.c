@@ -1,14 +1,72 @@
-//  ENMSX.C  -- Example EPANET-MSX Application
+/*******************************************************************************
+**  MODULE:        MSXMAIN.C
+**  PROJECT:       EPANET-MSX
+**  DESCRIPTION:   Main module of the EPANET Multi-Species Extension toolkit.
+**  COPYRIGHT:     Copyright (C) 2006 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
+**  AUTHORS:       L. Rossman, US EPA - NRMRL
+**                 F. Shang, University of Cincinnati
+**                 J. Uber, University of Cincinnati
+**  VERSION:       1.00
+**  LAST UPDATE:   3/13/07
+**
+**  EPANET-MSX is an extension of the EPANET program for modeling the fate
+**  and transport of multiple interacting chemical species within a water
+**  distribution system over an extended period of operation. This module
+**  provides both a main function for producing a stand-alone console
+**  application and an entry point for creating a Dynamic Linked Library (DLL)
+**  version of EPANET-MSX. To use either the console version or the DLL a user
+**  must prepare a regular EPANET input file that describes the network layout
+**  and its hydraulic properties as well as a special EPANET-MSX input file
+**  that names the chemical species being modeled and specifies the reaction
+**  rate and equilbrium expressions that define their chemical behavior. The
+**  format of these files is described in the EPANET and EPANET-MSX Users
+**  Manuals, respectively.
+*******************************************************************************/
+
+// Un-comment this line to compile as a DLL
+//#define DLL
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <float.h>
+
+// --- define WINDOWS
+#ifdef DLL
+  #undef WINDOWS
+  #ifdef _WIN32
+    #define WINDOWS
+  #endif
+  #ifdef __WIN32__
+    #define WINDOWS
+  #endif
+  #ifdef WINDOWS
+    #include <windows.h>
+  #endif
+#endif
+
 #include "epanet2.h"                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
+//
+//  Entry point used to compile a Windows DLL
+//-------------------------------------------
+#ifdef DLL
+BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID reserved)
+{
+    _fpreset();              
+    return TRUE;
+}
+#endif
+
+//
+//  Entry point used to compile a console application
+//---------------------------------------------------
+#ifndef DLL
 int main(int argc, char *argv[])
 /*
 **  Purpose:
-**    main function
+**    main function for the console version of EPANET-MSX.
 **
 **  Input:
 **    argc = number of command line arguments
@@ -56,7 +114,7 @@ int main(int argc, char *argv[])
     // --- open the MSX input file
 
         printf("\n  o Processing MSX input file");
-        err = ENMSXopen(argv[2]);
+        err = MSXopen(argv[2]);
         if (err)
         {
             printf("\n\n... Cannot read EPANET-MSX file; error code = %d\n", err);
@@ -66,7 +124,7 @@ int main(int argc, char *argv[])
     //--- solve hydraulics
 
         printf("\n  o Computing network hydraulics");
-        err = ENMSXsolveH();
+        err = MSXsolveH();
         if (err)
         {
             printf("\n\n... Cannot obtain network hydraulics; error code = %d\n", err);
@@ -76,7 +134,7 @@ int main(int argc, char *argv[])
     //--- Initialize the multi-species analysis
 
         printf("\n  o Initializing network water quality");
-        err = ENMSXinit(1);
+        err = MSXinit(1);
         if (err)
         {
             printf("\n\n... Cannot initialize EPANET-MSX; error code = %d\n", err);
@@ -96,7 +154,7 @@ int main(int argc, char *argv[])
                 printf("\r  o Computing water quality at hour %-4d", newHour);
                 oldHour = newHour;
             }
-            err = ENMSXstep(&t, &tleft);
+            err = MSXstep(&t, &tleft);
             newHour = t / 3600;
 
         } while (!err && tleft > 0);
@@ -111,7 +169,7 @@ int main(int argc, char *argv[])
     // --- report results
 
         printf("\n  o Reporting water quality results");
-        err = ENMSXreport();
+        err = MSXreport();
         if (err)
         {
             printf("\n\n... EPANET-MSX report writer error; error code = %d\n", err);
@@ -122,20 +180,22 @@ int main(int argc, char *argv[])
 
         if ( argc >= 5 )
         {
-            err = ENMSXsaveoutfile(argv[4]);
+            err = MSXsaveoutfile(argv[4]);
             if ( err > 0 )
             {
                 printf("\n\n... Cannot save EPANET-MSX results file; error code = %d\n", err);
                 break;
             }
         }
+
     } while(!done);
 
 //--- Close both the multi-species & EPANET systems
 
-    ENMSXclose();
+    MSXclose();
     ENclose();
     if ( !err ) printf("\n\n... EPANET-MSX completed successfully.");
     printf("\n");
     return err;
 }
+#endif

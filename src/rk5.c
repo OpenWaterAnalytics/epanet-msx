@@ -1,10 +1,11 @@
 /************************************************************************
-**  TITLE:         RK5.C
+**  MODULE:        RK5.C
+**  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Numerical solution of a system of first order
 **                 ordinary differential equations dY/dt = F(t,Y).
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.00                                               
-**  LAST UPDATE:   8/1/06 - initial version
+**  LAST UPDATE:   3/1/07
 **
 **  This is an explicit Runge-Kutta method of order (4)5  
 **  due to Dormand & Prince (with optional stepsize control).
@@ -237,7 +238,7 @@ int rk5_integrate(double y[], int n, double t, double tnext,
             // --- computation of hnew
             fac11 = pow(err, expo1);
             fac = fac11/pow(facold, beta);               // LUND-stabilization
-            fac = fmax(facc2, fmin(facc1, (fac/SAFE)));  // must have FAC1 <= HNEW/MSXH <= FAC2
+            fac = fmax(facc2, fmin(facc1, (fac/SAFE)));  // must have FAC1 <= HNEW/H <= FAC2
             hnew = h/fac;
         }
   
