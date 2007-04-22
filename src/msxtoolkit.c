@@ -131,9 +131,9 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 **    an error code (or 0 for no error).
 */
 {
-    int magic;
-    int version;
-    int n;
+    INT4 magic;
+    INT4 version;
+    INT4 n;
 
 // --- check that an MSX project was opened
 
@@ -148,18 +148,18 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 
 // --- check that file is really a hydraulics file for current project
 
-    fread(&magic, sizeof(int), 1, MSX.HydFile.file);
+    fread(&magic, sizeof(INT4), 1, MSX.HydFile.file);
     if ( magic != MAGICNUMBER ) return ERR_READ_HYD_FILE;
-    fread(&version, sizeof(int), 1, MSX.HydFile.file);
-    fread(&n, sizeof(int), 1, MSX.HydFile.file);
+    fread(&version, sizeof(INT4), 1, MSX.HydFile.file);
+    fread(&n, sizeof(INT4), 1, MSX.HydFile.file);
     if ( n != MSX.Nobjects[NODE] ) return ERR_READ_HYD_FILE;
-    fread(&n, sizeof(int), 1, MSX.HydFile.file);
+    fread(&n, sizeof(INT4), 1, MSX.HydFile.file);
     if ( n != MSX.Nobjects[LINK] ) return ERR_READ_HYD_FILE;
-    fseek(MSX.HydFile.file, 3*sizeof(int), SEEK_CUR);
+    fseek(MSX.HydFile.file, 3*sizeof(INT4), SEEK_CUR);
 
 // --- read length of simulation period covered by file
 
-    fread(&MSX.Dur, sizeof(int), 1, MSX.HydFile.file);
+    fread(&MSX.Dur, sizeof(long), 1, MSX.HydFile.file);
     MSX.HydOffset = ftell(MSX.HydFile.file);
     return 0;
 }
@@ -604,7 +604,7 @@ int  DLLEXPORT  MSXgetpatternlen(int pat, int *len)
 **
 **  Input:
 **    pat = the index number (base 1) of the time pattern;
-**   
+**
 **  Output:
 **    len = the number of time periods that appear in the pattern.
 **
@@ -631,7 +631,7 @@ int  DLLEXPORT  MSXgetpatternvalue(int pat, int period, double *value)
 **    pat = the index number (base 1) of the time pattern;
 **    period = the index of the time period (starting from 1) whose
 **             multiplier is being sought;
-**   
+**
 **  Output:
 **    value = the value of the pattern's multiplier in the desired period.
 **
@@ -941,7 +941,7 @@ int  DLLEXPORT  MSXsetpatternvalue(int pat, int period, double value)
 **    period = the time period (starting from 1) whose multiplier is
 **             being replaced;
 **    value = the new value of the pattern's multiplier in the desired period.
-**   
+**
 **  Output:
 **    none.
 **
@@ -983,7 +983,7 @@ int  DLLEXPORT  MSXaddpattern(char *id)
 **
 **  Input:
 **    id = C-style character string with the ID name of the new pattern.
-**   
+**
 **  Output:
 **    none.
 **
@@ -1050,7 +1050,7 @@ int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
 **    mult[] = an array of multiplier values (base 0) to replace those
 **             previously used by the pattern;
 **    len = the number of entries in the multiplier array mult.
-**   
+**
 **  Output:
 **    none.
 **
@@ -1112,4 +1112,4 @@ int  DLLEXPORT MSXsavemsxfile(char *fname)
     MSXfile_save(f);
     fclose(f);
     return 0;
-}    
+}

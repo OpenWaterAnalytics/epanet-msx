@@ -2,7 +2,7 @@
 **  MODULE:        MSXRPT.C
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   report writing routines for the EPANET Multi-Species
-**                 Extension toolkit.                  
+**                 Extension toolkit.
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
@@ -22,7 +22,6 @@
 
 // Constants
 //----------
-#define RECORDSIZE    4
 #define SERIES_TABLE  0
 #define STATS_TABLE   1
 
@@ -84,15 +83,16 @@ static void  writeLine(char *line);
 
 int  MSXrpt_write()
 {
-    int  magic = 0;
+    INT4  magic = 0;
     int  j;
+    int recordsize = sizeof(INT4);
 
 // --- check that results are available
 
     if ( MSX.Nperiods < 1 )    return 0;
     if ( MSX.OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
-    fseek(MSX.OutFile.file, -RECORDSIZE, SEEK_END);
-    fread(&magic, sizeof(int), 1, MSX.OutFile.file);
+    fseek(MSX.OutFile.file, -recordsize, SEEK_END);
+    fread(&magic, sizeof(INT4), 1, MSX.OutFile.file);
     if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
 
 // --- write program logo & project title
@@ -199,7 +199,7 @@ void createTableHdr(int objType, int tableType)
     }
     if ( tableType == STATS_TABLE )
     {
-        strcpy(TableHdr.Line1, ""); 
+        strcpy(TableHdr.Line1, "");
         sprintf(TableHdr.Line2, "%-16s", StatsHdrs[tableType]);
         if ( objType == NODE ) strcpy(TableHdr.Line3, "for Node        ");
         else                   strcpy(TableHdr.Line3, "for Link        ");
@@ -307,7 +307,7 @@ void getHrsMins(int k, int *hrs, int *mins)
     m = m - 60*h;
     *hrs = h;
     *mins = m;
-}    
+}
 
 //=============================================================================
 
