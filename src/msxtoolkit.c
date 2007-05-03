@@ -159,7 +159,7 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 
 // --- read length of simulation period covered by file
 
-    fread(&MSX.Dur, sizeof(long), 1, MSX.HydFile.file);
+    fread(&MSX.Dur, sizeof(INT4), 1, MSX.HydFile.file);
     MSX.HydOffset = ftell(MSX.HydFile.file);
     return 0;
 }

@@ -1,34 +1,34 @@
 /************************************************************************
 **  MODULE:        TYPES.H
 **  PROJECT:       EPANET-MSX
-**  DESCRIPTION:   Global constants and data types used by the EPANET 
-**                 Multi-Species Extension toolkit.  
+**  DESCRIPTION:   Global constants and data types used by the EPANET
+**                 Multi-Species Extension toolkit.
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00                                               
+**  VERSION:       1.00
 **  LAST UPDATE:   3/13/07
 ***********************************************************************/
 
 #include "mathexpr.h"
 
-//-----------------------------------------------------------------------------            
-//  Definition of 4-byte integers & reals 
-//-----------------------------------------------------------------------------            
-typedef  long  INT4;
+//-----------------------------------------------------------------------------
+//  Definition of 4-byte integers & reals
+//-----------------------------------------------------------------------------
+typedef  int   INT4;
 typedef  float REAL4;
 
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 //  Macros for memory allocation
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 #define  MEMCHECK(x)  (((x) == NULL) ? ERR_MEMORY : 0 )
 #define  FREE(x) { if (x) { free(x); x = NULL; } }
 
-//-----------------------------------------------------------------------------            
-//  Conversion macros to be used in place of functions             
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
+//  Conversion macros to be used in place of functions
+//-----------------------------------------------------------------------------
 #define INT(x)   ((int)(x))                   // integer portion of x
 #define FRAC(x)  ((x)-(int)(x))               // fractional part of x
 #define ABS(x)   (((x)<0) ? -(x) : (x))       // absolute value of x
@@ -41,16 +41,16 @@ typedef  float REAL4;
 #define SGN(x)   (((x)<0) ? (-1) : (1))       // sign of x
 #define UCHAR(x) (((x) >= 'a' && (x) <= 'z') ? ((x)&~32) : (x))
                                               // uppercase char of x
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 //  Macro to evaluate function f with error checking
-//  (Fatal errors are numbered higher than 100)             
-//-----------------------------------------------------------------------------            
+//  (Fatal errors are numbered higher than 100)
+//-----------------------------------------------------------------------------
 #define CALL(err, f) (err = ( (err>100) ? (err) : (f) ))
 
 
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 //  Defined Constants
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 #define   MAGICNUMBER  516114521
 #define   VERSION      100000
 #define   MAXMSG       1024            // Max. # characters in message text
@@ -64,15 +64,15 @@ typedef  float REAL4;
 #define   VISCOS       1.1E-5          // Kinematic viscosity of water
                                        // @ 20 deg C (sq ft/sec)
 
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 //  Various conversion factors
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
 #define   M2perFT2     0.09290304
 #define   CM2perFT2    929.0304
 #define   DAYperSEC    1.1574E-5
 #define   HOURperSEC   2.7778E-4
 #define   MINUTEperSEC 0.016667
-#define   GPMperCFS    448.831 
+#define   GPMperCFS    448.831
 #define   AFDperCFS    1.9837
 #define   MGDperCFS    0.64632
 #define   IMGDperCFS   0.5382
@@ -88,7 +88,7 @@ typedef  float REAL4;
 #define   KPAperPSI    6.895
 #define   KWperHP      0.7457
 #define   SECperDAY    86400
- 
+
 
 //-----------------------------------------------------------------------------
 //  Enumerated Types
@@ -248,9 +248,9 @@ typedef  float REAL4;
            ERR_MAX};
 
 
-//-----------------------------------------------------------------------------            
-// Data Structures                             
-//-----------------------------------------------------------------------------            
+//-----------------------------------------------------------------------------
+// Data Structures
+//-----------------------------------------------------------------------------
 struct  NumList                        // List of numerical values
 {
    double  value;
@@ -299,7 +299,7 @@ typedef struct                         // LINK OBJECT
    double len;                         // length
    char   rpt;                         // reporting flag
    double *c0;                         // initial species concentrations
-   double *param;                      // kinetic parameter values 
+   double *param;                      // kinetic parameter values
 }  Slink;
 
 

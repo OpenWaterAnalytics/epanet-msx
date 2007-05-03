@@ -1,7 +1,7 @@
 /******************************************************************************
 **  MODULE:        MSXQUAL.C
 **  PROJECT:       EPANET-MSX
-**  DESCRIPTION:   Water quality routing routines. 
+**  DESCRIPTION:   Water quality routing routines.
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
@@ -98,7 +98,7 @@ int  MSXqual_open()
 **   Purpose:
 **     opens the WQ routing system.
 **
-**   Returns:     
+**   Returns:
 **     an error code (0 if no errors).
 */
 {
@@ -151,7 +151,7 @@ int  MSXqual_open()
 
 // --- allocate memory used to accumulate mass and volume
 //     inflows to each node
- 
+
     n        = MSX.Nobjects[NODE] + 1;
     VolIn    = (double *) calloc(n, sizeof(double));
     MassIn   = createMatrix(n, MSX.Nobjects[SPECIE]+1);
@@ -225,7 +225,7 @@ int  MSXqual_init()
     {
         n = 0;
         for (m=1; m<=MSX.Nobjects[SPECIE]; m++) n += MSX.Specie[m].rpt;
-    } 
+    }
     if ( n > 0 ) MSX.Rptflag = 1;
     if ( MSX.Rptflag ) MSX.Saveflag = 1;
 
@@ -233,7 +233,7 @@ int  MSXqual_init()
 
     AllocSetPool(QualPool);
     FreeSeg = NULL;
-    AllocReset(); 
+    AllocReset();
 
 // --- re-position hydraulics file
 
@@ -396,7 +396,7 @@ double  MSXqual_getLinkQual(int k, int m)
     double  vsum = 0.0,
             msum = 0.0;
     Pseg    seg;
-   
+
     seg = MSX.FirstSeg[k];
     while (seg != NULL)
     {
@@ -483,9 +483,9 @@ int  getHydVars()
 **
 **   Returns:
 **     error code (0 if no error).
-**                                                              
+**
 **   NOTE:
-**     A hydraulic solution consists of the current time      
+**     A hydraulic solution consists of the current time
 **     (hydtime), nodal demands (D) and heads (H), link
 **     flows (Q), and link status values and settings (which are not used).
 */
@@ -514,7 +514,7 @@ int  getHydVars()
 
 // --- read time step until next hydraulic event
 
-    if (fread(&n, sizeof(long), 1, MSX.HydFile.file) < 1)
+    if (fread(&n, sizeof(INT4), 1, MSX.HydFile.file) < 1)
         return ERR_READ_HYD_FILE;
     hydstep = (long)n;
 
@@ -538,7 +538,7 @@ int  getHydVars()
 int  transport(long tstep)
 /*
 **  Purpose:
-**    transports constituent mass through pipe network        
+**    transports constituent mass through pipe network
 **    under a period of constant hydraulic conditions.
 **
 **  Input:
@@ -619,7 +619,7 @@ void  initSegs()
         if ( v > 0.0 ) MSXqual_addSeg(k, MSXqual_getFreeSeg(v, MSX.C1));
     }
 
-// --- initialize segments in tanks 
+// --- initialize segments in tanks
 
     for (j=1; j<=MSX.Nobjects[TANK]; j++)
     {
@@ -681,7 +681,7 @@ void  reorientSegs()
         if (MSX.Q[k] == 0.0)     newdir = FlowDir[k];
         else if (MSX.Q[k] < 0.0) newdir = '-';
 
-    // --- if direction changes, then reverse the order of segments 
+    // --- if direction changes, then reverse the order of segments
     //     (first to last) and save new direction
 
         if (newdir != FlowDir[k])
@@ -797,7 +797,7 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
         vsum += vadded;
         vleft -= vadded;
-        
+
     // --- add wall species mass contributed by this segment to new segment
 
         for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
@@ -860,7 +860,7 @@ void shiftSegWallQual(int k, long dt)
 
         vend = vstart + seg1->v;
         if (vend > v) vend = v;
-        vcur = vstart; 
+        vcur = vstart;
         vsum = 0;
 
     // --- find volume taken up by the segment after it moves down the pipe
@@ -931,8 +931,8 @@ void accumulate(long dt)
         i = UP_NODE(k);               // upstream node
         j = DOWN_NODE(k);             // downstream node
         v = ABS(MSX.Q[k])*dt;         // flow volume
-         
-    // --- if link volume < flow volume, then transport upstream node's 
+
+    // --- if link volume < flow volume, then transport upstream node's
     //     quality to downstream node and remove all link segments
 
         if (LINKVOL(k) < v)
@@ -1123,7 +1123,7 @@ void updateNodes(long dt)
 
         else
         {
-        // --- use initial quality for reservoirs 
+        // --- use initial quality for reservoirs
 
             if (MSX.Tank[j].a == 0.0)
             {
@@ -1136,7 +1136,7 @@ void updateNodes(long dt)
             else
             {
                 if (VolIn[i] > 0.0)
-                { 
+                {
                     for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
                     {
                         MSX.C1[m] = MassIn[i][m]/VolIn[i];
@@ -1191,7 +1191,7 @@ void sourceInput(long dt)
         source = MSX.Node[n].sources;
         if (source == NULL) continue;
 
-    // --- find total flow volume leaving node 
+    // --- find total flow volume leaving node
 
         if (MSX.Node[n].tank == 0) volout = VolIn[n];  // Junctions
         else volout = VolIn[n] - MSX.D[n]*dt;          // Tanks
@@ -1220,7 +1220,7 @@ void sourceInput(long dt)
 void addSource(int n, Psource source, double volout, long dt)
 /*
 **  Purpose:
-**    updates concentration of particular species leaving a node 
+**    updates concentration of particular species leaving a node
 **    that receives external source input.
 **
 **  Input:
@@ -1266,7 +1266,7 @@ void addSource(int n, Psource source, double volout, long dt)
               break;
 
         // Setpoint Booster Source:
-        // Mass added is difference between source 
+        // Mass added is difference between source
         // & node concen. times outflow volume
 
           case SETPOINT:
@@ -1274,8 +1274,8 @@ void addSource(int n, Psource source, double volout, long dt)
                   massadded = (s - MSX.Node[n].c[m])*volout;
               break;
 
-        // Flow-Paced Booster Source: 
-        // Mass added = source concen. times outflow volume 
+        // Flow-Paced Booster Source:
+        // Mass added = source concen. times outflow volume
 
           case FLOWPACED:
               massadded = s*volout;
@@ -1336,7 +1336,7 @@ void release(long dt)
         useNewSeg = 0;
         seg = MSX.LastSeg[k];
         if ( seg == NULL ) useNewSeg = 1;
-        
+
     // --- otherwise check if quality in last segment
     //     differs from that of the new segment
 
@@ -1351,7 +1351,7 @@ void release(long dt)
             MSXqual_removeSeg(NewSeg[k]);
         }
 
-    // --- otherwise add the new seg to the end of the link 
+    // --- otherwise add the new seg to the end of the link
 
         else
         {
@@ -1368,20 +1368,20 @@ double  getSourceQual(Psource source)
 /*
 **   Input:   j = source index
 **   Output:  returns source WQ value
-**   Purpose: determines source concentration in current time period  
+**   Purpose: determines source concentration in current time period
 */
 {
     int    i;
     long   k;
     double c, f = 1.0;
 
-// --- get source concentration (or mass flow) in original units 
+// --- get source concentration (or mass flow) in original units
     c = source->c0;
 
-// --- convert mass flow rate from min. to sec. 
+// --- convert mass flow rate from min. to sec.
     if (source->type == MASS) c /= 60.0;
 
-// --- apply time pattern if assigned 
+// --- apply time pattern if assigned
     i = source->pat;
     if (i == 0) return(c);
     k = ((MSX.Qtime + MSX.Pstart) / MSX.Pstep) % MSX.Pattern[i].length;
@@ -1476,7 +1476,7 @@ Pseg MSXqual_getFreeSeg(double v, double c[])
         {
             OutOfMemory = TRUE;
             return NULL;
-        }     
+        }
         seg->c = (double *) Alloc((MSX.Nobjects[SPECIE]+1)*sizeof(double));
         if ( seg->c == NULL )
         {
