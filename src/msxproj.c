@@ -52,7 +52,7 @@ static char * Errmsg[] =
      "Error 517 - reference made to an undefined object ID.",
      "Error 518 - invalid property values were specified.",
      "Error 519 - an MSX project was not opened.",
-     "Error 510 - an MSX project is already opened."};
+     "Error 520 - an MSX project is already opened."};
 
 //  Imported functions
 //--------------------
