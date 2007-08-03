@@ -8,7 +8,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 
 #include <stdio.h>
@@ -37,7 +37,7 @@ static Pseg           FreeSeg;         // pointer to unused pipe segment
 static Pseg           *NewSeg;         // new segment added to each pipe
 static char           *FlowDir;        // flow direction for each pipe
 static double         *VolIn;          // inflow flow volume to each node
-static double         **MassIn;        // mass inflow of each specie to each node
+static double         **MassIn;        // mass inflow of each species to each node
 static double         **X;             // work matrix
 static char           HasWallSpecies;  // wall species indicator
 static char           OutOfMemory;     // out of memory indicator
@@ -134,8 +134,8 @@ int  MSXqual_open()
 
 // --- allocate memory used for species concentrations
 
-    X  = createMatrix(MSX.Nobjects[NODE]+1, MSX.Nobjects[SPECIE]+1);
-    MSX.C1 = (double *) calloc(MSX.Nobjects[SPECIE]+1, sizeof(double));
+    X  = createMatrix(MSX.Nobjects[NODE]+1, MSX.Nobjects[SPECIES]+1);
+    MSX.C1 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
 
 // --- allocate memory used for pointers to the first, last,
 //     and new WQ segments in each link and tank
@@ -154,7 +154,7 @@ int  MSXqual_open()
 
     n        = MSX.Nobjects[NODE] + 1;
     VolIn    = (double *) calloc(n, sizeof(double));
-    MassIn   = createMatrix(n, MSX.Nobjects[SPECIE]+1);
+    MassIn   = createMatrix(n, MSX.Nobjects[SPECIES]+1);
 
 // --- check for successful memory allocation
 
@@ -169,9 +169,9 @@ int  MSXqual_open()
 
 // --- check if wall species are present
 
-    for (n=1; n<=MSX.Nobjects[SPECIE]; n++)
+    for (n=1; n<=MSX.Nobjects[SPECIES]; n++)
     {
-        if ( MSX.Specie[n].type == WALL ) HasWallSpecies = TRUE;
+        if ( MSX.Species[n].type == WALL ) HasWallSpecies = TRUE;
     }
     if ( !errcode ) MSX.QualityOpened = TRUE;
     return(errcode);
@@ -198,7 +198,7 @@ int  MSXqual_init()
 
     for (i=1; i<=MSX.Nobjects[NODE]; i++)
     {
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             MSX.Node[i].c[m] = MSX.Node[i].c0[m];
     }
     for (i=1; i<=MSX.Nobjects[TANK]; i++)
@@ -206,7 +206,7 @@ int  MSXqual_init()
         MSX.Tank[i].hstep = 0.0;
         MSX.Tank[i].v = MSX.Tank[i].v0;
         n = MSX.Tank[i].node;
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             MSX.Tank[i].c[m] = MSX.Node[n].c0[m];
     }
     for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
@@ -224,7 +224,7 @@ int  MSXqual_init()
     if ( n > 0 )
     {
         n = 0;
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++) n += MSX.Specie[m].rpt;
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++) n += MSX.Species[m].rpt;
     }
     if ( n > 0 ) MSX.Rptflag = 1;
     if ( MSX.Rptflag ) MSX.Saveflag = 1;
@@ -348,7 +348,7 @@ int MSXqual_step(long *t, long *tleft)
 double  MSXqual_getNodeQual(int j, int m)
 /*
 **   Purpose:
-**     retrieves WQ for specie m at node n.
+**     retrieves WQ for species m at node n.
 **
 **   Input:
 **     j = node index
@@ -362,7 +362,7 @@ double  MSXqual_getNodeQual(int j, int m)
 
 // --- return 0 for WALL species
 
-    if ( MSX.Specie[m].type == WALL ) return 0.0;
+    if ( MSX.Species[m].type == WALL ) return 0.0;
 
 // --- if node is a tank, return its internal concentration
 
@@ -454,8 +454,8 @@ int    MSXqual_isSame(double c1[], double c2[])
 **     checks if two sets of concentrations are the same
 **
 **   Input:
-**     c1[] = first set of specie concentrations
-**     c2[] = second set of specie concentrations
+**     c1[] = first set of species concentrations
+**     c2[] = second set of species concentrations
 **
 **   Returns:
 **     1 if the concentrations are all within a specific tolerance of each
@@ -463,9 +463,9 @@ int    MSXqual_isSame(double c1[], double c2[])
 */
 {
     int m;
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
-        if ( fabs(c1[m] - c2[m]) >= MSX.Specie[m].aTol ) return 0;
+        if ( fabs(c1[m] - c2[m]) >= MSX.Species[m].aTol ) return 0;
     }
     return 1;
 }
@@ -604,11 +604,11 @@ void  initSegs()
     //     if no initial link quality supplied
 
         j = DOWN_NODE(k);
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
             if ( MSX.Link[k].c0[m] != MISSING )
                 MSX.C1[m] = MSX.Link[k].c0[m];
-            else if ( MSX.Specie[m].type == BULK )
+            else if ( MSX.Species[m].type == BULK )
                 MSX.C1[m] = MSX.Node[j].c0[m];
             else MSX.C1[m] = 0.0;
         }
@@ -630,7 +630,7 @@ void  initSegs()
     // --- tank segment pointers are stored after those for links
 
         k = MSX.Tank[j].node;
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             MSX.C1[m] = MSX.Node[k].c0[m];
         k = MSX.Nobjects[LINK] + j;
         MSX.LastSeg[k] = NULL;
@@ -722,7 +722,7 @@ void advectSegs(long dt)
     {
     // --- zero out WQ in new segment to be added at entrance of link
 
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.C1[m] = 0.0;
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.C1[m] = 0.0;
 
     // --- get a free segment to add to entrance of link
 
@@ -750,7 +750,7 @@ void advectSegs(long dt)
 void getNewSegWallQual(int k, long dt, Pseg newseg)
 /*
 **  Purpose:
-**     computes wall specie concentrations for a new WQ segment that
+**     computes wall species concentrations for a new WQ segment that
 **     enters a pipe from its upstream node.
 **
 **  Input:
@@ -778,9 +778,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 	seg = MSX.LastSeg[k];
 	vsum = 0.0;
     vleft = vin;
-    for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+    for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
     {
-        if ( MSX.Specie[m].type == WALL ) newseg->c[m] = 0.0;
+        if ( MSX.Species[m].type == WALL ) newseg->c[m] = 0.0;
     }
 
 // --- repeat while some inflow volume still remains
@@ -800,9 +800,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
     // --- add wall species mass contributed by this segment to new segment
 
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
         {
-            if ( MSX.Specie[m].type == WALL ) newseg->c[m] += vadded*seg->c[m];
+            if ( MSX.Species[m].type == WALL ) newseg->c[m] += vadded*seg->c[m];
         }
 
     // --- move to next downstream WQ segment
@@ -814,9 +814,9 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 
     if ( vsum > 0.0 )
     {
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
         {
-            if ( MSX.Specie[m].type == WALL ) newseg->c[m] /= vsum;
+            if ( MSX.Species[m].type == WALL ) newseg->c[m] /= vsum;
         }
     }
 }
@@ -826,7 +826,7 @@ void getNewSegWallQual(int k, long dt, Pseg newseg)
 void shiftSegWallQual(int k, long dt)
 /*
 **  Purpose:
-**    recomputes wall specie concentrations in segments that remain
+**    recomputes wall species concentrations in segments that remain
 **    within a pipe after flow is advected over current time step.
 **
 **  Input:
@@ -854,7 +854,7 @@ void shiftSegWallQual(int k, long dt)
     {
     // --- initialize a "mixture" WQ
 
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++) MSX.C1[m] = 0.0;
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++) MSX.C1[m] = 0.0;
 
     // --- find the future end position of this segment
 
@@ -871,9 +871,9 @@ void shiftSegWallQual(int k, long dt)
             vsum += seg2->v;
             if ( vsum >= vstart && vsum <= vend )
             {
-                for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+                for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
                 {
-                    if ( MSX.Specie[m].type == WALL )
+                    if ( MSX.Species[m].type == WALL )
                         MSX.C1[m] += (vsum - vcur) * seg2->c[m];
                 }
                 vcur = vsum;
@@ -881,11 +881,11 @@ void shiftSegWallQual(int k, long dt)
             if ( vsum >= vend ) break;
         }
 
-    // --- update the wall specie concentrations in the segment
+    // --- update the wall species concentrations in the segment
 
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
         {
-            if ( MSX.Specie[m].type != WALL ) continue;
+            if ( MSX.Species[m].type != WALL ) continue;
             if (seg2 != NULL) MSX.C1[m] += (vend - vcur) * seg2->c[m];
             seg1->c[m] = MSX.C1[m] / (vend - vstart);
             if ( seg1->c[m] < 0.0 ) seg1->c[m] = 0.0;
@@ -921,7 +921,7 @@ void accumulate(long dt)
 // --- reset cumlulative inflow to each node to zero
 
     memset(VolIn, 0, (MSX.Nobjects[NODE]+1)*sizeof(double));
-    n = (MSX.Nobjects[NODE]+1)*(MSX.Nobjects[SPECIE]+1);
+    n = (MSX.Nobjects[NODE]+1)*(MSX.Nobjects[SPECIES]+1);
     memset(MassIn[0], 0, n*sizeof(double));
 
 // --- move mass from first segment of each link into link's downstream node
@@ -939,9 +939,9 @@ void accumulate(long dt)
         {
             VolIn[j] += v;
             seg = MSX.FirstSeg[k];
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
                 cseg = MSX.Node[i].c[m];
                 if (seg != NULL) cseg = seg->c[m];
                 MassIn[j][m] += v*cseg;
@@ -969,9 +969,9 @@ void accumulate(long dt)
 
         // --- update volume & mass entering downstream node
 
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
                 cseg = seg->c[m];
                 MassIn[j][m] += vseg*cseg;
             }
@@ -1021,7 +1021,7 @@ void getIncidentConcen()
 // --- zero-out memory used to store accumulated totals
 
     memset(VolIn, 0, (MSX.Nobjects[NODE]+1)*sizeof(double));
-    n = (MSX.Nobjects[NODE]+1)*(MSX.Nobjects[SPECIE]+1);
+    n = (MSX.Nobjects[NODE]+1)*(MSX.Nobjects[SPECIES]+1);
     memset(MassIn[0], 0, n*sizeof(double));
     memset(X[0], 0, n*sizeof(double));
 
@@ -1032,9 +1032,9 @@ void getIncidentConcen()
         j = DOWN_NODE(k);             // downstream node
         if (MSX.FirstSeg[k] != NULL)  // accumulate concentrations
         {
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type == BULK )
+                if ( MSX.Species[m].type == BULK )
                   MassIn[j][m] += MSX.FirstSeg[k]->c[m];
             }
             VolIn[j]++;
@@ -1042,9 +1042,9 @@ void getIncidentConcen()
         j = UP_NODE(k);              // upstream node
         if (MSX.LastSeg[k] != NULL)  // accumulate concentrations
         {
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type == BULK )
+                if ( MSX.Species[m].type == BULK )
                     MassIn[j][m] += MSX.LastSeg[k]->c[m];
             }
             VolIn[j]++;
@@ -1057,7 +1057,7 @@ void getIncidentConcen()
     {
         if (VolIn[k] > 0.0)
         {
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                 X[k][m] = MassIn[k][m]/VolIn[k];
         }
     }
@@ -1101,7 +1101,7 @@ void updateNodes(long dt)
 
             if (VolIn[i] > 0.0)
             {
-                for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+                for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                     MSX.Node[i].c[m] = MassIn[i][m]/VolIn[i];
             }
 
@@ -1110,7 +1110,7 @@ void updateNodes(long dt)
 
             else
             {
-                for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+                for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                     MSX.Node[i].c[m] = X[i][m];
             }
 
@@ -1127,7 +1127,7 @@ void updateNodes(long dt)
 
             if (MSX.Tank[j].a == 0.0)
             {
-                for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+                for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                     MSX.Node[i].c[m] = MSX.Node[i].c0[m];
             }
 
@@ -1137,12 +1137,12 @@ void updateNodes(long dt)
             {
                 if (VolIn[i] > 0.0)
                 {
-                    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+                    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                     {
                         MSX.C1[m] = MassIn[i][m]/VolIn[i];
                     }
                 }
-                else for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.C1[m] = 0.0;
+                else for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.C1[m] = 0.0;
                 switch(MSX.Tank[j].mixModel)
                 {
                     case MIX1: MSXtank_mix1(j, VolIn[i], MSX.C1, dt);
@@ -1154,7 +1154,7 @@ void updateNodes(long dt)
                     case LIFO: MSXtank_mix4(j, VolIn[i], MSX.C1, dt);
                                break;
                 }
-                for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+                for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                     MSX.Node[i].c[m] = MSX.Tank[j].c[m];
                 MSX.Tank[j].v += MSX.D[i]*dt;
             }
@@ -1201,7 +1201,7 @@ void sourceInput(long dt)
 
         if (qout <= qcutoff) continue;
 
-    // --- add contribution of each source specie
+    // --- add contribution of each source species
 
         while (source)
         {
@@ -1234,9 +1234,9 @@ void addSource(int n, Psource source, double volout, long dt)
 
 // --- only analyze bulk species
 
-    m = source->specie;
+    m = source->species;
     massadded = 0.0;
-    if (source->c0 > 0.0 && MSX.Specie[m].type == BULK)
+    if (source->c0 > 0.0 && MSX.Species[m].type == BULK)
     {
 
     // --- mass added depends on type of source
@@ -1325,9 +1325,9 @@ void release(long dt)
 
     // --- place bulk WQ at upstream node in new segment identified for link
 
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
-            if ( MSX.Specie[m].type == BULK )
+            if ( MSX.Species[m].type == BULK )
                 NewSeg[k]->c[m] = MSX.Node[n].c[m];
         }
 
@@ -1477,7 +1477,7 @@ Pseg MSXqual_getFreeSeg(double v, double c[])
             OutOfMemory = TRUE;
             return NULL;
         }
-        seg->c = (double *) Alloc((MSX.Nobjects[SPECIE]+1)*sizeof(double));
+        seg->c = (double *) Alloc((MSX.Nobjects[SPECIES]+1)*sizeof(double));
         if ( seg->c == NULL )
         {
             OutOfMemory = TRUE;
@@ -1488,7 +1488,7 @@ Pseg MSXqual_getFreeSeg(double v, double c[])
 // --- assign volume, WQ, & integration time step to the new segment
 
     seg->v = v;
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++) seg->c[m] = c[m];
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++) seg->c[m] = c[m];
     seg->hstep = 0.0;
     return seg;
 }

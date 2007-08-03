@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 **
 **  These functions can be used in conjunction with the original EPANET
 **  toolkit functions to model water quality fate and transport of
@@ -178,7 +178,7 @@ int  DLLEXPORT  MSXsolveQ()
 **    an error code (or 0 for no error).
 */
 {
-    long t, tleft;
+    long t, tleft = 0;
     int err = 0;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     CALL(err, MSXinit(1));
@@ -322,7 +322,7 @@ int  DLLEXPORT  MSXgetindex(int type, char *id, int *index)
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIE:    i = MSXproj_findObject(SPECIE, id);    break;
+        case MSX_SPECIES:   i = MSXproj_findObject(SPECIES, id);   break;
         case MSX_CONSTANT:  i = MSXproj_findObject(CONSTANT, id);  break;
         case MSX_PARAMETER: i = MSXproj_findObject(PARAMETER, id); break;
         case MSX_PATTERN:   i = MSXproj_findObject(PATTERN, id);   break;
@@ -356,7 +356,7 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIE:    i = SPECIE;    break;
+        case MSX_SPECIES:   i = SPECIES;   break;
         case MSX_CONSTANT:  i = CONSTANT;  break;
         case MSX_PARAMETER: i = PARAMETER; break;
         case MSX_PATTERN:   i = PATTERN;   break;
@@ -365,7 +365,7 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
     if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIE:    *len = strlen(MSX.Specie[index].id);  break;
+        case SPECIES:   *len = strlen(MSX.Species[index].id); break;
         case CONSTANT:  *len = strlen(MSX.Const[index].id);   break;
         case PARAMETER: *len = strlen(MSX.Param[index].id);   break;
         case PATTERN:   *len = strlen(MSX.Pattern[index].id); break;
@@ -398,7 +398,7 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIE:    i = SPECIE;    break;
+        case MSX_SPECIES:   i = SPECIES;   break;
         case MSX_CONSTANT:  i = CONSTANT;  break;
         case MSX_PARAMETER: i = PARAMETER; break;
         case MSX_PATTERN:   i = PATTERN;   break;
@@ -407,7 +407,7 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
     if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIE:    strncpy(id, MSX.Specie[index].id, len);  break;
+        case SPECIES:   strncpy(id, MSX.Species[index].id, len);  break;
         case CONSTANT:  strncpy(id, MSX.Const[index].id, len);   break;
         case PARAMETER: strncpy(id, MSX.Param[index].id, len);   break;
         case PATTERN:   strncpy(id, MSX.Pattern[index].id, len); break;
@@ -436,7 +436,7 @@ int DLLEXPORT  MSXgetcount(int type, int *count)
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIE:    *count = MSX.Nobjects[SPECIE];    break;
+        case MSX_SPECIES:   *count = MSX.Nobjects[SPECIES];   break;
         case MSX_CONSTANT:  *count = MSX.Nobjects[CONSTANT];  break;
         case MSX_PARAMETER: *count = MSX.Nobjects[PARAMETER]; break;
         case MSX_PATTERN:   *count = MSX.Nobjects[PATTERN];   break;
@@ -447,8 +447,8 @@ int DLLEXPORT  MSXgetcount(int type, int *count)
 
 //=============================================================================
 
-int DLLEXPORT  MSXgetspecie(int index, int *type, char *units,
-                            double *aTol, double * rTol)
+int DLLEXPORT  MSXgetspecies(int index, int *type, char *units,
+                             double *aTol, double * rTol)
 /*
 **  Purpose:
 **    retrieves the attributes of a chemical species.
@@ -457,9 +457,9 @@ int DLLEXPORT  MSXgetspecie(int index, int *type, char *units,
 **    index = index (base 1) of the species in the list of all species.
 **
 **  Output:
-**    type = MSX_BULK (0) for a bulk flow specie or MSX_WALL (1) for a
-**           surface specie;
-**    units = character string containing the mass units defined for the specie -
+**    type = MSX_BULK (0) for a bulk flow species or MSX_WALL (1) for a
+**           surface species;
+**    units = character string containing the mass units defined for the species -
 **            must be sized in the calling program to accept up to 15 bytes
 **            plus a null termination character
 **    aTol = absolute concentration tolerance (concentration units);
@@ -474,11 +474,11 @@ int DLLEXPORT  MSXgetspecie(int index, int *type, char *units,
     *aTol  = 0.0;
     *rTol  = 0.0;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( index < 1 || index > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
-    *type  = MSX.Specie[index].type;
-    strncpy(units, MSX.Specie[index].units, MAXUNITS);
-    *aTol  = MSX.Specie[index].aTol;
-    *rTol  = MSX.Specie[index].rTol;
+    if ( index < 1 || index > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    *type  = MSX.Species[index].type;
+    strncpy(units, MSX.Species[index].units, MAXUNITS);
+    *aTol  = MSX.Species[index].aTol;
+    *rTol  = MSX.Species[index].rTol;
     return 0;
 }
 
@@ -547,8 +547,8 @@ int DLLEXPORT MSXgetparameter(int type, int index, int param, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
-                              int *pat)
+int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
+                            int *pat)
 /*
 **  Purpose:
 **    retrieves information on any external source of a particular chemical
@@ -556,7 +556,7 @@ int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
 **
 **  Input:
 **    node = index number (base 1) assigned to the node of interest;
-**    specie = index number (base 1) of the specie of interest;
+**    species = index number (base 1) of the species of interest;
 **
 **  Output:
 **    type = one of the following of external source type codes:
@@ -565,9 +565,9 @@ int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
 **           MSX_MASS      =  1 for a mass booster source,
 **           MSX_SETPOINT  =	2 for a setpoint source,
 **           MSX_FLOWPACED =	3 for a flow paced source;
-**    level = the baseline concentration (or mass flow rate) of the specie
+**    level = the baseline concentration (or mass flow rate) of the species
 **            in the source;
-**    pat = the index of the time pattern assigned to the specie at the source
+**    pat = the index of the time pattern assigned to the species at the source
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -579,11 +579,11 @@ int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
     *pat   = 0;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( node < 1 || node > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( specie < 1 || specie > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     source = MSX.Node[node].sources;
     while ( source )
     {
-        if ( source->specie == specie )
+        if ( source->species == species )
         {
             *type  = source->type;
             *level = source->c0;
@@ -662,7 +662,7 @@ int  DLLEXPORT  MSXgetpatternvalue(int pat, int period, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetinitqual(int type, int index, int specie, double *value)
+int  DLLEXPORT  MSXgetinitqual(int type, int index, int species, double *value)
 /*
 **  Purpose:
 **    retrieves the initial concentration of a particular chemical species
@@ -671,7 +671,7 @@ int  DLLEXPORT  MSXgetinitqual(int type, int index, int specie, double *value)
 **  Input:
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;
-**    specie = index (base 1) of the specie of interest.
+**    species = index (base 1) of the specie of interest.
 **
 **  Output:
 **    value = initial concentration of the specie at the node or link.
@@ -682,16 +682,16 @@ int  DLLEXPORT  MSXgetinitqual(int type, int index, int specie, double *value)
 {
     *value = 0.0;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( specie < 1 || specie > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
         if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSX.Node[index].c0[specie];
+        *value = MSX.Node[index].c0[species];
     }
     else if ( type == MSX_LINK )
     {
         if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSX.Link[index].c0[specie];
+        *value = MSX.Link[index].c0[species];
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -699,7 +699,7 @@ int  DLLEXPORT  MSXgetinitqual(int type, int index, int specie, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetqual(int type, int index, int specie, double *value)
+int  DLLEXPORT  MSXgetqual(int type, int index, int species, double *value)
 /*
 **  Purpose:
 **    retrieves the current concentration of a species at a particular node
@@ -708,10 +708,10 @@ int  DLLEXPORT  MSXgetqual(int type, int index, int specie, double *value)
 **  Input:
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;.
-**    specie = index (base 1) of the specie of interest.
+**    species = index (base 1) of the species of interest.
 **
 **  Output:
-**    value = specie concentration at the node or link.
+**    value = species concentration at the node or link.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -719,16 +719,16 @@ int  DLLEXPORT  MSXgetqual(int type, int index, int specie, double *value)
 {
     *value = 0.0;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( specie < 1 || specie > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
         if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSXqual_getNodeQual(index, specie);
+        *value = MSXqual_getNodeQual(index, species);
     }
     else if ( type == MSX_LINK )
     {
         if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSXqual_getLinkQual(index, specie);
+        *value = MSXqual_getLinkQual(index, species);
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -821,7 +821,7 @@ int  DLLEXPORT  MSXsetparameter(int type, int index, int param, double value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetinitqual(int type, int index, int specie, double value)
+int  DLLEXPORT  MSXsetinitqual(int type, int index, int species, double value)
 /*
 **  Purpose:
 **    assigns an initial concentration of a particular chemical species
@@ -830,8 +830,8 @@ int  DLLEXPORT  MSXsetinitqual(int type, int index, int specie, double value)
 **  Input:
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;
-**    specie = index (base 1) of the specie of interest.
-**    value = initial concentration of the specie at the node or link.
+**    species = index (base 1) of the species of interest.
+**    value = initial concentration of the species at the node or link.
 **
 **  Output:
 **    none.
@@ -841,17 +841,17 @@ int  DLLEXPORT  MSXsetinitqual(int type, int index, int specie, double value)
 */
 {
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( specie < 1 || specie > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
         if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        if ( MSX.Specie[specie].type == BULK )
-            MSX.Node[index].c0[specie] = value;
+        if ( MSX.Species[species].type == BULK )
+            MSX.Node[index].c0[species] = value;
     }
     else if ( type == MSX_LINK )
     {
         if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        MSX.Link[index].c0[specie] = value;
+        MSX.Link[index].c0[species] = value;
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -859,8 +859,8 @@ int  DLLEXPORT  MSXsetinitqual(int type, int index, int specie, double value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetsource(int node, int specie, int type, double level,
-                               int pat)
+int  DLLEXPORT  MSXsetsource(int node, int species, int type, double level,
+                             int pat)
 /*
 **  Purpose:
 **    sets the attributes of an external source of a particular chemical
@@ -868,16 +868,16 @@ int  DLLEXPORT  MSXsetsource(int node, int specie, int type, double level,
 **
 **  Input:
 **    node = index number (base 1) assigned to the node of interest;
-**    specie = index number (base 1) of the specie of interest;
+**    species = index number (base 1) of the species of interest;
 **    type = one of the following of external source type codes:
 **           MSX_NOSOURCE  = -1 for no source,
 **           MSX_CONCEN    =  0 for a concentration source,
 **           MSX_MASS      =  1 for a mass booster source,
 **           MSX_SETPOINT  =	2 for a setpoint source,
 **           MSX_FLOWPACED =	3 for a flow paced source;
-**    level = the baseline concentration (or mass flow rate) of the specie
+**    level = the baseline concentration (or mass flow rate) of the species
 **            in the source;
-**    pat = the index of the time pattern assigned to the specie at the source
+**    pat = the index of the time pattern assigned to the species at the source
 **
 **  Output:
 **    none.
@@ -892,12 +892,12 @@ int  DLLEXPORT  MSXsetsource(int node, int specie, int type, double level,
 
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( node < 1 || node > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( specie < 1 || specie > MSX.Nobjects[SPECIE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( pat < 0 ) pat = 0;
     if ( type < MSX_NOSOURCE ||
          type > MSX_FLOWPACED ) return ERR_INVALID_OBJECT_PARAMS;
-    if ( MSX.Specie[specie].type != BULK ) return ERR_INVALID_OBJECT_PARAMS;
+    if ( MSX.Species[species].type != BULK ) return ERR_INVALID_OBJECT_PARAMS;
     if ( level < 0.0 ) return ERR_INVALID_OBJECT_PARAMS;
 
 // --- check if a source for this species already exists at the node
@@ -905,7 +905,7 @@ int  DLLEXPORT  MSXsetsource(int node, int specie, int type, double level,
     source = MSX.Node[node].sources;
     while ( source )
     {
-        if ( source->specie == specie ) break;
+        if ( source->species == species ) break;
         source = source->next;
     }
 
@@ -921,8 +921,8 @@ int  DLLEXPORT  MSXsetsource(int node, int specie, int type, double level,
 
 // --- assign parameters to the source
 
-    source->type   = type;
-    source->specie = specie;
+    source->type   = (char)type;
+    source->species = species;
     source->c0     = level;
     source->pat    = pat;
     return 0;

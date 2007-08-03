@@ -8,7 +8,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 *******************************************************************************/
 
 #include <stdio.h>
@@ -65,14 +65,14 @@ void  saveSpecies(FILE *f)
 {
     int  i, n;
     fprintf(f, "\n[SPECIES]");
-    n = MSX.Nobjects[SPECIE];
+    n = MSX.Nobjects[SPECIES];
     for (i=1; i<=n; i++)
     {
-        if ( MSX.Specie[i].type == BULK ) fprintf(f, "\nBULK    "); 
-        else                          fprintf(f, "\nWALL    ");
+        if ( MSX.Species[i].type == BULK ) fprintf(f, "\nBULK    "); 
+        else                               fprintf(f, "\nWALL    ");
         fprintf(f, "%-32s %-15s %.6f %.6f",
-            MSX.Specie[i].id, MSX.Specie[i].units,
-            MSX.Specie[i].aTol, MSX.Specie[i].rTol);
+            MSX.Species[i].id, MSX.Species[i].units,
+            MSX.Species[i].aTol, MSX.Species[i].rTol);
     }
 }
 
@@ -174,7 +174,7 @@ void  saveQuality(FILE *f)
     char   id[MAXLINE+1];
 
     fprintf(f, "\n\n[QUALITY]");
-    for (j=1; j<=MSX.Nobjects[SPECIE]; j++)
+    for (j=1; j<=MSX.Nobjects[SPECIES]; j++)
     {
         for (i=1; i<=MSX.Nobjects[NODE]; i++)
         {
@@ -182,7 +182,7 @@ void  saveQuality(FILE *f)
             {
                 ENgetnodeid(i, id);
                 fprintf(f, "\nNODE    %-32s  %-32s  %.6f",
-                    id, MSX.Specie[j].id, MSX.Node[i].c0[j]);
+                    id, MSX.Species[j].id, MSX.Node[i].c0[j]);
             }
         }
         for (i=1; i<=MSX.Nobjects[LINK]; i++)
@@ -191,7 +191,7 @@ void  saveQuality(FILE *f)
             {
                 ENgetlinkid(i, id);
                 fprintf(f, "\nLINK    %-32s  %-32s  %.6f",
-                    id, MSX.Specie[j].id, MSX.Link[i].c0[j]);
+                    id, MSX.Species[j].id, MSX.Link[i].c0[j]);
             }
         }
     }
@@ -216,7 +216,7 @@ void  saveSources(FILE *f)
                 ENgetnodeid(i, id);
                 fprintf(f, "\n%-10s  %-32s  %-32s  %.6f",
                     SourceTypeWords[source->type], id,
-                    MSX.Specie[source->specie].id, source->c0);
+                    MSX.Species[source->species].id, source->c0);
                 if ( source->pat > 0 )
                     fprintf(f, "  %-32s", MSX.Pattern[source->pat]);
             }

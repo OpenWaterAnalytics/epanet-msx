@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ***********************************************************************/
 
 #include "mathexpr.h"
@@ -97,7 +97,7 @@ typedef  float REAL4;
                 {NODE,
                  LINK,
                  TANK,
-                 SPECIE,
+                 SPECIES,
                  TERM,
                  PARAMETER,
                  CONSTANT,
@@ -132,9 +132,9 @@ typedef  float REAL4;
                   FIFO,                //   First in, first out model
                   LIFO};               //   Last in, first out model
 
- enum SpecieType                       // Types of water quality species
-                {BULK,                 //   bulk flow specie
-                 WALL};                //   pipe wall attached specie
+ enum SpeciesType                      // Types of water quality species
+                {BULK,                 //   bulk flow species
+                 WALL};                //   pipe wall attached species
 
  enum ExpressionType                   // Types of math expressions
                 {NO_EXPR,              //   no expression
@@ -211,7 +211,7 @@ typedef  float REAL4;
 
  enum SectionType                      // Input data file sections
                  {s_TITLE,
-                  s_SPECIE,
+                  s_SPECIES,
                   s_COEFF,
                   s_TERM,
                   s_PIPE,
@@ -272,11 +272,11 @@ typedef struct                         // TIME PATTERN OBJECT
 struct Ssource                         // WATER QUALITY SOURCE OBJECT
 {
     char      type;                    // sourceType
-    int       specie;                  // specie index
+    int       species;                 // species index
     double    c0;                      // base concentration
     int       pat;                     // time pattern index
     double    massRate;                // actual mass flow rate
-    struct    Ssource *next;	       // next bulk specie source
+    struct    Ssource *next;	       // next bulk species source
 };
 typedef struct Ssource *Psource;
 
@@ -329,7 +329,7 @@ typedef struct Sseg *Pseg;
 
 
 #define MAXUNITS  16
-typedef struct                         // CHEMICAL SPECIE OBJECT
+typedef struct                         // CHEMICAL SPECIES OBJECT
 {
 	char      *id;                     // name
 	char      units[MAXUNITS];         // mass units code
@@ -342,7 +342,7 @@ typedef struct                         // CHEMICAL SPECIE OBJECT
     char      rpt;                     // reporting flag
     MathExpr  *pipeExpr;               // pipe chemistry expression
     MathExpr  *tankExpr;               // tank chemistry expression
-}   Sspecie;
+}   Sspecies;
 
 
 typedef struct                         // INTERMEDIATE TERM OBJECT
@@ -419,12 +419,12 @@ typedef struct                         // MSX PROJECT VARIABLES
    double Ucf[MAX_UNIT_TYPES],         // Unit conversion factors
           DefRtol,                     // Default relative error tolerance
           DefAtol,                     // Default absolute error tolerance
-          *C1;                         // Specie concentration vector
+          *C1;                         // Species concentration vector
 
    Pseg   *FirstSeg,                   // First WQ segment in each pipe/tank
           *LastSeg;                    // Last WQ segment in each pipe/tank
 
-   Sspecie  *Specie;                   // WQ species data
+   Sspecies *Species;                  // WQ species data
    Sparam   *Param;                    // Expression parameters
    Sconst   *Const;                    // Expression constants
    Sterm    *Term;                     // Intermediate terms

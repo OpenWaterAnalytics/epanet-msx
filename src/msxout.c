@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 
 #include <stdio.h>
@@ -117,23 +117,23 @@ int MSXout_saveInitialResults()
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of nodes
     n = (INT4)MSX.Nobjects[LINK];
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of links
-    n = (INT4)MSX.Nobjects[SPECIE];
+    n = (INT4)MSX.Nobjects[SPECIES];
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of species
     n = (INT4)MSX.Rstep;
     fwrite(&n, sizeof(INT4), 1, f);                         //Reporting step size
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
-        n = strlen(MSX.Specie[m].id);
-        fwrite(&n, sizeof(INT4), 1, f);                     //Length of specie ID
-        fwrite(MSX.Specie[m].id, sizeof(char), n, f);       //Specie ID string
+        n = strlen(MSX.Species[m].id);
+        fwrite(&n, sizeof(INT4), 1, f);                     //Length of species ID
+        fwrite(MSX.Species[m].id, sizeof(char), n, f);      //Species ID string
     }
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
-    {                                                       //Specie mass units
-        fwrite(&MSX.Specie[m].units, sizeof(char), MAXUNITS, f);
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    {                                                       //Species mass units
+        fwrite(&MSX.Species[m].units, sizeof(char), MAXUNITS, f);
     }
     ResultsOffset = ftell(f);
-    NodeBytesPerPeriod = MSX.Nobjects[NODE]*MSX.Nobjects[SPECIE]*sizeof(REAL4);
-    LinkBytesPerPeriod = MSX.Nobjects[LINK]*MSX.Nobjects[SPECIE]*sizeof(REAL4);
+    NodeBytesPerPeriod = MSX.Nobjects[NODE]*MSX.Nobjects[SPECIES]*sizeof(REAL4);
+    LinkBytesPerPeriod = MSX.Nobjects[LINK]*MSX.Nobjects[SPECIES]*sizeof(REAL4);
     return 0;
 }
     
@@ -159,7 +159,7 @@ int MSXout_saveResults()
     int   m, j;
     REAL4 x;
 
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
         for (j=1; j<=MSX.Nobjects[NODE]; j++)
         {
@@ -167,7 +167,7 @@ int MSXout_saveResults()
             fwrite(&x, sizeof(REAL4), 1, MSX.TmpOutFile.file);
         }
     }
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
         for (j=1; j<=MSX.Nobjects[LINK]; j++)
         {
@@ -228,10 +228,10 @@ float MSXout_getNodeQual(int k, int j, int m)
 **  Input:
 **    k = time period index
 **    j = node index
-**    m = specie index.
+**    m = species index.
 **
 **  Returns:
-**    the requested specie concentration. 
+**    the requested species concentration. 
 */
 {
     REAL4 c;
@@ -252,10 +252,10 @@ float MSXout_getLinkQual(int k, int j, int m)
 **  Input:
 **    k = time period index
 **    j = link index
-**    m = specie index.
+**    m = species index.
 **
 **  Returns:
-**    the requested specie concentration. 
+**    the requested species concentration. 
 */
 {
     REAL4 c;
@@ -298,12 +298,12 @@ int  saveStatResults()
 
     if ( x && stats1 && stats2 )
     {
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++ )
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++ )
         {
             getStatResults(NODE, m, stats1, stats2, x);
             fwrite(x+1, sizeof(REAL4), MSX.Nobjects[NODE], MSX.OutFile.file);
         }
-        for (m = 1; m <= MSX.Nobjects[SPECIE]; m++)
+        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
         {
             getStatResults(LINK, m, stats1, stats2, x);    
             fwrite(x+1, sizeof(REAL4), MSX.Nobjects[LINK], MSX.OutFile.file);
@@ -332,7 +332,7 @@ void getStatResults(int objType, int m, double * stats1, double * stats2,
 **
 **  Input:
 **    objType = type of object (nodes or links)
-**    m = specie index
+**    m = species index
 **    stats1, stats2 = work arrays used to hold intermediate values
 **    x = array used to store results read from file.
 **

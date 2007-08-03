@@ -8,15 +8,17 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   4/3/07
 **
 **  EPANET-MSX is an extension of the EPANET program for modeling the fate
 **  and transport of multiple interacting chemical species within a water
 **  distribution system over an extended period of operation. This module
-**  provides both a main function for producing a stand-alone console
-**  application and an entry point for creating a Dynamic Linked Library (DLL)
-**  version of EPANET-MSX. To use either the console version or the DLL a user
-**  must prepare a regular EPANET input file that describes the network layout
+**  provides a main function for producing a stand-alone console
+**  application version of EPANET-MSX. It is not needed when compiling
+**  EPANET-MSX into a dynamic link library (DLL) of callable functions.
+**
+**  To use either the console version or the DLL a user must prepare a
+**  regular EPANET input file that describes the pipe network layout
 **  and its hydraulic properties as well as a special EPANET-MSX input file
 **  that names the chemical species being modeled and specifies the reaction
 **  rate and equilbrium expressions that define their chemical behavior. The
@@ -24,45 +26,13 @@
 **  Manuals, respectively.
 *******************************************************************************/
 
-// Un-comment this line to compile as a DLL
-//#define DLL
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
 
-// --- define WINDOWS
-#ifdef DLL
-  #undef WINDOWS
-  #ifdef _WIN32
-    #define WINDOWS
-  #endif
-  #ifdef __WIN32__
-    #define WINDOWS
-  #endif
-  #ifdef WINDOWS
-    #include <windows.h>
-  #endif
-#endif
-
 #include "epanet2.h"                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
-//
-//  Entry point used to compile a Windows DLL
-//-------------------------------------------
-#ifdef DLL
-BOOL WINAPI DllMain(HANDLE hModule, DWORD reason, LPVOID reserved)
-{
-    _fpreset();              
-    return TRUE;
-}
-#endif
-
-//
-//  Entry point used to compile a console application
-//---------------------------------------------------
-#ifndef DLL
 int main(int argc, char *argv[])
 /*
 **  Purpose:
@@ -198,4 +168,3 @@ int main(int argc, char *argv[])
     printf("\n");
     return err;
 }
-#endif

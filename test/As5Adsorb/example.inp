@@ -2,14 +2,14 @@
 EPANET-MSX Example Network
 
 [JUNCTIONS]
-;ID    Elev  Demand  Pattern         
+;ID    Elev  Demand  Pattern
  A     0     4.1
  B     0     3.4
  C     0     5.5
  D     0     2.3
 
 [RESERVOIRS]
-;ID      Head  Pattern         
+;ID      Head  Pattern
  Source  100
 
 [PIPES]
@@ -22,10 +22,10 @@ EPANET-MSX Example Network
 
 [TIMES]
  Duration           	48
- Hydraulic Timestep 	1:00 
+ Hydraulic Timestep 	1:00
  Quality Timestep   	0:05
  Report Timestep    	2
- Report Start       	0 
+ Report Start       	0
  Statistic          	NONE
 
 [OPTIONS]

@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 
 #include <stdio.h>
@@ -59,7 +59,7 @@ static char IDname[MAXLINE+1];
 
 //  Imported functions
 //--------------------
-void  MSXinp_getSpecieUnits(int m, char *units);
+void  MSXinp_getSpeciesUnits(int m, char *units);
 float MSXout_getNodeQual(int k, int j, int m);
 float MSXout_getLinkQual(int k, int j, int m);
 
@@ -205,14 +205,14 @@ void createTableHdr(int objType, int tableType)
         else                   strcpy(TableHdr.Line3, "for Link        ");
         strcpy(TableHdr.Line4, "----------------");
     }
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
-        if ( !MSX.Specie[m].rpt ) continue;
-        if ( objType == NODE && MSX.Specie[m].type == WALL ) continue;
-        sprintf(s1, "  %10s", MSX.Specie[m].id);
+        if ( !MSX.Species[m].rpt ) continue;
+        if ( objType == NODE && MSX.Species[m].type == WALL ) continue;
+        sprintf(s1, "  %10s", MSX.Species[m].id);
         strcat(TableHdr.Line2, s1);
         strcat(TableHdr.Line4, "  ----------");
-        MSXinp_getSpecieUnits(m, s1);
+        MSXinp_getSpeciesUnits(m, s1);
         sprintf(s2, "  %10s", s1);
         strcat(TableHdr.Line3, s2);
     }
@@ -253,12 +253,12 @@ void  writeNodeTable(int j, int tableType)
             ENgetnodeid(j, IDname);
             sprintf(Line, "%-16s", IDname);
         }
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
-            if ( !MSX.Specie[m].rpt ) continue;
-            if ( MSX.Specie[m].type == WALL ) continue;
+            if ( !MSX.Species[m].rpt ) continue;
+            if ( MSX.Species[m].type == WALL ) continue;
             c = MSXout_getNodeQual(k, j, m);
-            sprintf(s, "  %10.*f", MSX.Specie[m].precision, c);
+            sprintf(s, "  %10.*f", MSX.Species[m].precision, c);
             strcat(Line, s);
         }
         writeLine(Line);
@@ -285,11 +285,11 @@ void  writeLinkTable(int j, int tableType)
             ENgetlinkid(j, IDname);
             sprintf(Line, "%-16s", IDname);
         }
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
-            if ( !MSX.Specie[m].rpt ) continue;
+            if ( !MSX.Species[m].rpt ) continue;
             c = MSXout_getLinkQual(k, j, m);
-            sprintf(s, "  %10.*f", MSX.Specie[m].precision, c);
+            sprintf(s, "  %10.*f", MSX.Species[m].precision, c);
             strcat(Line, s);
         }
         writeLine(Line);

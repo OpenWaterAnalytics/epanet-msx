@@ -316,6 +316,7 @@ int factorize(double **a, int n, double *w, int *indx)
 			a[i][j] = sum;
 		}
 		big = 0.0; /*Initialize for the search for largest pivot element.*/
+		imax = j;
 		for (i = j; i <= n; i++) 
 		{ 
 			sum = a[i][j];

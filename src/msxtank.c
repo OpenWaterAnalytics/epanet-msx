@@ -8,7 +8,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 
 #include <stdio.h>
@@ -60,9 +60,9 @@ void  MSXtank_mix1(int i, double vIn, double cIn[], long dt)
     n = MSX.Tank[i].node;
     k = MSX.Nobjects[LINK] + i;
     seg = MSX.FirstSeg[k];
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
-        if ( MSX.Specie[m].type != BULK ) continue;
+        if ( MSX.Species[m].type != BULK ) continue;
         c = seg->c[m];
         if (MSX.Tank[i].v > 0.0) c += (cIn[m] - c)*vIn/MSX.Tank[i].v;
         else c = cIn[m];
@@ -94,7 +94,7 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
     double  qIn,                       // Inflow rate
             qOut,                      // Outflow rate
             qNet;                      // Net flow rate
-    double  c, c1, c2;                 // Specie concentrations
+    double  c, c1, c2;                 // Species concentrations
     Pseg    seg1,                      // Mixing zone segment
             seg2;                      // Ambient zone segment
 
@@ -128,9 +128,9 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
             tstar = (long) ((MSX.Tank[i].vMix - (seg1->v))/qNet);
             tstep = MIN(dt, tstar);
 
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
 
             // --- new quality in mixing zone
                 c = seg1->c[m]; 
@@ -150,9 +150,9 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
     // --- case where mixing zone full & ambient zone filling 
         if (dt > 1)
         {
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
 
             // --- new quality in mixing zone
                 c1 = seg1->c[m]; 
@@ -189,9 +189,9 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
             tstar = (long)(seg2->v/-qNet);
             tstep = MIN(dt, tstar);
 
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
 	            c1 = seg1->c[m];
 	            c2 = seg2->c[m];
 
@@ -213,9 +213,9 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
 
         if (dt > 1)
         {
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
             {
-                if ( MSX.Specie[m].type != BULK ) continue;
+                if ( MSX.Species[m].type != BULK ) continue;
 
             // --- new mixing zone quality (affected by external inflow only)
 		        c = seg1->c[m];
@@ -234,7 +234,7 @@ void  MSXtank_mix2(int i, double vIn, double cIn[], long dt)
 // --- use quality of mixed compartment (seg1) to represent quality
 //     of tank since this is where outflow begins to flow from
 
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.Tank[i].c[m] = seg1->c[m];
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.Tank[i].c[m] = seg1->c[m];
 }
 
 //=============================================================================
@@ -264,7 +264,7 @@ void  MSXtank_mix3(int i, double vIn, double cIn[], long dt)
 // --- initialize outflow volume & concentration
 
     vSum = 0.0;
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.C1[m] = 0.0;
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.C1[m] = 0.0;
 
 // --- withdraw flow from first segment
 
@@ -279,7 +279,7 @@ void  MSXtank_mix3(int i, double vIn, double cIn[], long dt)
 
     // --- update mass & volume removed
         vSum += vSeg;
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
             MSX.C1[m] += (seg->c[m])*vSeg;
         }
@@ -302,7 +302,7 @@ void  MSXtank_mix3(int i, double vIn, double cIn[], long dt)
 // --- use quality from first segment to represent overall
 //     quality of tank since this is where outflow flows from
 
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
         if (vSum > 0.0) MSX.Tank[i].c[m] = MSX.C1[m]/vSum;
         else            MSX.Tank[i].c[m] = MSX.FirstSeg[k]->c[m];
@@ -355,7 +355,7 @@ void  MSXtank_mix4(int i, double vIn, double cIn[], long dt)
 // --- keep track of total volume & mass removed from tank
 
     vSum = 0.0;
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.C1[m] = 0.0;
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.C1[m] = 0.0;
 
 // --- if tank filling, then create a new last segment
 
@@ -377,7 +377,7 @@ void  MSXtank_mix4(int i, double vIn, double cIn[], long dt)
 
     // --- quality of tank is that of inflow
 
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++) MSX.Tank[i].c[m] = cIn[m];
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++) MSX.Tank[i].c[m] = cIn[m];
 
     }
 
@@ -400,7 +400,7 @@ void  MSXtank_mix4(int i, double vIn, double cIn[], long dt)
 
         // --- update mass & volume removed
             vSum += vSeg;
-            for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+            for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
                 MSX.C1[m] += (seg->c[m])*vSeg;
 
         // --- reduce vNet by volume of last segment
@@ -423,7 +423,7 @@ void  MSXtank_mix4(int i, double vIn, double cIn[], long dt)
 
     // --- tank quality is mixture of flow released and any inflow
 
-        for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
         {
             vSum = vSum + vIn;
             if (vSum > 0.0)

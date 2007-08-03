@@ -82,12 +82,11 @@ MScmdname = $(shell ../svnname.sh $(epanetmsxsvnpath) "" CreateEpanetMSXLib_ .ba
 # Location of EPANET-MSX toolkit includes
 epanetincludedir = $(epanetsvnpath)/include
 epanetmsxincludedir = ../../include
-epanetcommondir = $(epanetsvnpath)/common
 # Search path for sources
 epanetmsxsrcdir = ../../src
 # dependent libraries
 epanetlibname := $(shell ../svnname.sh $(epanetsvnpath) "" epanet_gcc_ .dll)
-VPATH = $(epanetmsxsrcdir):$(epanetcommondir)
+VPATH = $(epanetmsxsrcdir)
 
 # Install directories
 winprefix = $(shell cygpath -w $$HOME)
@@ -107,7 +106,7 @@ docdir = $(datarootdir)/doc/epanet
 CC = $(MinGWdir)/bin/gcc
 dlltool = $(MinGWdir)/bin/dlltool
 CFLAGS = -g -O
-CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir) -I $(epanetcommondir)
+CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
 LDFLAGS = -L . -L $(winlibdir) -W1,-rpath,$(bindir) -l$(epanetlibname)
 
 # Installer

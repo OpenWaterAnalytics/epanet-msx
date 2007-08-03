@@ -7,7 +7,7 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 /*
 **   Operand codes:
@@ -581,9 +581,9 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				ExprStack[stackindex] = node->fvalue;
 				break;
 			case 8:
-                if (getVariableValue != NULL)
-                   r1 = getVariableValue(node->ivar);
-                else r1 = 0.0;
+                                if (getVariableValue != NULL)
+                                r1 = getVariableValue(node->ivar);
+                                else r1 = 0.0;
 				stackindex++;
 				ExprStack[stackindex] = r1;
 				break;
@@ -624,12 +624,12 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				break;
 			case 16: 
 				r1 = ExprStack[stackindex];
-				r2 = sqrt( r1 );     
+                                r2 = sqrt( r1 );     
 				ExprStack[stackindex] = r2;
 				break;
 			case 17: 
 				r1 = ExprStack[stackindex];
-				r2 = log(r1);
+                                r2 = log(r1);
 				ExprStack[stackindex] = r2;
 				break;
 			case 18: 
@@ -682,7 +682,7 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				r2 = log10( r1 );     
 				ExprStack[stackindex] = r2;
 				break;
-            case 28:
+                        case 28:
  				r1 = ExprStack[stackindex];
 				if (r1 <= 0.0) r2 = 0.0;
 				else           r2 = 1.0;
@@ -692,7 +692,7 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 			case 31: 
 				r1 = ExprStack[stackindex];
 				r2 = ExprStack[stackindex-1];
-				r2 = exp(r1*log(r2));
+                                r2 = exp(r1*log(r2));
 				ExprStack[stackindex-1] = r2;
 				stackindex--;
 				break;
@@ -717,7 +717,7 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
 {
     ExprTree *tree;
     MathExpr *expr = NULL;
-	MathExpr *result = NULL;
+    MathExpr *result = NULL;
     getVariableIndex = getVar;
     Err = 0;
     PrevLex = 0;
@@ -728,14 +728,14 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
     Bc = 0;
     tree = getTree();
     if (Bc == 0 && Err == 0)
+    {
+	traverseTree(tree, &expr);
+	while (expr)
 	{
-		traverseTree(tree, &expr);
-		while (expr)
-		{
-			result = expr;
-			expr = expr->prev;
-		}
+	    result = expr;
+	    expr = expr->prev;
 	}
-	deleteTree(tree);
+    }
+    deleteTree(tree);
     return result;
 }

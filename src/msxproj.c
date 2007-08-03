@@ -2,14 +2,14 @@
 **  MODULE:        MSXPROJ.C
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   project data manager used by the EPANET Multi-Species
-**                 Extension toolkit.         
+**                 Extension toolkit.
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 ******************************************************************************/
 
 #include <stdio.h>
@@ -36,13 +36,13 @@ static char * Errmsg[] =
      "Error 501 - insufficient memory available.",
      "Error 502 - no EPANET data file supplied.",
      "Error 503 - could not open MSX input file.",
-     "Error 504 - could not open hydraulic results file.", 
+     "Error 504 - could not open hydraulic results file.",
      "Error 505 - could not read hydraulic results file.",
      "Error 506 - could not read MSX input file.",
      "Error 507 - too few pipe reaction expressions.",
      "Error 508 - too few tank reaction expressions.",
      "Error 509 - could not open differential equation solver.",
-     "Error 510 - could not open algebraic equation solver."
+     "Error 510 - could not open algebraic equation solver.",
      "Error 511 - could not open binary results file.",
      "Error 512 - read/write error on binary results file.",
      "Error 513 - could not integrate reaction rate expressions.",
@@ -149,7 +149,7 @@ void MSXproj_close()
         fclose(MSX.TmpOutFile.file);
         remove(MSX.TmpOutFile.name);
     }
-    if ( MSX.OutFile.file ) fclose(MSX.OutFile.file); 
+    if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
     if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
     MSX.HydFile.file = NULL;
     MSX.OutFile.file = NULL;
@@ -293,7 +293,7 @@ void setDefaults()
     MSX.D = NULL;
     MSX.Q = NULL;
     MSX.H = NULL;
-    MSX.Specie = NULL;
+    MSX.Species = NULL;
     MSX.Term = NULL;
     MSX.Const = NULL;
     MSX.Pattern = NULL;
@@ -373,10 +373,10 @@ int convertUnits()
 
 // --- assign default tolerances to species
 
-    for (m=1; m<=MSX.Nobjects[SPECIE]; m++)
+    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
     {
-        if ( MSX.Specie[m].rTol == 0.0 ) MSX.Specie[m].rTol = MSX.DefRtol;
-        if ( MSX.Specie[m].aTol == 0.0 ) MSX.Specie[m].aTol = MSX.DefAtol;
+        if ( MSX.Species[m].rTol == 0.0 ) MSX.Species[m].rTol = MSX.DefRtol;
+        if ( MSX.Species[m].aTol == 0.0 ) MSX.Species[m].aTol = MSX.DefAtol;
     }
     return errcode;
 }
@@ -406,7 +406,7 @@ int createObjects()
 
 // --- create species, terms, parameters, constants & time patterns
 
-    MSX.Specie  = (Sspecie *)  calloc(MSX.Nobjects[SPECIE]+1, sizeof(Sspecie));
+    MSX.Species = (Sspecies *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(Sspecies));
     MSX.Term    = (Sterm *)    calloc(MSX.Nobjects[TERM]+1,  sizeof(Sterm));
     MSX.Param   = (Sparam *)   calloc(MSX.Nobjects[PARAMETER]+1, sizeof(Sparam));
     MSX.Const   = (Sconst *)   calloc(MSX.Nobjects[CONSTANT]+1, sizeof(Sconst));
@@ -418,12 +418,12 @@ int createObjects()
     MSX.H = (float *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
     MSX.Q = (float *) calloc(MSX.Nobjects[LINK]+1, sizeof(float));
 
-// --- create arrays for current & initial concen. of each specie for each node
+// --- create arrays for current & initial concen. of each species for each node
 
     for (i=1; i<=MSX.Nobjects[NODE]; i++)
     {
-        MSX.Node[i].c = (double *) calloc(MSX.Nobjects[SPECIE]+1, sizeof(double));
-        MSX.Node[i].c0 = (double *) calloc(MSX.Nobjects[SPECIE]+1, sizeof(double));
+        MSX.Node[i].c = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
+        MSX.Node[i].c0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
         MSX.Node[i].rpt = 0;
     }
 
@@ -432,7 +432,7 @@ int createObjects()
     for (i=1; i<=MSX.Nobjects[LINK]; i++)
     {
         MSX.Link[i].c0 = (double *)
-            calloc(MSX.Nobjects[SPECIE]+1, sizeof(double));
+            calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
         MSX.Link[i].param = (double *)
             calloc(MSX.Nobjects[PARAMETER]+1, sizeof(double));
         MSX.Link[i].rpt = 0;
@@ -445,7 +445,7 @@ int createObjects()
         MSX.Tank[i].param = (double *)
             calloc(MSX.Nobjects[PARAMETER]+1, sizeof(double));
         MSX.Tank[i].c = (double *)
-            calloc(MSX.Nobjects[SPECIE]+1, sizeof(double));
+            calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
     }
 
 // --- initialize contents of each time pattern object
@@ -457,16 +457,16 @@ int createObjects()
         MSX.Pattern[i].current = NULL;
     }
 
-// --- initialize reaction rate & equil. formulas for each specie
+// --- initialize reaction rate & equil. formulas for each species
 
-    for (i=1; i<=MSX.Nobjects[SPECIE]; i++)
+    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
-        MSX.Specie[i].pipeExpr     = NULL;
-        MSX.Specie[i].tankExpr     = NULL;
-        MSX.Specie[i].pipeExprType = NO_EXPR;
-        MSX.Specie[i].tankExprType = NO_EXPR;
-        MSX.Specie[i].precision    = 2;
-        MSX.Specie[i].rpt = 0;
+        MSX.Species[i].pipeExpr     = NULL;
+        MSX.Species[i].tankExpr     = NULL;
+        MSX.Species[i].pipeExprType = NO_EXPR;
+        MSX.Species[i].tankExprType = NO_EXPR;
+        MSX.Species[i].precision    = 2;
+        MSX.Species[i].rpt = 0;
     }
 
 // --- initialize math expressions for each intermediate term
@@ -535,20 +535,20 @@ void deleteObjects()
 
 // --- free memory used by reaction rate & equilibrium expressions
 
-    if (MSX.Specie) for (i=1; i<=MSX.Nobjects[SPECIE]; i++)
+    if (MSX.Species) for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
-    // --- free the specie's tank expression only if it doesn't
-    //     already point to the specie's pipe expression
-        if ( MSX.Specie[i].tankExpr != MSX.Specie[i].pipeExpr )
+    // --- free the species tank expression only if it doesn't
+    //     already point to the species pipe expression
+        if ( MSX.Species[i].tankExpr != MSX.Species[i].pipeExpr )
         {
-            mathexpr_delete(MSX.Specie[i].tankExpr);
+            mathexpr_delete(MSX.Species[i].tankExpr);
         }
-        mathexpr_delete(MSX.Specie[i].pipeExpr);
+        mathexpr_delete(MSX.Species[i].pipeExpr);
     }
 
 // --- delete all species, parameters, and constants
 
-    FREE(MSX.Specie);
+    FREE(MSX.Species);
     FREE(MSX.Param);
     FREE(MSX.Const);
 

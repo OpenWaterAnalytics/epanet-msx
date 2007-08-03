@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 *******************************************************************************/
 
 #include <stdio.h>
@@ -60,7 +60,7 @@ static char  *InpErrorTxt[INP_ERR_LAST-INP_ERR_FIRST] = {
     "Error 405 (reference to undefined object)",
     "Error 406 (illegal use of a reserved name)",
     "Error 407 (name already used by another object)",
-    "Error 408 (specie already assigned an expression)", 
+    "Error 408 (species already assigned an expression)", 
     "Error 409 (illegal math expression)"};
 
 //  Imported functions
@@ -75,20 +75,20 @@ int    MSXinp_countMsxObjects(void);
 int    MSXinp_countNetObjects(void);
 int    MSXinp_readNetData(void);
 int    MSXinp_readMsxData(void);
-void   MSXinp_getSpecieUnits(int m, char *units);
+void   MSXinp_getSpeciesUnits(int m, char *units);
 
 //  Local functions
 //-----------------
 static int    getLineLength(char *line);
 static int    getNewSection(char *tok, char *sectWords[], int *sect);
-static int    addSpecie(char *line);
+static int    addSpecies(char *line);
 static int    addCoeff(char *line);
 static int    addTerm(char *id);
 static int    addPattern(char *id);
 static int    checkID(char *id);
 static int    parseLine(int sect, char *line);
 static int    parseOption(void);
-static int    parseSpecie(void);
+static int    parseSpecies(void);
 static int    parseCoeff(void);
 static int    parseTerm(void);
 static int    parseExpression(int classType);
@@ -148,7 +148,7 @@ int MSXinp_countMsxObjects()
 
     // --- read id names from SPECIES, COEFFS, TERMS, & PATTERNS sections
 
-        if ( sect == s_SPECIE )  errcode = addSpecie(line);
+        if ( sect == s_SPECIES ) errcode = addSpecies(line);
         if ( sect == s_COEFF )   errcode = addCoeff(line);
         if ( sect == s_TERM )    errcode = addTerm(tok);
         if ( sect == s_PATTERN ) errcode = addPattern(tok);
@@ -338,21 +338,21 @@ int  MSXinp_readMsxData()
 
 //=============================================================================
 
-void   MSXinp_getSpecieUnits(int m, char *units)
+void   MSXinp_getSpeciesUnits(int m, char *units)
 /*
 **  Purpose:
-**    constructs the character string for a specie's concentration units.
+**    constructs the character string for a species concentration units.
 **
 **  Input:
-**    m = specie index
+**    m = species index
 **
 **  Output:
-**    units = character string with specie's concentration units
+**    units = character string with species concentration units
 */
 {
-    strcpy(units, MSX.Specie[m].units);
+    strcpy(units, MSX.Species[m].units);
     strcat(units, "/");
-    if ( MSX.Specie[m].type == BULK ) strcat(units, "L");
+    if ( MSX.Species[m].type == BULK ) strcat(units, "L");
     else strcat(units, AreaUnitsWords[MSX.AreaUnits]);
 }
 
@@ -417,10 +417,10 @@ int  getNewSection(char *tok, char *sectWords[], int *sect)
 
 //=============================================================================
 
-int addSpecie(char *line)
+int addSpecies(char *line)
 /* 
 **  Purpose:
-**    adds a specie ID name to the project.
+**    adds a species ID name to the project.
 **
 **  Input:
 **    line = line of input data
@@ -434,9 +434,9 @@ int addSpecie(char *line)
     if ( Ntokens < 2 ) return ERR_ITEMS;
     errcode = checkID(Tok[1]);
     if ( errcode ) return errcode;
-    if ( MSXproj_addObject(SPECIE, Tok[1], MSX.Nobjects[SPECIE]+1) < 0 )
+    if ( MSXproj_addObject(SPECIES, Tok[1], MSX.Nobjects[SPECIES]+1) < 0 )
         errcode = 101;
-    else MSX.Nobjects[SPECIE]++;
+    else MSX.Nobjects[SPECIES]++;
     return errcode;
 }
 
@@ -550,7 +550,7 @@ int checkID(char *id)
     
 // --- check that id name not used before
 
-    if ( MSXproj_findObject(SPECIE, id) > 0 ||
+    if ( MSXproj_findObject(SPECIES, id) > 0 ||
          MSXproj_findObject(TERM, id)   > 0 ||
          MSXproj_findObject(PARAMETER, id)  > 0 ||
          MSXproj_findObject(CONSTANT, id)  > 0
@@ -582,8 +582,8 @@ int parseLine(int sect, char *line)
       case s_OPTION:
         return parseOption();
 
-      case s_SPECIE:
-        return parseSpecie();
+      case s_SPECIES:
+        return parseSpecies();
 
       case s_COEFF:
         return parseCoeff();
@@ -684,10 +684,10 @@ int parseOption()
 
 //=============================================================================
 
-int parseSpecie()
+int parseSpecies()
 /*
 **  Purpose:
-**    parses an input line containing a specie variable.
+**    parses an input line containing a species variable.
 **
 **  Input:
 **    none
@@ -698,38 +698,38 @@ int parseSpecie()
 {
     int i;
 
-// --- get Specie's index
+// --- get Species index
 
     if ( Ntokens < 3 ) return ERR_ITEMS;
-    i = MSXproj_findObject(SPECIE, Tok[1]);
+    i = MSXproj_findObject(SPECIES, Tok[1]);
     if ( i <= 0 ) return ERR_NAME;
 
-// --- get pointer to Specie's name
+// --- get pointer to Species name
 
-    MSX.Specie[i].id = MSXproj_findID(SPECIE, Tok[1]);
+    MSX.Species[i].id = MSXproj_findID(SPECIES, Tok[1]);
 
-// --- get Specie's type
+// --- get Species type
 
-    if      ( MSXutils_match(Tok[0], "BULK") ) MSX.Specie[i].type = BULK;
-    else if ( MSXutils_match(Tok[0], "WALL") ) MSX.Specie[i].type = WALL;
+    if      ( MSXutils_match(Tok[0], "BULK") ) MSX.Species[i].type = BULK;
+    else if ( MSXutils_match(Tok[0], "WALL") ) MSX.Species[i].type = WALL;
     else return ERR_KEYWORD;
 
-// --- get Specie's units
+// --- get Species units
 
-    strncpy(MSX.Specie[i].units, Tok[2], MAXUNITS);
+    strncpy(MSX.Species[i].units, Tok[2], MAXUNITS);
 
-// --- get Specie's error tolerance
+// --- get Species error tolerance
 
-    MSX.Specie[i].aTol = 0.0;
-    MSX.Specie[i].rTol = 0.0;
+    MSX.Species[i].aTol = 0.0;
+    MSX.Species[i].rTol = 0.0;
     if ( Ntokens >= 4)
     {
-        if ( !MSXutils_getDouble(Tok[3], &MSX.Specie[i].aTol) )
+        if ( !MSXutils_getDouble(Tok[3], &MSX.Species[i].aTol) )
             return ERR_NUMBER;
     }
     if ( Ntokens >= 5)
     {
-        if ( !MSXutils_getDouble(Tok[4], &MSX.Specie[i].rTol) )
+        if ( !MSXutils_getDouble(Tok[4], &MSX.Species[i].rTol) )
             return ERR_NUMBER;
     }
     return 0;
@@ -859,20 +859,20 @@ int parseExpression(int classType)
     k = MSXutils_findmatch(Tok[0], ExprTypeWords);
     if ( k < 0 ) return ERR_KEYWORD;
 
-// --- determine specie associated with expression
+// --- determine species associated with expression
 
-    i = MSXproj_findObject(SPECIE, Tok[1]);
+    i = MSXproj_findObject(SPECIES, Tok[1]);
     if ( i < 1 ) return ERR_NAME;
 
-// --- check that specie does not already have an expression
+// --- check that species does not already have an expression
 
     if ( classType == LINK )
     {
-        if ( MSX.Specie[i].pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
+        if ( MSX.Species[i].pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
     if ( classType == TANK )
     {
-        if ( MSX.Specie[i].tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
+        if ( MSX.Species[i].tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
 
 // --- reconstruct the expression string from its tokens
@@ -884,17 +884,17 @@ int parseExpression(int classType)
     expr = mathexpr_create(s, getVariableCode);
     if ( expr == NULL ) return ERR_MATH_EXPR;
 
-// --- assign the expression to the specie
+// --- assign the expression to the species
 
     switch (classType)
     {
     case LINK:
-        MSX.Specie[i].pipeExpr = expr;
-        MSX.Specie[i].pipeExprType = k;
+        MSX.Species[i].pipeExpr = expr;
+        MSX.Species[i].pipeExprType = k;
         break;
     case TANK:
-        MSX.Specie[i].tankExpr = expr;
-        MSX.Specie[i].tankExprType = k;
+        MSX.Species[i].tankExpr = expr;
+        MSX.Species[i].tankExprType = k;
         break;
     }
     return 0;    
@@ -929,7 +929,7 @@ int parseQuality()
 
     k = 1;
     if ( i >= 2 ) k = 2;
-    m = MSXproj_findObject(SPECIE, Tok[k]);
+    m = MSXproj_findObject(SPECIES, Tok[k]);
     if ( m <= 0 ) return ERR_NAME;
 
 // --- get quality value
@@ -940,11 +940,11 @@ int parseQuality()
     if ( !MSXutils_getDouble(Tok[k], &x) ) return ERR_NUMBER;
 
 // --- for global specification, set initial quality either for
-//     all nodes or links depending on type of specie
+//     all nodes or links depending on type of species
 
     if ( i == 1)
     {
-        if ( MSX.Specie[m].type == BULK )
+        if ( MSX.Species[m].type == BULK )
         {
             for (j=1; j<=MSX.Nobjects[NODE]; j++) MSX.Node[j].c0[m] = x;
         }
@@ -957,7 +957,7 @@ int parseQuality()
     {
         err = ENgetnodeindex(Tok[1], &j);
         if ( err ) return ERR_NAME;
-        if ( MSX.Specie[m].type == BULK ) MSX.Node[j].c0[m] = x;
+        if ( MSX.Species[m].type == BULK ) MSX.Node[j].c0[m] = x;
     }
 
 // --- for a specific link, get its index & set its initial quality
@@ -1048,14 +1048,14 @@ int parseSource()
     err = ENgetnodeindex(Tok[1], &j);
     if ( err ) return ERR_NAME;
 
-//  --- get specie index
+//  --- get species index
 
-    m = MSXproj_findObject(SPECIE, Tok[2]);
+    m = MSXproj_findObject(SPECIES, Tok[2]);
     if ( m <= 0 ) return ERR_NAME;
 
-// --- check that specie is a BULK specie
+// --- check that species is a BULK species
 
-    if ( MSX.Specie[m].type != BULK ) return 0;
+    if ( MSX.Species[m].type != BULK ) return 0;
 
 // --- get base strength
 
@@ -1070,12 +1070,12 @@ int parseSource()
         if ( i <= 0 ) return ERR_NAME;
     }
 
-// --- check if a source for this specie already exists
+// --- check if a source for this species already exists
 
     source = MSX.Node[j].sources;
     while ( source )
     {
-        if ( source->specie == m ) break;
+        if ( source->species == m ) break;
         source = source->next;
     }
 
@@ -1091,10 +1091,10 @@ int parseSource()
 
 // --- save source's properties
 
-    source->type   = k;
-    source->specie = m;
-    source->c0     = x;
-    source->pat    = i;
+    source->type    = (char)k;
+    source->species = m;
+    source->c0      = x;
+    source->pat     = i;
     return 0;
 }    
 
@@ -1200,20 +1200,20 @@ int parseReport()
         }
         break;
 
-    // --- keyword is SPECIE; get YES/NO & precision
+    // --- keyword is SPECIES; get YES/NO & precision
 
         case 2:
-        j = MSXproj_findObject(SPECIE, Tok[1]);
+        j = MSXproj_findObject(SPECIES, Tok[1]);
         if ( j <= 0 ) return ERR_NAME;
         if ( Ntokens >= 3 )
         {
-            if ( MSXutils_strcomp(Tok[2], YES) ) MSX.Specie[j].rpt = 1;
-            else if ( MSXutils_strcomp(Tok[2], NO)  ) MSX.Specie[j].rpt = 0;
+            if ( MSXutils_strcomp(Tok[2], YES) ) MSX.Species[j].rpt = 1;
+            else if ( MSXutils_strcomp(Tok[2], NO)  ) MSX.Species[j].rpt = 0;
             else return ERR_KEYWORD;
         }
         if ( Ntokens >= 4 )
         {
-            if ( !MSXutils_getInt(Tok[3], &MSX.Specie[j].precision) )
+            if ( !MSXutils_getInt(Tok[3], &MSX.Species[j].precision) )
                 return ERR_NUMBER;
         }
         break;
@@ -1249,20 +1249,20 @@ int getVariableCode(char *id)
 **
 **  Note:
 **    Variables are assigned consecutive code numbers starting from 1 
-**    and proceeding through each Specie, Term, Parameter and Constant.
+**    and proceeding through each Species, Term, Parameter and Constant.
 */
 {
-    int j = MSXproj_findObject(SPECIE, id);
+    int j = MSXproj_findObject(SPECIES, id);
     if ( j >= 1 ) return j;
     j = MSXproj_findObject(TERM, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIE] + j;
+    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + j;
     j = MSXproj_findObject(PARAMETER, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIE] + MSX.Nobjects[TERM] + j;
+    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + j;
     j = MSXproj_findObject(CONSTANT, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIE] + MSX.Nobjects[TERM] + 
+    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + 
                          MSX.Nobjects[PARAMETER] + j;
     j = MSXutils_findmatch(id, HydVarWords);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIE] + MSX.Nobjects[TERM] + 
+    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + 
                          MSX.Nobjects[PARAMETER] + MSX.Nobjects[CONSTANT] + j;
     return -1;
 }

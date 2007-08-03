@@ -8,7 +8,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00 
-**  LAST UPDATE:   3/13/07
+**  LAST UPDATE:   7/31/07
 *******************************************************************************/
 
 #ifndef EPANETMSX_H
@@ -45,7 +45,7 @@
 #define MSX_NODE      0
 #define MSX_LINK      1
 #define MSX_TANK      2
-#define MSX_SPECIE    3
+#define MSX_SPECIES   3
 #define MSX_TERM      4
 #define MSX_PARAMETER 5
 #define MSX_CONSTANT  6
@@ -77,22 +77,22 @@ int  DLLEXPORT MSXgetindex(int type, char *id, int *index);
 int  DLLEXPORT MSXgetIDlen(int type, int index, int *len);
 int  DLLEXPORT MSXgetID(int type, int index, char *id, int len);
 int  DLLEXPORT MSXgetcount(int type, int *count);
-int  DLLEXPORT MSXgetspecie(int index, int *type, char *units, double *aTol,
+int  DLLEXPORT MSXgetspecies(int index, int *type, char *units, double *aTol,
                double *rTol);
 int  DLLEXPORT MSXgetconstant(int index, double *value);
 int  DLLEXPORT MSXgetparameter(int type, int index, int param, double *value);
-int  DLLEXPORT MSXgetsource(int node, int specie, int *type, double *level,
+int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
                int *pat);
 int  DLLEXPORT MSXgetpatternlen(int pat, int *len);
 int  DLLEXPORT MSXgetpatternvalue(int pat, int period, double *value);
-int  DLLEXPORT MSXgetinitqual(int type, int index, int specie, double *value);
-int  DLLEXPORT MSXgetqual(int type, int index, int specie, double *value);
+int  DLLEXPORT MSXgetinitqual(int type, int index, int species, double *value);
+int  DLLEXPORT MSXgetqual(int type, int index, int species, double *value);
 int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
 
 int  DLLEXPORT MSXsetconstant(int index, double value);
 int  DLLEXPORT MSXsetparameter(int type, int index, int param, double value);
-int  DLLEXPORT MSXsetinitqual(int type, int index, int specie, double value);
-int  DLLEXPORT MSXsetsource(int node, int specie, int type, double level,
+int  DLLEXPORT MSXsetinitqual(int type, int index, int species, double value);
+int  DLLEXPORT MSXsetsource(int node, int species, int type, double level,
                int pat);
 int  DLLEXPORT MSXsetpatternvalue(int pat, int period, double value);
 int  DLLEXPORT MSXsetpattern(int pat, double mult[], int len);

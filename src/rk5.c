@@ -131,8 +131,8 @@ int rk5_integrate(double y[], int n, double t, double tnext,
     double e1=71.0/57600.0, e3=-71.0/16695.0, e4=71.0/1920.0,
            e5=-17253.0/339200.0, e6=22.0/525.0, e7=-1.0/40.0;
 
-    double tnew, h, hmax, hnew, ytol, err, sk, fac, fac11;
-    int    i, n1 = n+1;
+    double tnew, h, hmax, hnew, ytol, err, sk, fac, fac11 = 1.0;
+    int    i;
 
 // --- parameters for step size control
 
