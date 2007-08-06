@@ -25,13 +25,13 @@ extern MSXproject  MSX;                // MSX project data
 
 //  Exported functions
 //--------------------
-void MSXfile_save(FILE *f);
+int MSXfile_save(FILE *f);
 
 //  Local functions
 //-----------------
 static void  saveSpecies(FILE *f);
 static void  saveCoeffs(FILE *f);
-static void  saveInpSections(FILE *f);
+static int   saveInpSections(FILE *f);
 static void  saveParams(FILE *f);
 static void  saveQuality(FILE *f);
 static void  saveSources(FILE *f);
@@ -39,7 +39,7 @@ static void  savePatterns(FILE *f);
 
 //=============================================================================
 
-void MSXfile_save(FILE *f)
+int MSXfile_save(FILE *f)
 /*
 **  Purpose:
 **    saves current MSX project data to file.
@@ -48,15 +48,17 @@ void MSXfile_save(FILE *f)
 **    f = pointer to MSX file where data are saved.
 */
 {
+    int errcode;
     fprintf(f, "[TITLE]");
     fprintf(f, "\n%s\n", MSX.Title);
     saveSpecies(f);
     saveCoeffs(f);
-    saveInpSections(f);
+    errcode = saveInpSections(f);
     saveParams(f);
     saveQuality(f);
     saveSources(f);
     savePatterns(f);
+    return errcode;
 }
 
 //=============================================================================
@@ -68,7 +70,7 @@ void  saveSpecies(FILE *f)
     n = MSX.Nobjects[SPECIES];
     for (i=1; i<=n; i++)
     {
-        if ( MSX.Species[i].type == BULK ) fprintf(f, "\nBULK    "); 
+        if ( MSX.Species[i].type == BULK ) fprintf(f, "\nBULK    ");
         else                               fprintf(f, "\nWALL    ");
         fprintf(f, "%-32s %-15s %e %e",
             MSX.Species[i].id, MSX.Species[i].units,
@@ -98,15 +100,16 @@ void  saveCoeffs(FILE *f)
 
 //=============================================================================
 
-void  saveInpSections(FILE *f)
+int  saveInpSections(FILE *f)
 {
     char   line[MAXLINE+1];
     char   writeLine;
     int    newsect;
 
-    if ((MSX.MsxFile.file = fopen(MSX.MsxFile.name,"rt")) == NULL) return;
+    if ((MSX.MsxFile.file = fopen(MSX.MsxFile.name,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
     rewind(MSX.MsxFile.file);
 
+    fprintf(f,"\n\n");
     writeLine = FALSE;
     while ( fgets(line, MAXLINE, MSX.MsxFile.file) != NULL )
     {
@@ -121,16 +124,16 @@ void  saveInpSections(FILE *f)
               case s_PIPE:
               case s_TANK:
               case s_REPORT:
-                fprintf(f, "\n");
                 break;
               default:
                 writeLine = FALSE;
             }
         }
-        if ( writeLine) fprintf(f, "\n%s", line);
+        if ( writeLine) fprintf(f, "%s", line);
     }
     if ( MSX.MsxFile.file ) fclose(MSX.MsxFile.file);
     MSX.MsxFile.file = NULL;
+    return 0;
 }
 
 //=============================================================================

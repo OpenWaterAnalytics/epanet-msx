@@ -49,7 +49,7 @@ int    MSXqual_close(void);
 double MSXqual_getNodeQual(int j, int m);
 double MSXqual_getLinkQual(int k, int m);
 int    MSXrpt_write(void);
-void   MSXfile_save(FILE *f);
+int    MSXfile_save(FILE *f);
 
 //=============================================================================
 
@@ -1106,10 +1106,11 @@ int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
 
 int  DLLEXPORT MSXsavemsxfile(char *fname)
 {
+    int errcode;
     FILE *f;
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ((f = fopen(fname,"wt")) == NULL) return ERR_OPEN_OUT_FILE;
-    MSXfile_save(f);
+    errcode = MSXfile_save(f);
     fclose(f);
-    return 0;
+    return errcode;
 }
