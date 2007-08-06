@@ -70,7 +70,7 @@ void  saveSpecies(FILE *f)
     {
         if ( MSX.Species[i].type == BULK ) fprintf(f, "\nBULK    "); 
         else                               fprintf(f, "\nWALL    ");
-        fprintf(f, "%-32s %-15s %.6f %.6f",
+        fprintf(f, "%-32s %-15s %e %e",
             MSX.Species[i].id, MSX.Species[i].units,
             MSX.Species[i].aTol, MSX.Species[i].rTol);
     }
@@ -85,13 +85,13 @@ void  saveCoeffs(FILE *f)
     n = MSX.Nobjects[CONSTANT];
     for (i=1; i<=n; i++)
     {
-        fprintf(f, "\nCONSTANT    %-32s  %.6f",
+        fprintf(f, "\nCONSTANT    %-32s  %e",
             MSX.Const[i].id, MSX.Const[i].value);
     }
     n = MSX.Nobjects[PARAMETER];
     for (i=1; i<=n; i++)
     {
-        fprintf(f, "\nPARAMETER   %-32s  %.6f",
+        fprintf(f, "\nPARAMETER   %-32s  %e",
             MSX.Param[i].id, MSX.Param[i].value);
     }
 }
@@ -104,7 +104,9 @@ void  saveInpSections(FILE *f)
     char   writeLine;
     int    newsect;
 
+    if ((MSX.MsxFile.file = fopen(MSX.MsxFile.name,"rt")) == NULL) return;
     rewind(MSX.MsxFile.file);
+
     writeLine = FALSE;
     while ( fgets(line, MAXLINE, MSX.MsxFile.file) != NULL )
     {
@@ -127,6 +129,8 @@ void  saveInpSections(FILE *f)
         }
         if ( writeLine) fprintf(f, "\n%s", line);
     }
+    if ( MSX.MsxFile.file ) fclose(MSX.MsxFile.file);
+    MSX.MsxFile.file = NULL;
 }
 
 //=============================================================================
@@ -148,7 +152,7 @@ void  saveParams(FILE *f)
                 if ( MSX.Link[i].param[j] != x )
                 {
                     ENgetlinkid(i, id);
-                    fprintf(f, "\nPIPE    %-32s  %-32s  %.6f",
+                    fprintf(f, "\nPIPE    %-32s  %-32s  %e",
                         id, MSX.Param[j].id, MSX.Link[i].param[j]);
                 }
             }
@@ -158,8 +162,8 @@ void  saveParams(FILE *f)
                 {
                     k = MSX.Tank[i].node;
                     ENgetnodeid(k, id);
-                    fprintf(f, "\nTANK    %-32s  %-32s  %.6f",
-                        MSX.Param[j].id, MSX.Tank[i].param[j]);
+                    fprintf(f, "\nTANK    %-32s  %-32s  %e",
+                        id, MSX.Param[j].id, MSX.Tank[i].param[j]);
                 }
             }
         }
@@ -176,21 +180,25 @@ void  saveQuality(FILE *f)
     fprintf(f, "\n\n[QUALITY]");
     for (j=1; j<=MSX.Nobjects[SPECIES]; j++)
     {
+		if (MSX.C0[j] > 0.0)
+			fprintf(f, "\nGLOBAL  %-32s  %e",
+                    MSX.Species[j].id, MSX.C0[j]);
+
         for (i=1; i<=MSX.Nobjects[NODE]; i++)
         {
-            if ( MSX.Node[i].c0[j] > 0.0 )
+            if ( MSX.Node[i].c0[j] > 0.0 && MSX.Node[i].c0[j] != MSX.C0[j])
             {
                 ENgetnodeid(i, id);
-                fprintf(f, "\nNODE    %-32s  %-32s  %.6f",
+                fprintf(f, "\nNODE    %-32s  %-32s  %e",
                     id, MSX.Species[j].id, MSX.Node[i].c0[j]);
             }
         }
         for (i=1; i<=MSX.Nobjects[LINK]; i++)
         {
-            if ( MSX.Link[i].c0[j] > 0.0 )
+            if ( MSX.Link[i].c0[j] > 0.0 && MSX.Node[i].c0[j] != MSX.C0[j])
             {
                 ENgetlinkid(i, id);
-                fprintf(f, "\nLINK    %-32s  %-32s  %.6f",
+                fprintf(f, "\nLINK    %-32s  %-32s  %e",
                     id, MSX.Species[j].id, MSX.Link[i].c0[j]);
             }
         }
@@ -214,7 +222,7 @@ void  saveSources(FILE *f)
             if ( source->c0 > 0.0 )
             {
                 ENgetnodeid(i, id);
-                fprintf(f, "\n%-10s  %-32s  %-32s  %.6f",
+                fprintf(f, "\n%-10s  %-32s  %-32s  %e",
                     SourceTypeWords[source->type], id,
                     MSX.Species[source->species].id, source->c0);
                 if ( source->pat > 0 )
@@ -243,7 +251,7 @@ void  savePatterns(FILE *f)
             {
                 fprintf(f, "\n%-32s", MSX.Pattern[i].id);
             }
-            fprintf(f, "  %.6f", listItem->value);
+            fprintf(f, "  %e", listItem->value);
             count++;
             listItem = listItem->next;
         }

@@ -419,6 +419,7 @@ typedef struct                         // MSX PROJECT VARIABLES
    double Ucf[MAX_UNIT_TYPES],         // Unit conversion factors
           DefRtol,                     // Default relative error tolerance
           DefAtol,                     // Default absolute error tolerance
+		  *C0,						   // Species initial quality vector
           *C1;                         // Species concentration vector
 
    Pseg   *FirstSeg,                   // First WQ segment in each pipe/tank

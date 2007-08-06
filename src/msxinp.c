@@ -768,6 +768,7 @@ int parseCoeff()
         if ( Ntokens >= 3 )
         {
             if ( !MSXutils_getDouble(Tok[2], &x) ) return ERR_NUMBER;
+			MSX.Param[i].value = x;
             for (j=1; j<=MSX.Nobjects[LINK]; j++) MSX.Link[j].param[i] = x;
             for (j=1; j<=MSX.Nobjects[TANK]; j++) MSX.Tank[j].param[i] = x;
         }
@@ -944,6 +945,7 @@ int parseQuality()
 
     if ( i == 1)
     {
+		MSX.C0[m] = x;
         if ( MSX.Species[m].type == BULK )
         {
             for (j=1; j<=MSX.Nobjects[NODE]; j++) MSX.Node[j].c0[m] = x;

@@ -420,6 +420,7 @@ int createObjects()
 
 // --- create arrays for current & initial concen. of each species for each node
 
+	MSX.C0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
     for (i=1; i<=MSX.Nobjects[NODE]; i++)
     {
         MSX.Node[i].c = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
@@ -526,6 +527,7 @@ void deleteObjects()
     FREE(MSX.D);
     FREE(MSX.H);
     FREE(MSX.Q);
+	FREE(MSX.C0);
 
 // --- delete all nodes, links, and tanks
 
