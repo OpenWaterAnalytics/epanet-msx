@@ -30,14 +30,6 @@
 # make clean
 #     -Removes object and library files, returning the build directory
 #      to its pristine state.
-# ---FUTURE NEEDED TARGETS---
-# make uninstall
-#     -Undoes 'make install'
-# make check
-#     -Checks the installation by running EPANET-MSX against defined
-#      test networks and comparing the results quantitatively to a database
-#      of known correct results.  Reports comparison statistics and
-#      pass/fail status for each test.
 
 SHELL = /bin/sh
 
@@ -48,9 +40,9 @@ SHELL = /bin/sh
 # Target filenames
 # svnname.sh constructs a name: <prefix><root><Rev><postfix>
 # where <Rev> is the atomic revision number of the svn repo.
-epanetsvnpath = ../../../../BASE/trunk
+epanetsvnpath = ../../../../BASE
 epanetrootname := $(shell ../svnname.sh $(epanetsvnpath) "" epanet_gcc_ "")
-epanetmsxsvnpath = ../../../trunk
+epanetmsxsvnpath = ../../..
 epanetmsxrootname := $(shell ../svnname.sh $(epanetmsxsvnpath) "" epanetmsx_gcc_ "")
 soname := lib$(epanetmsxrootname).so
 exename := $(epanetmsxrootname)
@@ -58,12 +50,11 @@ exename := $(epanetmsxrootname)
 runcmdtemplate = runepanetmsx.sh.template
 runcmdname = $(shell ../svnname.sh $(epanetmsxsvnpath) "" runepanetmsx_ .sh)
 # Location of EPANET-MSX toolkit includes
-epanetincludedir = $(epanetsvnpath)/include
+epanetincludedir = $(epanetsvnpath)/trunk/include
 epanetmsxincludedir = ../../include
-epanetcommondir = $(epanetsvnpath)/common
 # Search path for sources
 epanetmsxsrcdir = ../../src
-VPATH = $(epanetmsxsrcdir):$(epanetcommondir)
+VPATH = $(epanetmsxsrcdir)
 
 # Install directories
 prefix = ~
@@ -79,8 +70,8 @@ docdir = $(datarootdir)/doc/epanetmsx
 # gcc
 CC = gcc
 CFLAGS = -g -O -fPIC
-CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir) -I $(epanetcommondir)
-LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(libdir)
+CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
+LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(libdir) -lm
 
 # Installer
 INSTALL = install

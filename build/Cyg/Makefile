@@ -42,13 +42,6 @@
 # make clean
 #     -Removes object and library files, returning the build directory
 #      to its pristine state.
-# make uninstall
-#     -Undoes 'make install'
-# make check
-#     -Checks the installation by running EPANET-MSX against defined
-#      test networks and comparing the results quantitatively to a database
-#      of known correct results.  Reports comparison statistics and
-#      pass/fail status for each test.
 
 SHELL = /bin/sh
 
@@ -66,8 +59,8 @@ MSVClibexe = c:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\bin\\lib
 # Target filenames
 # svnname.sh constructs a name: <prefix><root><Rev><postfix>
 # where <Rev> is the atomic revision number of the svn repo.
-epanetsvnpath = ../../../../BASE/trunk
-epanetmsxsvnpath = ../../../trunk
+epanetsvnpath = ../../../../BASE
+epanetmsxsvnpath = ../../..
 epanetmsxrootname := $(shell ../svnname.sh $(epanetmsxsvnpath) "" epanetmsx_gcc_ "")
 dllname := $(epanetmsxrootname).dll
 defname := $(epanetmsxrootname).def
@@ -80,7 +73,7 @@ runcmdname = $(shell ../svnname.sh $(epanetmsxsvnpath) "" runepanetmsx_ .sh)
 MScmdtemplate = CreateEpanetMSXLib.bat.template
 MScmdname = $(shell ../svnname.sh $(epanetmsxsvnpath) "" CreateEpanetMSXLib_ .bat)
 # Location of EPANET-MSX toolkit includes
-epanetincludedir = $(epanetsvnpath)/include
+epanetincludedir = $(epanetsvnpath)/trunk/include
 epanetmsxincludedir = ../../include
 # Search path for sources
 epanetmsxsrcdir = ../../src
