@@ -9,7 +9,9 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00                                               
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   1/29/08
+**  Bug FIX:       Bug ID 11, Feng Shang, 01/10/2008
+				   BUG ID 8 (add roughness as hydraulic variable),  Feng Shang, 01/29/2008 
 ***********************************************************************/
 
 // NOTE: the entries in MsxsectWords must match the entries in the enumeration
@@ -21,7 +23,7 @@ static char *MsxSectWords[] = {"[TITLE", "[SPECIE",  "[COEFF",  "[TERM",
 static char *ReportWords[]  = {"NODE", "LINK", "SPECIE", "FILE", "PAGESIZE", NULL};
 static char *OptionTypeWords[] = {"AREA_UNITS", "RATE_UNITS", "SOLVER", "COUPLING",
                                   "TIMESTEP", "RTOL", "ATOL", NULL}; 
-static char *SourceTypeWords[] = {"CONC", "MASS", "FLOW", "SETPOINT", NULL};
+static char *SourceTypeWords[] = {"CONC", "MASS", "SETPOINT", "FLOW", NULL};      //(FS-01/10/2008 To fix bug 11)
 static char *MixingTypeWords[] = {"MIXED", "2COMP", "FIFO", "LIFO", NULL};
 static char *MassUnitsWords[]  = {"MG", "UG", "MOLE", "MMOL", NULL};
 static char *AreaUnitsWords[]  = {"FT2", "M2", "CM2", NULL};
@@ -30,7 +32,7 @@ static char *SolverTypeWords[] = {"EUL", "RK5", "ROS2", NULL};
 static char *CouplingWords[]   = {"NONE", "FULL", NULL};
 static char *ExprTypeWords[]   = {"", "RATE", "FORMULA", "EQUIL", NULL};
 static char *HydVarWords[]     = {"", "D", "Q", "U", "Re",
-                                  "Us", "Ff", "Av", NULL};
+                                  "Us", "Ff", "Av", "Kc", NULL};	/*Feng Shang 01/29/2008*/
 static char YES[]  = "YES";
 static char NO[]   = "NO";
 static char ALL[]  = "ALL";

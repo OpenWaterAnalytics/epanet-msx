@@ -8,7 +8,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   01/08/08
+**  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
 *******************************************************************************/
 
 #include <stdio.h>
@@ -198,7 +199,7 @@ void  saveQuality(FILE *f)
         }
         for (i=1; i<=MSX.Nobjects[LINK]; i++)
         {
-            if ( MSX.Link[i].c0[j] > 0.0 && MSX.Node[i].c0[j] != MSX.C0[j])
+            if ( MSX.Link[i].c0[j] > 0.0 && MSX.Link[i].c0[j] != MSX.C0[j])			//(FS-01/08/2008, bug fix)
             {
                 ENgetlinkid(i, id);
                 fprintf(f, "\nLINK    %-32s  %-32s  %e",

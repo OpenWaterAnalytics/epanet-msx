@@ -9,7 +9,9 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   01/29/08
+**  Bug Fix:       Bug ID 08, Feng Shang, 01/07/08 
+				   Bug ID 09 (add roughness as hyfraulic variable) Feng Shang 01/29/2008
 ***********************************************************************/
 
 #include "mathexpr.h"
@@ -186,6 +188,7 @@ typedef  float REAL4;
                   SHEAR,               //   link shear velocity
                   FRICTION,            //   friction factor
                   AREAVOL,             //   area/volume
+				  ROUGHNESS,		   //   roughness		/*Feng Shang 01/29/2008*/
                   MAX_HYD_VARS};
 
  enum TstatType                        // Time series statistics
@@ -245,6 +248,7 @@ typedef  float REAL4;
            ERR_INVALID_OBJECT_PARAMS,  // 518
            ERR_MSX_NOT_OPENED,         // 519
            ERR_MSX_OPENED,             // 520
+           ERR_OPEN_RPT_FILE,          // 521                                  //(LR-11/20/07, to fix bug 08)
            ERR_MAX};
 
 
@@ -300,6 +304,7 @@ typedef struct                         // LINK OBJECT
    char   rpt;                         // reporting flag
    double *c0;                         // initial species concentrations
    double *param;                      // kinetic parameter values
+   double roughness;				   // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
 }  Slink;
 
 

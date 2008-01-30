@@ -9,7 +9,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   01/07/08
+**  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
 ******************************************************************************/
 
 #include <stdio.h>
@@ -52,7 +53,8 @@ static char * Errmsg[] =
      "Error 517 - reference made to an undefined object ID.",
      "Error 518 - invalid property values were specified.",
      "Error 519 - an MSX project was not opened.",
-     "Error 520 - an MSX project is already opened."};
+     "Error 520 - an MSX project is already opened."
+     "Error 521 - could not open MSX report file."};                           //(LR-11/20/07)
 
 //  Imported functions
 //--------------------
@@ -77,6 +79,8 @@ static int    createObjects(void);
 static void   deleteObjects(void);
 static int    createHashTables(void);
 static void   deleteHashTables(void);
+
+static int    openRptFile(void);                                               //(LR-11/20/07)
 
 //=============================================================================
 
@@ -119,6 +123,9 @@ int  MSXproj_open(char *fname)
     CALL(errcode, MSXinp_readNetData());
     CALL(errcode, MSXinp_readMsxData());
 
+	if (strcmp(MSX.RptFile.name, ""))											   //(FS-01/07/2008, to fix bug 08)
+		CALL(errcode, openRptFile());                                              //(LR-11/20/07, to fix bug 08)
+
 // --- convert user's units to internal units
 
     CALL(errcode, convertUnits());
@@ -142,6 +149,7 @@ void MSXproj_close()
 **    none
 */
 {
+    if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);                          //(LR-11/20/07, to fix bug 08)
     if ( MSX.HydFile.file ) fclose(MSX.HydFile.file);
     if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
     if ( MSX.TmpOutFile.file != NULL && MSX.TmpOutFile.file != MSX.OutFile.file )
@@ -151,6 +159,7 @@ void MSXproj_close()
     }
     if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
     if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
+    MSX.RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
     MSX.HydFile.file = NULL;
     MSX.OutFile.file = NULL;
     MSX.TmpOutFile.file = NULL;
@@ -263,6 +272,7 @@ void setDefaults()
 */
 {
     int i;
+    MSX.RptFile.file = NULL;                                                   //(LR-11/20/07)
     MSX.HydFile.file = NULL;
     MSX.HydFile.mode = USED_FILE;
     MSX.OutFile.file = NULL;
@@ -619,3 +629,13 @@ void deleteHashTables()
         AllocFreePool();
     }
 }
+
+// New function added (LR-11/20/07, to fix bug 08)
+int openRptFile()
+{
+    if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);
+    MSX.RptFile.file = fopen(MSX.RptFile.name, "wt");
+    if ( MSX.RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
+    return 0;
+}
+    

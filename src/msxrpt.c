@@ -9,7 +9,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   01/07/08
+**  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
 
 #include <stdio.h>
@@ -316,7 +317,7 @@ void  newPage()
     char  s[MAXLINE+1];
     LineNum = 1;
     sprintf(s,
-            "\n\fPage %-3d                                             EPANET-MSX 1.0",
+            "\nPage %-3d                                             EPANET-MSX 1.0",   //(modified, FS-01/07/08)
             PageNum);
     writeLine(s);
     writeLine("");
@@ -329,7 +330,7 @@ void  newPage()
 void  writeLine(char *line)
 {
     if ( LineNum == MSX.PageSize ) newPage();
-    if ( MSX.RptFile.file ) fprintf(MSX.RptFile.file, "  %s", line);
+    if ( MSX.RptFile.file ) fprintf(MSX.RptFile.file, "  %s\n", line);   //(modified, FS-01/07/2008)
     else ENwriteline(line);
     LineNum++;
 }

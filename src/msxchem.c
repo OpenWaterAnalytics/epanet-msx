@@ -8,7 +8,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   8/2/07
+**  LAST UPDATE:   1/29/08
+**  BUG FIX    :   Bug ID 8,  Feng Shang, 01/29/2008
 *******************************************************************************/
 
 #include <stdio.h>
@@ -461,6 +462,8 @@ void evalHydVariables(int k)
         av /= LperFT3;                 // area_units/L
         HydVar[AREAVOL] = av;
     }
+
+	HydVar[ROUGHNESS] = MSX.Link[k].roughness;   /*Feng Shang, Bug ID 8,  01/29/2008*/
 }
 
 //=============================================================================

@@ -9,7 +9,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   1/29/08
+**  BUG FIX:	   BUG ID 09 (add roughness as a hydraulic variable) Feng Shang 01/29/2008	
 *******************************************************************************/
 
 #include <stdio.h>
@@ -212,6 +213,7 @@ int MSXinp_readNetData()
     int   n1 = 0, n2 = 0;
     float diam = 0.0, len = 0.0, v0 = 0.0, xmix = 0.0, vmix = 0.0;
 
+	float roughness = 0.0;   /*Feng Shang, Bug ID 8,  01/29/2008*/
 // --- get flow units & time parameters
 
     CALL(errcode, ENgetflowunits(&MSX.Flowflag));
@@ -256,12 +258,14 @@ int MSXinp_readNetData()
         CALL(errcode, ENgetlinknodes(i, &n1, &n2));
         CALL(errcode, ENgetlinkvalue(i, EN_DIAMETER, &diam));
         CALL(errcode, ENgetlinkvalue(i, EN_LENGTH, &len));
+		CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
         if ( !errcode )
         {
             MSX.Link[i].n1 = n1;
             MSX.Link[i].n2 = n2;
             MSX.Link[i].diam = diam;
             MSX.Link[i].len = len;
+			MSX.Link[i].roughness = roughness;  /*Feng Shang, Bug ID 8,  01/29/2008*/
         }
     }
     return errcode;
