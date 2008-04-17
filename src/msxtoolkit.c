@@ -9,7 +9,8 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   4/17/08
+**	BUG FIX:       BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
 **
 **  These functions can be used in conjunction with the original EPANET
 **  toolkit functions to model water quality fate and transport of
@@ -1099,6 +1100,9 @@ int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
         }
         MSX.Pattern[pat].length++;
     }
+	
+	MSX.Pattern[pat].interval = 0;						//Feng Shang   04/17/2008
+	MSX.Pattern[pat].current = MSX.Pattern[pat].first;    //Feng Shang   04/17/2008
     return 0;
 }
 
