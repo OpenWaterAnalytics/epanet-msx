@@ -8,8 +8,10 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.00
-**  LAST UPDATE:   01/08/08
+**  LAST UPDATE:   09/12/08
 **  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
+				   in funtcion saveSources, MSX.Pattern[source->pat].id rather 
+				   than MSX.Pattern[source->pat] should be printed, 09/12/08 FS
 *******************************************************************************/
 
 #include <stdio.h>
@@ -230,7 +232,7 @@ void  saveSources(FILE *f)
                     SourceTypeWords[source->type], id,
                     MSX.Species[source->species].id, source->c0);
                 if ( source->pat > 0 )
-                    fprintf(f, "  %-32s", MSX.Pattern[source->pat]);
+                    fprintf(f, "  %-32s", MSX.Pattern[source->pat].id);
             }
             source = source->next;
         }
