@@ -10,8 +10,12 @@
 **  VERSION:       1.00
 **  LAST UPDATE:   09/12/08
 **  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
-				   in funtcion saveSources, MSX.Pattern[source->pat].id rather 
+				   
+				   In funtcion saveSources, MSX.Pattern[source->pat].id rather 
 				   than MSX.Pattern[source->pat] should be printed, 09/12/08 FS
+				   
+				   BUG ID 53, check if the source type > -1 before saving. 
+				   FS 09/23/08 
 *******************************************************************************/
 
 #include <stdio.h>
@@ -225,7 +229,7 @@ void  saveSources(FILE *f)
         source = MSX.Node[i].sources;
         while ( source )
         {
-            if ( source->c0 > 0.0 )
+            if ( source->c0 > 0.0 && source->type > -1)   //Feng Shang 09/23/2008
             {
                 ENgetnodeid(i, id);
                 fprintf(f, "\n%-10s  %-32s  %-32s  %e",
