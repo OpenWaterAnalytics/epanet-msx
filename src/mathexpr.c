@@ -46,10 +46,21 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>                                                             //1.1.00
 #include <math.h>
 #include "mathexpr.h"
 
 #define MAX_STACK_SIZE  1024
+
+//***************************************************                          //1.1.00
+#define MAX_TERM_SIZE  256
+struct MathTerm
+{
+    char s[MAX_TERM_SIZE];
+};
+typedef struct MathTerm Term;
+//***************************************************
+
 
 //  Local declarations
 //--------------------
@@ -581,9 +592,9 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				ExprStack[stackindex] = node->fvalue;
 				break;
 			case 8:
-                                if (getVariableValue != NULL)
-                                r1 = getVariableValue(node->ivar);
-                                else r1 = 0.0;
+                if (getVariableValue != NULL)
+                r1 = getVariableValue(node->ivar);
+                else r1 = 0.0;
 				stackindex++;
 				ExprStack[stackindex] = r1;
 				break;
@@ -624,12 +635,12 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				break;
 			case 16: 
 				r1 = ExprStack[stackindex];
-                                r2 = sqrt( r1 );     
+                r2 = sqrt( r1 );     
 				ExprStack[stackindex] = r2;
 				break;
 			case 17: 
 				r1 = ExprStack[stackindex];
-                                r2 = log(r1);
+                r2 = log(r1);
 				ExprStack[stackindex] = r2;
 				break;
 			case 18: 
@@ -682,17 +693,16 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				r2 = log10( r1 );     
 				ExprStack[stackindex] = r2;
 				break;
-                        case 28:
+            case 28:
  				r1 = ExprStack[stackindex];
 				if (r1 <= 0.0) r2 = 0.0;
 				else           r2 = 1.0;
 				ExprStack[stackindex] = r2;
 				break;
-               
 			case 31: 
 				r1 = ExprStack[stackindex];
 				r2 = ExprStack[stackindex-1];
-                                r2 = exp(r1*log(r2));
+                r2 = exp(r1*log(r2));
 				ExprStack[stackindex-1] = r2;
 				stackindex--;
 				break;
@@ -729,13 +739,158 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
     tree = getTree();
     if (Bc == 0 && Err == 0)
     {
-	traverseTree(tree, &expr);
-	while (expr)
-	{
-	    result = expr;
-	    expr = expr->prev;
-	}
+        traverseTree(tree, &expr);
+        while (expr)
+        {
+            result = expr;
+            expr = expr->prev;
+        }
     }
     deleteTree(tree);
     return result;
+}
+
+
+//=============================================================================
+
+char * mathexpr_getStr(MathExpr* expr, char* exprStr,                          //1.1.00
+                       char * (*getVariableStr) (int, char *))
+{
+    Term TermStack[50];
+    MathExpr *node = expr;
+    char r1[MAX_TERM_SIZE], r2[MAX_TERM_SIZE];
+    int stackindex = 0;
+
+    strcpy(TermStack[0].s, "");
+    while(node != NULL)
+    {
+	switch (node->opcode)
+	{
+	    case 3:  
+	        strcpy(r1, TermStack[stackindex].s);
+	        stackindex--;
+	        strcpy(r2, TermStack[stackindex].s);
+		sprintf(TermStack[stackindex].s, "(%s) + (%s)", r2, r1);
+		break;
+	    case 4:  
+		strcpy(r1, TermStack[stackindex].s);
+		stackindex--;
+		strcpy(r2, TermStack[stackindex].s);
+		sprintf(TermStack[stackindex].s, "(%s) - (%s)", r2, r1);
+		break;
+	    case 5:  
+		strcpy(r1, TermStack[stackindex].s);
+		stackindex--;
+		strcpy(r2, TermStack[stackindex].s);
+		sprintf(TermStack[stackindex].s, "(%s) * (%s)", r2, r1);
+		break;
+	    case 6:  
+		strcpy(r1, TermStack[stackindex].s);
+		stackindex--;
+		strcpy(r2, TermStack[stackindex].s);
+		sprintf(TermStack[stackindex].s, "(%s) / (%s)", r2, r1);
+		break;				
+	    case 7:  
+		stackindex++;
+                sprintf(TermStack[stackindex].s, "%.6g", node->fvalue);
+		break;
+	    case 8:
+                if (getVariableStr != NULL)
+                    strcpy(r1, getVariableStr(node->ivar, r2));
+                else
+                    strcpy(r1, "");
+		stackindex++;
+		strcpy(TermStack[stackindex].s, r1);
+		break;
+	    case 9: 
+                strcpy(r1, TermStack[stackindex].s);
+		sprintf(TermStack[stackindex].s, "-(%s)", r1);
+		break;
+            case 10:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "cos(%s)", r1);
+                break;
+            case 11:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "sin(%s)", r1);
+                break;
+            case 12:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "tan(%s)", r1);
+                break;
+            case 13:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "cot(%s)", r1);
+                break;
+            case 14:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "abs(%s)", r1);
+                break;
+            case 15:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "sgn(%s)", r1);
+                break;
+            case 16:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "sqrt(%s)", r1);
+                break;
+            case 17:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "log(%s)", r1);
+                break;
+            case 18:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "exp(%s)", r1);
+                break;
+            case 19:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "asin(%s)", r1);
+                break;
+            case 20:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "acos(%s)", r1);
+                break;
+            case 21:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "atan(%s)", r1);
+                break;
+            case 22:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "acot(%s)", r1);
+                break;
+            case 23:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "sinh(%s)", r1);
+                break;
+            case 24:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "cosh(%s)", r1);
+                break;
+            case 25:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "tanh(%s)", r1);
+                break;
+            case 26:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "coth(%s)", r1);
+                break;
+            case 27:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "log10(%s)", r1);
+                break;
+            case 28:
+                strcpy(r1, TermStack[stackindex].s);
+                sprintf(TermStack[stackindex].s, "step(%s)", r1);
+                break;
+	    case 31: 
+		strcpy(r1, TermStack[stackindex].s);
+		strcpy(r2, TermStack[stackindex-1].s);
+                sprintf(TermStack[stackindex-1].s, "(%s)^(%s)", r2, r1);
+		stackindex--;
+		break;
+	}
+        node = node->next;
+    }
+    strcpy(exprStr, TermStack[stackindex].s);
+    return exprStr;
 }

@@ -8,8 +8,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   1/29/08
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/14/08
 **  BUG FIX:	   BUG ID 09 (add roughness as a hydraulic variable) Feng Shang 01/29/2008	
 *******************************************************************************/
 
@@ -38,6 +38,7 @@ extern MSXproject  MSX;                // MSX project data
 //-----------------
 static char *Tok[MAXTOKS];             // String tokens from line of input
 static int  Ntokens;                   // Number of tokens in line of input
+static double **TermArray;             // Incidence array used to check Terms  //1.1.00
 
 enum InpErrorCodes {                   // Error codes (401 - 409)
     INP_ERR_FIRST        = 400,
@@ -102,6 +103,9 @@ static int    parseReport(void);
 static int    getVariableCode(char *id);
 static int    getTokens(char *s);
 static void   writeInpErrMsg(int errcode, char *sect, char *line, int lineCount);
+
+static int    checkCyclicTerms(void);                                          //1.1.00
+static int    traceTermPath(int i, int istar, int n);                          //1.1.00
 
 //=============================================================================
 
@@ -258,14 +262,14 @@ int MSXinp_readNetData()
         CALL(errcode, ENgetlinknodes(i, &n1, &n2));
         CALL(errcode, ENgetlinkvalue(i, EN_DIAMETER, &diam));
         CALL(errcode, ENgetlinkvalue(i, EN_LENGTH, &len));
-		CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
+	CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
         if ( !errcode )
         {
             MSX.Link[i].n1 = n1;
             MSX.Link[i].n2 = n2;
             MSX.Link[i].diam = diam;
             MSX.Link[i].len = len;
-			MSX.Link[i].roughness = roughness;  /*Feng Shang, Bug ID 8,  01/29/2008*/
+            MSX.Link[i].roughness = roughness;  /*Feng Shang, Bug ID 8,  01/29/2008*/
         }
     }
     return errcode;
@@ -291,6 +295,11 @@ int  MSXinp_readMsxData()
     int   errsum = 0;                  // number of errors found
     int   inperr = 0;                  // input error code
     long  lineCount = 0;               // line count
+
+// --- create the TermArray for checking circular references in Terms          //1.1.00
+
+	TermArray = createMatrix(MSX.Nobjects[TERM]+1, MSX.Nobjects[TERM]+1);      //1.1.00
+	if ( TermArray == NULL ) return ERR_MEMORY;                                //1.1.00
 
 // --- read each line from MSX input file
 
@@ -336,7 +345,9 @@ int  MSXinp_readMsxData()
 
 // --- check for errors
 
-    if (errsum > 0) return 200;
+	if ( checkCyclicTerms() ) errsum++;                                        //1.1.00
+	freeMatrix(TermArray);                                                     //1.1.00
+    if (errsum > 0) return ERR_MSX_INPUT;                                      //1.1.00
     return 0;
 }
 
@@ -682,6 +693,13 @@ int parseOption()
       case ATOL_OPTION:
           if ( !MSXutils_getDouble(Tok[1], &MSX.DefAtol) ) return ERR_NUMBER;
           break;
+
+      case COMPILER_OPTION:                                                    //1.1.00
+          k = MSXutils_findmatch(Tok[1], CompilerWords);
+          if ( k < 0 ) return ERR_KEYWORD;
+    	  MSX.Compiler = k;
+	  break;
+
     }
     return 0;
 }
@@ -817,6 +835,7 @@ int parseTerm()
 */
 {
     int i, j;
+	int k;                                                                     //1.1.00
     char s[MAXLINE+1] = "";
     MathExpr *expr;
 
@@ -824,10 +843,16 @@ int parseTerm()
 
     if ( Ntokens < 2 ) return 0;
     i = MSXproj_findObject(TERM, Tok[0]);
+    MSX.Term[i].id = MSXproj_findID(TERM, Tok[0]);                             //1.1.00
 
 // --- reconstruct the expression string from its tokens
 
-    for (j=1; j<Ntokens; j++) strcat(s, Tok[j]);
+    for (j=1; j<Ntokens; j++)
+	{                                                                          //1.1.00
+		strcat(s, Tok[j]);                     
+		k = MSXproj_findObject(TERM, Tok[j]);                                  //1.1.00
+		if ( k > 0 ) TermArray[i][k] = 1.0;                                    //1.1.00
+	}                                                                          //1.1.00
     
 // --- convert expression into a postfix stack of op codes
 
@@ -1349,3 +1374,66 @@ void writeInpErrMsg(int errcode, char *sect, char *line, int lineCount)
     ENwriteline(msg);
     ENwriteline(line);
 }
+
+//=============================================================================
+
+int checkCyclicTerms()                                                         //1.1.00
+/*
+**  Purpose:
+**    checks for cyclic references in Term expressions (e.g., T1 = T2 + T3
+**    and T3 = T2/T1)
+**
+**  Input:
+**    none
+**
+**  Returns:
+**    1 if cyclic reference found or 0 if none found.
+*/
+{
+	int i, j, n;
+    char msg[MAXMSG+1];
+
+	n = MSX.Nobjects[TERM];
+	for (i=1; i<n; i++)
+	{
+        for (j=1; j<=n; j++) TermArray[0][j] = 0.0;
+		if ( traceTermPath(i, i, n) )
+		{
+			sprintf(msg, "Error 410 - term %s contains a cyclic reference.",
+				MSX.Term[i].id);
+            ENwriteline(msg);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+//=============================================================================
+
+int traceTermPath(int i, int istar, int n)                                     //1.1.00
+/*
+**  Purpose:
+**    checks if Term[istar] is in the path of terms that appear when evaluating
+**    Term[i]
+**
+**  Input:
+**    i = index of term whose expressions are to be traced
+**    istar = index of term being searched for
+**    n = total number of terms
+**
+**  Returns:
+**    1 if term istar found; 0 if not found.
+*/
+{
+	int j;
+    if ( TermArray[0][i] == 1.0 ) return 0;
+	TermArray[0][i] = 1.0;
+	for (j=1; j<=n; j++)
+	{
+		if ( TermArray[i][j] == 0.0 ) continue;
+		if ( j == istar ) return 1;
+		else if ( traceTermPath(j, istar, n) ) return 1;
+	}
+	return 0;
+}
+

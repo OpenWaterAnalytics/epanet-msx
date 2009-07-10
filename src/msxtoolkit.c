@@ -8,9 +8,10 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   4/17/08
-**	BUG FIX:       BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/10/08
+**	BUG FIX:   BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
+**                 BUG ID ??  MSXsolveH & MSXusehydfile, L. Rossman 10/05/2008
 **
 **  These functions can be used in conjunction with the original EPANET
 **  toolkit functions to model water quality fate and transport of
@@ -28,6 +29,7 @@
 #include <float.h>
 
 #include "msxtypes.h"
+#include "msxutils.h"                                                          //1.1.00
 #include "epanet2.h"
 #include "epanetmsx.h"
 
@@ -70,6 +72,13 @@ int  DLLEXPORT  MSXopen(char *fname)
     if (MSX.ProjectOpened) return(ERR_MSX_OPENED);
     CALL(err, MSXproj_open(fname));
     CALL(err, MSXqual_open());
+
+    if ( err )
+    {
+	ENwriteline(MSXproj_getErrmsg(err));
+	ENwriteline("");
+    }
+
     return err;
 }
 
@@ -104,17 +113,14 @@ int   DLLEXPORT  MSXsolveH()
 
 // --- create a temporary hydraulics file
 
-    tmpnam(MSX.HydFile.name);
+    MSXutils_getTempName(MSX.HydFile.name);                                    //1.1.00
+    MSX.HydFile.mode = SCRATCH_FILE;                                           //(LR-10/05/08, to fix bug ??)
 
 // --- use EPANET to solve for & save hydraulics results
 
     CALL(err, ENsolveH());
     CALL(err, ENsavehydfile(MSX.HydFile.name));
     CALL(err, MSXusehydfile(MSX.HydFile.name));
-
-// --- make sure file is declared temporary
-
-    MSX.HydFile.mode = SCRATCH_FILE;
     return err;
 }
 
@@ -140,10 +146,18 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
 
+// --- close any existing hydraulics file 
+
+    if ( MSX.HydFile.file )
+    {
+	fclose(MSX.HydFile.file);
+        if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);      //(LR-10/05/08, to fix bug ??)   
+    } 
+	
+
 // --- open hydraulics file
 
-    if ( MSX.HydFile.file ) fclose(MSX.HydFile.file);
-    MSX.HydFile.mode = USED_FILE;
+    //MSX.HydFile.mode = USED_FILE;                                            //(LR-10/05/08, to fix bug ??)
     MSX.HydFile.file = fopen(fname, "rb");
     if (!MSX.HydFile.file) return ERR_OPEN_HYD_FILE;
 

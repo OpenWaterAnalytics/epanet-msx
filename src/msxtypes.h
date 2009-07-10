@@ -8,10 +8,10 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   01/29/08
+**  VERSION:       1.1.00
+**  LAST UPDATE:   09/29/08
 **  Bug Fix:       Bug ID 08, Feng Shang, 01/07/08 
-				   Bug ID 09 (add roughness as hyfraulic variable) Feng Shang 01/29/2008
+		   Bug ID 09 (add roughness as hyfraulic variable) Feng Shang 01/29/2008
 ***********************************************************************/
 
 #include "mathexpr.h"
@@ -188,7 +188,7 @@ typedef  float REAL4;
                   SHEAR,               //   link shear velocity
                   FRICTION,            //   friction factor
                   AREAVOL,             //   area/volume
-				  ROUGHNESS,		   //   roughness		/*Feng Shang 01/29/2008*/
+		  ROUGHNESS,	       //   roughness		/*Feng Shang 01/29/2008*/
                   MAX_HYD_VARS};
 
  enum TstatType                        // Time series statistics
@@ -205,7 +205,13 @@ typedef  float REAL4;
                   COUPLING_OPTION,
                   TIMESTEP_OPTION,
                   RTOL_OPTION,
-                  ATOL_OPTION};
+                  ATOL_OPTION,
+				  COMPILER_OPTION};                                            //1.1.00
+
+ enum CompilerType                     // C compiler type                      //1.1.00
+                 {NO_COMPILER,
+                  VC,                  // MS Visual C compiler
+		  GC};                 // Gnu C compiler
 
  enum FileModeType                     // File modes
                  {SCRATCH_FILE,
@@ -249,6 +255,10 @@ typedef  float REAL4;
            ERR_MSX_NOT_OPENED,         // 519
            ERR_MSX_OPENED,             // 520
            ERR_OPEN_RPT_FILE,          // 521                                  //(LR-11/20/07, to fix bug 08)
+           
+           ERR_COMPILE_FAILED,         // 522                                  //1.1.00
+           ERR_COMPILED_LOAD,          // 523                                  //1.1.00
+
            ERR_MAX};
 
 
@@ -304,7 +314,7 @@ typedef struct                         // LINK OBJECT
    char   rpt;                         // reporting flag
    double *c0;                         // initial species concentrations
    double *param;                      // kinetic parameter values
-   double roughness;				   // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
+   double roughness;		       // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
 }  Slink;
 
 
@@ -336,8 +346,8 @@ typedef struct Sseg *Pseg;
 #define MAXUNITS  16
 typedef struct                         // CHEMICAL SPECIES OBJECT
 {
-	char      *id;                     // name
-	char      units[MAXUNITS];         // mass units code
+    char      *id;                     // name
+    char      units[MAXUNITS];         // mass units code
     double    aTol;                    // absolute tolerance
     double    rTol;                    // relative tolerance
     int       type;                    // BULK or WALL
@@ -396,6 +406,7 @@ typedef struct                         // MSX PROJECT VARIABLES
           Saveflag,                    // Save results flag
           Rptflag,                     // Report results flag
           Coupling,                    // Degree of coupling for solving DAE's
+	      Compiler,                    // chemistry function compiler code     //1.1.00 
           AreaUnits,                   // Surface area units
           RateUnits,                   // Reaction rate time units
           Solver,                      // Choice of ODE solver
@@ -424,7 +435,8 @@ typedef struct                         // MSX PROJECT VARIABLES
    double Ucf[MAX_UNIT_TYPES],         // Unit conversion factors
           DefRtol,                     // Default relative error tolerance
           DefAtol,                     // Default absolute error tolerance
-		  *C0,						   // Species initial quality vector
+          *K,                          // Vector of expression constants       //1.1.00
+	      *C0,			               // Species initial quality vector
           *C1;                         // Species concentration vector
 
    Pseg   *FirstSeg,                   // First WQ segment in each pipe/tank

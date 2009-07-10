@@ -17,7 +17,7 @@ struct ExprNode
     int    opcode;                // operator code
     int    ivar;                  // variable index
     double fvalue;                // numerical value
-	struct ExprNode *prev;        // previous node
+    struct ExprNode *prev;        // previous node
     struct ExprNode *next;        // next node
 };
 typedef struct ExprNode MathExpr;
@@ -30,3 +30,7 @@ double mathexpr_eval(MathExpr* expr, double (*getVal) (int));
 
 //  Deletes a tokenized math expression
 void  mathexpr_delete(MathExpr* expr);
+
+// Returns reconstructed string version of a tokenized expression              //1.1.00
+char * mathexpr_getStr(MathExpr* expr, char* exprStr,
+                       char * (*getVariableStr) (int, char *));

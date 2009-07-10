@@ -8,8 +8,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   3/13/07
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/20/08
 *******************************************************************************/
 
 #include <stdlib.h>
@@ -20,9 +20,53 @@
 #include <float.h>
 
 #include "msxutils.h"
+// --- define WINDOWS
+
+#undef WINDOWS
+#ifdef _WIN32
+  #define WINDOWS
+#endif
+#ifdef __WIN32__
+  #define WINDOWS
+#endif
 
 #define UCHAR(x) (((x) >= 'a' && (x) <= 'z') ? ((x)&~32) : (x))
 #define TINY1 1.0e-20
+
+//=============================================================================
+
+char * MSXutils_getTempName(char *s)                                           //1.1.00
+/*
+**  Purpose:
+**    gets the name of a temporary file with path name and periods stripped
+**
+**  Input:
+**    s = character string (must be of size L_tmpnam)
+**  
+**  Returns:
+**    a pointer to the file name.
+*/
+{
+#ifdef WINDOWS
+    char *ptr;
+    char fname[L_tmpnam];
+    unsigned int i;
+    tmpnam(fname);
+    for (i=0; i<strlen(fname); i++)
+    {
+	if ( fname[i] == '.' ) fname[i] = '_';
+    }
+    ptr = strrchr(fname, '\\');
+    if ( ptr ) ++ptr;
+    else ptr = fname;
+    strcpy(s, ptr);
+#else
+    // --- use system function mkstemp() to create a temporary file name
+    strcpy(s, "msxXXXXXX");
+    mkstemp(s);
+#endif
+    return s;
+}
 
 //=============================================================================
 
@@ -290,66 +334,64 @@ int factorize(double **a, int n, double *w, int *indx)
 **    they must have been sized to n+1 when first created.
 */
 {
-	int    i, imax, j, k;
-	double big, dum, sum, temp;
+    int    i, imax, j, k;
+    double big, dum, sum, temp;
 
-	for (i = 1; i <= n; i++) 
+    for (i = 1; i <= n; i++) 
+    { 
+	/*Loop over rows to get the implicit scaling information.*/
+	big = 0.0;
+	for (j = 1;j <= n;j++)
+	    if ((temp = fabs(a[i][j])) > big) big = temp;
+        if (big == 0.0) 
+	return 0;  /* Warning for singular matrix*/
+	/*No nonzero largest element.*/
+	w[i] = 1.0/big; /*Save the scaling.*/
+    }
+    for (j = 1;j <= n;j++) /**for each column*/
+    { 
+	/*This is the loop over columns of Crout’s method.*/
+	for (i = 1; i < j; i++) 
 	{ 
-		/*Loop over rows to get the implicit scaling information.*/
-		big = 0.0;
-		for (j = 1;j <= n;j++)
-			if ((temp = fabs(a[i][j])) > big) big = temp;
-		if (big == 0.0) 
-			return 0;  /* Warning for singular matrix*/
-		/*No nonzero largest element.*/
-		w[i] = 1.0/big; /*Save the scaling.*/
+	    /*Up from the diagonal*/
+	    sum = a[i][j];
+	    for (k = 1;k < i;k++) sum -= a[i][k]*a[k][j];
+	    a[i][j] = sum;
 	}
-	for (j = 1;j <= n;j++) /**for each column*/
+	big = 0.0; /*Initialize for the search for largest pivot element.*/
+	imax = j;
+	for (i = j; i <= n; i++) 
 	{ 
-		/*This is the loop over columns of Crout’s method.*/
-		for (i = 1; i < j; i++) 
-		{ 
-			/*Up from the diagonal*/
-			sum = a[i][j];
-			for (k = 1;k < i;k++) 
-				sum -= a[i][k]*a[k][j];
-			a[i][j] = sum;
-		}
-		big = 0.0; /*Initialize for the search for largest pivot element.*/
-		imax = j;
-		for (i = j; i <= n; i++) 
-		{ 
-			sum = a[i][j];
-			for (k = 1; k < j; k++)
-				sum -= a[i][k]*a[k][j];
-			a[i][j] = sum;
-			if ( (dum = w[i]*fabs(sum)) >= big) 
-			{
-				big = dum;
-				imax = i;
-			}
-		}
-		if (j != imax) 
-		{
-			/*Do we need to interchange rows?*/
-			for (k = 1; k <= n; k++) 
-			{ 
-				/*Yes,do so...*/
-				dum = a[imax][k];
-				a[imax][k] = a[j][k];
-				a[j][k] = dum;
-			}
-			w[imax] = w[j]; /* interchange the scale factor.*/
-		} 
-		indx[j] = imax;
-		if (a[j][j] == 0.0) a[j][j] = TINY1;
-		if (j != n) /* divide by the pivot element.*/
-		{ 
-			dum = 1.0/(a[j][j]);
-			for (i = j+1;i <= n;i++) a[i][j] *= dum;	
-		}
-	} 
-	return 1;
+	    sum = a[i][j];
+	    for (k = 1; k < j; k++) sum -= a[i][k]*a[k][j];
+            a[i][j] = sum;
+            if ( (dum = w[i]*fabs(sum)) >= big) 
+	    {
+                big = dum;
+	        imax = i;
+            }
+	}
+	if (j != imax) 
+	{
+	    /*Do we need to interchange rows?*/
+	    for (k = 1; k <= n; k++) 
+            { 
+                /*Yes,do so...*/
+                dum = a[imax][k];
+                a[imax][k] = a[j][k];
+                a[j][k] = dum;
+            }
+            w[imax] = w[j]; /* interchange the scale factor.*/
+        } 
+        indx[j] = imax;
+	if (a[j][j] == 0.0) a[j][j] = TINY1;
+	if (j != n) /* divide by the pivot element.*/
+	{ 
+	    dum = 1.0/(a[j][j]);
+	    for (i = j+1;i <= n;i++) a[i][j] *= dum;	
+        }
+    } 
+    return 1;
 }
 
 //=============================================================================

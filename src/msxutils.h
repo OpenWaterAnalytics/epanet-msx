@@ -12,6 +12,9 @@
 **  LAST UPDATE:   3/1/07
 *******************************************************************************/
 
+// Gets the name of a temporary file                                           //1.1.00
+char * MSXutils_getTempName(char *s);
+
 // Case insentive comparison of two strings
 int MSXutils_strcomp(char *s1, char *s2);
 

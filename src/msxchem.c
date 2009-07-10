@@ -7,8 +7,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   1/29/08
+**  VERSION:       1.1.00
+**  LAST UPDATE:   09/29/08
 **  BUG FIX    :   Bug ID 8,  Feng Shang, 01/29/2008
 *******************************************************************************/
 
@@ -21,6 +21,7 @@
 #include "rk5.h"
 #include "ros2.h"
 #include "newton.h"
+#include "msxfuncs.h"                                                          //1.1.00
 
 //  External variables
 //--------------------
@@ -38,6 +39,7 @@ int    NUMSIG = 3;                     // Number of significant digits in
 static Pseg   TheSeg;                  // Current water quality segment
 static int    TheLink;                 // Index of current link
 static int    TheNode;                 // Index of current node
+static int    TheTank;                 // Index of current tank                //1.1.00
 static int    NumSpecies;              // Total number of species
 static int    NumPipeRateSpecies;      // Number of species with pipe rates
 static int    NumTankRateSpecies;      // Number of species with tank rates
@@ -56,12 +58,20 @@ static double *Yrate;                  // Rate species concentrations
 static double *Yequil;                 // Equilibrium species concentrations
 static double HydVar[MAX_HYD_VARS];    // Values of hydraulic variables
 
+static double *F;                      // Function values                      //1.1.00
+
 //  Exported functions
 //--------------------
-int  MSXchem_open(void);
-int  MSXchem_react(long dt);
-int  MSXchem_equil(int zone, double *c);
-void MSXchem_close(void);
+int    MSXchem_open(void);
+int    MSXchem_react(long dt);
+int    MSXchem_equil(int zone, double *c);
+char*  MSXchem_getVariableStr(int i, char *s);                                 //1.1.00
+void   MSXchem_close(void);
+
+// Imported functions
+//-------------------
+int    MSXcompiler_open(void);                                                 //1.1.00
+void   MSXcompiler_close(void);                                                //1.1.00
 
 //  Local functions
 //-----------------
@@ -122,6 +132,7 @@ int  MSXchem_open()
     Rtol   = (double *) calloc(m, sizeof(double));
     Yrate  = (double *) calloc(m, sizeof(double));
     Yequil = (double *) calloc(m, sizeof(double));
+    F      = (double *) calloc(m, sizeof(double));                             //1.1.00
     CALL(errcode, MEMCHECK(PipeRateSpecies));
     CALL(errcode, MEMCHECK(TankRateSpecies));
     CALL(errcode, MEMCHECK(PipeEquilSpecies));
@@ -130,6 +141,7 @@ int  MSXchem_open()
     CALL(errcode, MEMCHECK(Rtol));
     CALL(errcode, MEMCHECK(Yrate));
     CALL(errcode, MEMCHECK(Yequil));
+    CALL(errcode, MEMCHECK(F));                                                //1.1.00
     if ( errcode ) return errcode;
 
 // --- assign species to each type of chemical expression
@@ -185,6 +197,14 @@ int  MSXchem_open()
     LastIndex[TERM] = LastIndex[SPECIES] + MSX.Nobjects[TERM];
     LastIndex[PARAMETER] = LastIndex[TERM] + MSX.Nobjects[PARAMETER];
     LastIndex[CONSTANT] = LastIndex[PARAMETER] + MSX.Nobjects[CONSTANT];
+
+// --- compile chemistry function dynamic library if specified                 //1.1.00
+
+    if ( MSX.Compiler )
+    {
+        errcode = MSXcompiler_open();
+        if ( errcode ) return errcode;
+    }
     return 0;
 }
 
@@ -199,6 +219,7 @@ void MSXchem_close()
 **    none.
 */
 {
+    if ( MSX.Compiler )	MSXcompiler_close();                                   //1.1.00
     if ( MSX.Solver == RK5 ) rk5_close();
     if ( MSX.Solver == ROS2 ) ros2_close();
     newton_close();
@@ -210,6 +231,7 @@ void MSXchem_close()
     FREE(Rtol);
     FREE(Yrate);
     FREE(Yequil);
+    FREE(F);                                                                   //1.1.00
 }
 
 //=============================================================================
@@ -311,6 +333,61 @@ int MSXchem_equil(int zone, double *c)
         evalTankFormulas(c);
     }
     return errcode;
+}
+
+//=============================================================================
+
+char* MSXchem_getVariableStr(int i, char *s)                                   //1.1.00
+/*
+**  Purpose:
+**    returns a string representation of a variable used in the chemistry
+**    functions appearing in the C source code file used to compile
+**    these functions
+**
+**  Input:
+**    i = variable's index in the LastIndex array
+**    s = string to hold variable's symbol
+**
+**  Output:
+**    returns a pointer to s
+*/
+{
+// --- WQ species have index between 1 & # of species
+
+    if ( i <= LastIndex[SPECIES] ) sprintf(s, "c[%d]", i);
+
+// --- intermediate term expressions come next
+
+    else if ( i <= LastIndex[TERM] )
+    {
+        i -= LastIndex[TERM-1];
+        sprintf(s, "term(%d, c, k, p, h)", i);
+    }
+
+// --- reaction parameter indexes come after that
+
+    else if ( i <= LastIndex[PARAMETER] )
+    {
+        i -= LastIndex[PARAMETER-1];
+        sprintf(s, "p[%d]", i);
+    }
+
+// --- followed by constants
+
+    else if ( i <= LastIndex[CONSTANT] )
+    {
+        i -= LastIndex[CONSTANT-1];
+        sprintf(s, "k[%d]", i);
+    }
+
+// --- and finally by hydraulic variables
+
+    else 
+    {
+        i -= LastIndex[CONSTANT];
+        sprintf(s, "h[%d]", i);
+    }
+    return s;
 }
 
 //=============================================================================
@@ -463,7 +540,7 @@ void evalHydVariables(int k)
         HydVar[AREAVOL] = av;
     }
 
-	HydVar[ROUGHNESS] = MSX.Link[k].roughness;   /*Feng Shang, Bug ID 8,  01/29/2008*/
+    HydVar[ROUGHNESS] = MSX.Link[k].roughness;   /*Feng Shang, Bug ID 8,  01/29/2008*/
 }
 
 //=============================================================================
@@ -484,12 +561,14 @@ int evalPipeReactions(int k, long dt)
 **
 **  Returns:
 **    an error code or 0 if no error.
+**
+**  Re-written to accommodate compiled functions (1.1)                         //1.1.00
 */
 {
     int i, m;
     int errcode = 0, ierr = 0;
     double tstep = (double)dt / MSX.Ucf[RATE_UNITS];
-    double c, dc, dh;
+    double c, dh;
 
 // --- start with the most downstream pipe segment
 
@@ -506,16 +585,24 @@ int evalPipeReactions(int k, long dt)
 
         if ( dt > 0.0 )
         {
+
+        // --- place current concentrations of species that react in vector Yrate
+
+            for (i=1; i<=NumPipeRateSpecies; i++)
+            {
+                m = PipeRateSpecies[i];
+                Yrate[i] = TheSeg->c[m];
+            }
+        
         // --- Euler integrator
 
             if ( MSX.Solver == EUL )
             {
+                getPipeDcDt(0, Yrate, NumPipeRateSpecies, Yrate);
                 for (i=1; i<=NumPipeRateSpecies; i++)
                 {
                     m = PipeRateSpecies[i];
-                    dc = mathexpr_eval(MSX.Species[m].pipeExpr,
-                                       getPipeVariableValue) * tstep;
-                    c = TheSeg->c[m] + dc;
+                    c = TheSeg->c[m] + Yrate[i]*tstep;
                     TheSeg->c[m] = MAX(c, 0.0);
                 }
             }
@@ -523,16 +610,7 @@ int evalPipeReactions(int k, long dt)
         // --- other integrators
             else
             {
-            // --- place current concentrations of species that react in vector Yrate
-
-                for (i=1; i<=NumPipeRateSpecies; i++)
-                {
-                    m = PipeRateSpecies[i];
-                    Yrate[i] = TheSeg->c[m];
-                }
                 dh = TheSeg->hstep;
-
-            // --- integrate the set of rate equations
 
             // --- Runge-Kutta integrator
 
@@ -589,15 +667,18 @@ int evalTankReactions(int k, long dt)
 **
 **  Returns:
 **    an error code or 0 if no error.
+**
+**  Re-written to accommodate compiled functions (1.1)                         //1.1.00
 */
 {
     int i, m;
     int errcode = 0, ierr = 0;
     double tstep = (double)dt / MSX.Ucf[RATE_UNITS];
-    double c, dc, dh;
+    double c, dh;
 
 // --- evaluate each volume segment in the tank
 
+    TheTank = k;
     TheNode = MSX.Tank[k].node;
     i = MSX.Nobjects[LINK] + k;
     TheSeg = MSX.FirstSeg[i];
@@ -613,34 +694,45 @@ int evalTankReactions(int k, long dt)
 
         if ( dt > 0.0 )
         {
+
+        // --- place current concentrations of species that react in vector Yrate
+            for (i=1; i<=NumTankRateSpecies; i++)
+            {
+                m = TankRateSpecies[i];
+                Yrate[i] = MSX.Tank[k].c[m];
+            }
+
+        // --- Euler integrator
+
             if ( MSX.Solver == EUL )
             {
+                getTankDcDt(0, Yrate, NumTankRateSpecies, Yrate);
                 for (i=1; i<=NumTankRateSpecies; i++)
                 {
                     m = TankRateSpecies[i];
-                    dc = tstep * mathexpr_eval(MSX.Species[m].tankExpr,
-                                               getTankVariableValue);
-                    c = TheSeg->c[m] + dc;
+                    c = TheSeg->c[m] + Yrate[i]*tstep;
                     TheSeg->c[m] = MAX(c, 0.0);
                 }
             }
 
+        // --- other integrators
             else
             {
-                for (i=1; i<=NumTankRateSpecies; i++)
-                {
-                    m = TankRateSpecies[i];
-                    Yrate[i] = MSX.Tank[k].c[m];
-                }
                 dh = MSX.Tank[k].hstep;
+
+            // --- Runge-Kutta integrator
 
                 if ( MSX.Solver == RK5 )
                     ierr = rk5_integrate(Yrate, NumTankRateSpecies, 0, tstep,
                                          &dh, Atol, Rtol, getTankDcDt);
 
+            // --- Rosenbrock integrator
+
                 if ( MSX.Solver == ROS2 )
                     ierr = ros2_integrate(Yrate, NumTankRateSpecies, 0, tstep,
                                           &dh, Atol, Rtol, getTankDcDt);
+
+            // --- save new concentration values of the species that reacted
 
                 for (m=1; m<=NumSpecies; m++) TheSeg->c[m] = MSX.C1[m];
                 for (i=1; i<=NumTankRateSpecies; i++)
@@ -753,10 +845,25 @@ void evalPipeFormulas(double *c)
 **
 **  Output:
 **    c[] = array of updated concentrations.
+**
+**  Re-written to accommodate compiled functions (1.1)
 */
 {
     int m;
     for (m=1; m<=NumSpecies; m++) MSX.C1[m] = c[m];
+
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetPipeFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar);
+        for (m=1; m<=NumSpecies; m++)
+        {
+            c[m] = MSX.C1[m];
+        }
+    	return;
+    }
+
     for (m=1; m<=NumSpecies; m++)
     {
         if ( MSX.Species[m].pipeExprType == FORMULA )
@@ -779,10 +886,25 @@ void evalTankFormulas(double *c)
 **
 **  Output:
 **    c[] = array of updated concentrations.
+**
+**  Re-written to accommodate compiled functions (1.1)
 */
 {
     int m;
     for (m=1; m<=NumSpecies; m++) MSX.C1[m] = c[m];
+
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetTankFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar);
+        for (m=1; m<=NumSpecies; m++)
+        {
+            c[m] = MSX.C1[m];
+        }
+    	return;
+    }
+
     for (m=1; m<=NumSpecies; m++)
     {
         if ( MSX.Species[m].tankExprType == FORMULA )
@@ -960,6 +1082,19 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
         }
     }
 
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetPipeRates(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
+        for (i=1; i<=n; i++)
+        {
+            m = PipeRateSpecies[i];
+            deriv[i] = F[m];
+        }
+	    return;
+    }
+
 // --- evaluate each pipe reaction expression
 
     for (i=1; i<=n; i++)
@@ -1007,6 +1142,19 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
         }
     }
 
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetTankRates(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
+        for (i=1; i<=n; i++)
+        {
+            m = TankRateSpecies[i];
+            deriv[i] = F[m];
+        }
+	    return;
+    }
+
 // --- evaluate each tank reaction expression
 
     for (i=1; i<=n; i++)
@@ -1041,6 +1189,19 @@ void getPipeEquil(double t, double y[], int n, double f[])
     {
         m = PipeEquilSpecies[i];
         MSX.C1[m] = y[i];
+    }
+
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetPipeEquil(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
+        for (i=1; i<=n; i++)
+        {
+            m = PipeEquilSpecies[i];
+            f[i] = F[m];
+        }
+    	return;
     }
 
 // --- evaluate each pipe equilibrium expression
@@ -1079,6 +1240,19 @@ void getTankEquil(double t, double y[], int n, double f[])
         MSX.C1[m] = y[i];
     }
 
+// --- use compiled functions if available                                     //1.1.00
+
+    if ( MSX.Compiler )
+    {
+	    MSXgetTankEquil(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
+        for (i=1; i<=n; i++)
+        {
+            m = TankEquilSpecies[i];
+            f[i] = F[m];
+        }
+	    return;
+    }
+
 // --- evaluate each tank equilibrium expression
 
     for (i=1; i<=n; i++)
@@ -1087,3 +1261,4 @@ void getTankEquil(double t, double y[], int n, double f[])
         f[i] = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
     }
 }
+

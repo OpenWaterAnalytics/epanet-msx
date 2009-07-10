@@ -8,8 +8,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   01/07/08
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/20/08
 **  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
 ******************************************************************************/
 
@@ -53,8 +53,11 @@ static char * Errmsg[] =
      "Error 517 - reference made to an undefined object ID.",
      "Error 518 - invalid property values were specified.",
      "Error 519 - an MSX project was not opened.",
-     "Error 520 - an MSX project is already opened."
-     "Error 521 - could not open MSX report file."};                           //(LR-11/20/07)
+     "Error 520 - an MSX project is already opened.",
+     "Error 521 - could not open MSX report file.",                            //(LR-11/20/07)
+
+     "Error 522 - could not compile chemistry functions.",                     //1.1.00
+     "Error 523 - could not load functions from compiled chemistry file."};    //1.1.00
 
 //  Imported functions
 //--------------------
@@ -123,8 +126,8 @@ int  MSXproj_open(char *fname)
     CALL(errcode, MSXinp_readNetData());
     CALL(errcode, MSXinp_readMsxData());
 
-	if (strcmp(MSX.RptFile.name, ""))											   //(FS-01/07/2008, to fix bug 08)
-		CALL(errcode, openRptFile());                                              //(LR-11/20/07, to fix bug 08)
+    if (strcmp(MSX.RptFile.name, ""))                                              //(FS-01/07/2008, to fix bug 08)
+	CALL(errcode, openRptFile());                                              //(LR-11/20/07, to fix bug 08)
 
 // --- convert user's units to internal units
 
@@ -149,16 +152,22 @@ void MSXproj_close()
 **    none
 */
 {
+    // --- close all files
+
     if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);                          //(LR-11/20/07, to fix bug 08)
     if ( MSX.HydFile.file ) fclose(MSX.HydFile.file);
-    if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
-    if ( MSX.TmpOutFile.file != NULL && MSX.TmpOutFile.file != MSX.OutFile.file )
-    {
+    if ( MSX.TmpOutFile.file && MSX.TmpOutFile.file != MSX.OutFile.file )
         fclose(MSX.TmpOutFile.file);
-        remove(MSX.TmpOutFile.name);
-    }
     if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
+
+    // --- delete all temporary files
+
+    if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
     if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
+    remove(MSX.TmpOutFile.name);
+
+    // --- free all allocated memory
+
     MSX.RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
     MSX.HydFile.file = NULL;
     MSX.OutFile.file = NULL;
@@ -278,8 +287,8 @@ void setDefaults()
     MSX.OutFile.file = NULL;
     MSX.OutFile.mode = SCRATCH_FILE;
     MSX.TmpOutFile.file = NULL;
-    tmpnam(MSX.OutFile.name);
-    tmpnam(MSX.TmpOutFile.name);
+    MSXutils_getTempName(MSX.OutFile.name);                                    //1.1.00
+    MSXutils_getTempName(MSX.TmpOutFile.name);                                 //1.1.00
     strcpy(MSX.RptFile.name, "");
     strcpy(MSX.Title, "");
     MSX.Rptflag = 0;
@@ -291,6 +300,7 @@ void setDefaults()
     MSX.DefAtol = 0.01;
     MSX.Solver = EUL;
     MSX.Coupling = NO_COUPLING;
+    MSX.Compiler = NO_COMPILER;                                                //1.1.00
     MSX.AreaUnits = FT2;
     MSX.RateUnits = DAYS;
     MSX.Qstep = 300;
@@ -307,6 +317,7 @@ void setDefaults()
     MSX.Term = NULL;
     MSX.Const = NULL;
     MSX.Pattern = NULL;
+    MSX.K = NULL;                                                              //1.1.00
 }
 
 //=============================================================================
@@ -421,6 +432,7 @@ int createObjects()
     MSX.Param   = (Sparam *)   calloc(MSX.Nobjects[PARAMETER]+1, sizeof(Sparam));
     MSX.Const   = (Sconst *)   calloc(MSX.Nobjects[CONSTANT]+1, sizeof(Sconst));
     MSX.Pattern = (Spattern *) calloc(MSX.Nobjects[PATTERN]+1, sizeof(Spattern));
+    MSX.K       = (double *)   calloc(MSX.Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
 
 // --- create arrays for demands, heads, & flows
 
@@ -430,7 +442,7 @@ int createObjects()
 
 // --- create arrays for current & initial concen. of each species for each node
 
-	MSX.C0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
+    MSX.C0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
     for (i=1; i<=MSX.Nobjects[NODE]; i++)
     {
         MSX.Node[i].c = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
@@ -537,7 +549,7 @@ void deleteObjects()
     FREE(MSX.D);
     FREE(MSX.H);
     FREE(MSX.Q);
-	FREE(MSX.C0);
+    FREE(MSX.C0);
 
 // --- delete all nodes, links, and tanks
 
@@ -563,6 +575,7 @@ void deleteObjects()
     FREE(MSX.Species);
     FREE(MSX.Param);
     FREE(MSX.Const);
+    FREE(MSX.K);                                                               //1.1.00
 
 // --- free memory used by intermediate terms
 
@@ -598,7 +611,7 @@ int createHashTables()
 
     HashPool = AllocInit();
     if ( HashPool == NULL ) return ERR_MEMORY;
-	return 0;
+    return 0;
 }
 
 //=============================================================================

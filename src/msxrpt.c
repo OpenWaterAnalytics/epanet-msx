@@ -8,8 +8,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   01/07/08
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/06/08
 **  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
 
@@ -37,7 +37,7 @@ static char *Logo[] =
      "*                      E P A N E T  -  M S X                     *",
      "*                   Multi-Species Water Quality                  *",
      "*                   Analysis for Pipe  Networks                  *",
-     "*                           Version 1.0                          *",
+     "*                           Version 1.1                          *",     //1.1.00
      "******************************************************************"};
 
 static char PageHdr[] = "  Page %d                                    ";
@@ -67,6 +67,7 @@ float MSXout_getLinkQual(int k, int j, int m);
 //  Exported functions
 //--------------------
 int   MSXrpt_write(void);
+void  MSXrpt_writeLine(char *line);                                            //1.1.00
 
 //  Local functions
 //-----------------
@@ -112,6 +113,13 @@ int  MSXrpt_write()
     writeLine("");
     return 0;
 }
+
+//=============================================================================
+
+void  MSXrpt_writeLine(char *line)                                             //1.1.00
+{                                                                              //1.1.00
+    writeLine(line);                                                           //1.1.00
+}                                                                              //1.1.00
 
 //=============================================================================
 
@@ -317,7 +325,7 @@ void  newPage()
     char  s[MAXLINE+1];
     LineNum = 1;
     sprintf(s,
-            "\nPage %-3d                                             EPANET-MSX 1.0",   //(modified, FS-01/07/08)
+            "\nPage %-3d                                             EPANET-MSX 1.1",   //1.1.00
             PageNum);
     writeLine(s);
     writeLine("");

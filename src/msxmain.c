@@ -7,8 +7,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   4/3/07
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/05/08
 **
 **  EPANET-MSX is an extension of the EPANET program for modeling the fate
 **  and transport of multiple interacting chemical species within a water
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
 // --- open EPANET file
 
-    printf("\n... EPANET-MSX Version 1.0\n");
+    printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
     printf("\n  o Processing EPANET input file");
     err = ENopen(argv[1], argv[3], "");
     do
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     // --- open the MSX input file
 
-        printf("\n  o Processing MSX input file");
+        printf("\n  o Processing MSX input file   ");
         err = MSXopen(argv[2]);
         if (err)
         {

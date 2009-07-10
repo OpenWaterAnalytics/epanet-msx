@@ -38,9 +38,10 @@ CLEAN :
 	-@erase "$(INTDIR)\mathexpr.obj"
 	-@erase "$(INTDIR)\mempool.obj"
 	-@erase "$(INTDIR)\msxchem.obj"
+	-@erase "$(INTDIR)\msxcompiler.obj"
 	-@erase "$(INTDIR)\msxfile.obj"
+	-@erase "$(INTDIR)\msxfuncs.obj"
 	-@erase "$(INTDIR)\msxinp.obj"
-	-@erase "$(INTDIR)\msxmain.obj"
 	-@erase "$(INTDIR)\msxout.obj"
 	-@erase "$(INTDIR)\msxproj.obj"
 	-@erase "$(INTDIR)\msxqual.obj"
@@ -60,7 +61,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MSXDLL_EXPORTS" /Fp"$(INTDIR)\msxdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MT /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MSXDLL_EXPORTS" /Fp"$(INTDIR)\msxdll.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -108,9 +109,10 @@ LINK32_OBJS= \
 	"$(INTDIR)\mathexpr.obj" \
 	"$(INTDIR)\mempool.obj" \
 	"$(INTDIR)\msxchem.obj" \
+	"$(INTDIR)\msxcompiler.obj" \
 	"$(INTDIR)\msxfile.obj" \
+	"$(INTDIR)\msxfuncs.obj" \
 	"$(INTDIR)\msxinp.obj" \
-	"$(INTDIR)\msxmain.obj" \
 	"$(INTDIR)\msxout.obj" \
 	"$(INTDIR)\msxproj.obj" \
 	"$(INTDIR)\msxqual.obj" \
@@ -163,21 +165,27 @@ SOURCE=..\msxchem.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\msxcompiler.c
+
+"$(INTDIR)\msxcompiler.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\msxfile.c
 
 "$(INTDIR)\msxfile.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\msxinp.c
+SOURCE=..\msxfuncs.c
 
-"$(INTDIR)\msxinp.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\msxfuncs.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=..\msxmain.c
+SOURCE=..\msxinp.c
 
-"$(INTDIR)\msxmain.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\msxinp.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

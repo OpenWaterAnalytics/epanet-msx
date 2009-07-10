@@ -7,8 +7,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
-**  LAST UPDATE:   7/31/07
+**  VERSION:       1.1.00
+**  LAST UPDATE:   10/20/08
 ******************************************************************************/
 
 #include <stdio.h>
@@ -106,6 +106,7 @@ int  MSXqual_open()
     int n;
 
 // --- set flags
+
     MSX.QualityOpened = FALSE;
     MSX.Saveflag = 0;
     OutOfMemory = FALSE;
@@ -134,16 +135,16 @@ int  MSXqual_open()
 
 // --- allocate memory used for species concentrations
 
-    X  = createMatrix(MSX.Nobjects[NODE]+1, MSX.Nobjects[SPECIES]+1);
+    X = createMatrix(MSX.Nobjects[NODE]+1, MSX.Nobjects[SPECIES]+1);
     MSX.C1 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
 
 // --- allocate memory used for pointers to the first, last,
 //     and new WQ segments in each link and tank
 
-    n        = MSX.Nobjects[LINK] + MSX.Nobjects[TANK] + 1;
+    n = MSX.Nobjects[LINK] + MSX.Nobjects[TANK] + 1;
     MSX.FirstSeg = (Pseg *) calloc(n, sizeof(Pseg));
     MSX.LastSeg  = (Pseg *) calloc(n, sizeof(Pseg));
-    NewSeg   = (Pseg *) calloc(n, sizeof(Pseg));
+    NewSeg = (Pseg *) calloc(n, sizeof(Pseg));
 
 // --- allocate memory used flow direction in each link
 
@@ -213,6 +214,13 @@ int  MSXqual_init()
     {
         MSX.Pattern[i].interval = 0;
         MSX.Pattern[i].current = MSX.Pattern[i].first;
+    }
+
+// --- copy expression constants to vector MSX.K[]                             //1.1.00
+
+    for (i=1; i<=MSX.Nobjects[CONSTANT]; i++)
+    {
+        MSX.K[i] = MSX.Const[i].value;
     }
 
 // --- check if a separate WQ report is required
@@ -448,7 +456,7 @@ int MSXqual_close()
 
 //=============================================================================
 
-int    MSXqual_isSame(double c1[], double c2[])
+int  MSXqual_isSame(double c1[], double c2[])
 /*
 **   Purpose:
 **     checks if two sets of concentrations are the same

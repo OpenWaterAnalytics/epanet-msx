@@ -40,7 +40,9 @@ CLEAN :
 	-@erase "$(INTDIR)\mathexpr.obj"
 	-@erase "$(INTDIR)\mempool.obj"
 	-@erase "$(INTDIR)\msxchem.obj"
+	-@erase "$(INTDIR)\msxcompiler.obj"
 	-@erase "$(INTDIR)\msxfile.obj"
+	-@erase "$(INTDIR)\msxfuncs.obj"
 	-@erase "$(INTDIR)\msxinp.obj"
 	-@erase "$(INTDIR)\msxmain.obj"
 	-@erase "$(INTDIR)\msxout.obj"
@@ -70,7 +72,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\mathexpr.obj" \
 	"$(INTDIR)\mempool.obj" \
 	"$(INTDIR)\msxchem.obj" \
+	"$(INTDIR)\msxcompiler.obj" \
 	"$(INTDIR)\msxfile.obj" \
+	"$(INTDIR)\msxfuncs.obj" \
 	"$(INTDIR)\msxinp.obj" \
 	"$(INTDIR)\msxmain.obj" \
 	"$(INTDIR)\msxout.obj" \
@@ -157,9 +161,21 @@ SOURCE=..\msxchem.c
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\msxcompiler.c
+
+"$(INTDIR)\msxcompiler.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\msxfile.c
 
 "$(INTDIR)\msxfile.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\msxfuncs.c
+
+"$(INTDIR)\msxfuncs.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
