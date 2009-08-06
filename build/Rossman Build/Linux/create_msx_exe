@@ -1,0 +1,6 @@
+#!/bin/sh
+# Creates the epanetmsx executable
+# (do not include mempool.c & hash.c since these appear in the epanet library)
+gcc -O2 -o epanetmsx -L. -lm -ldl -lepanet msxmain.c msxcompiler.c msxfuncs.c \
+mathexpr.c msxchem.c msxfile.c msxinp.c msxout.c msxproj.c \
+msxqual.c msxrpt.c msxtank.c msxtoolkit.c msxutils.c newton.c rk5.c ros2.c 

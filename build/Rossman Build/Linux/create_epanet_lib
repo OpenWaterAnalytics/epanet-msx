@@ -1,0 +1,7 @@
+#!/bin/sh
+# Creates the epanet2 shared library
+gcc -O2 -fPIC -c epanet.c hash.c hydraul.c inpfile.c input1.c input2.c input3.c \
+mempool.c output.c quality.c report.c rules.c smatrix.c
+ld -shared -o libepanet.so -lc -lm epanet.o \
+hash.o hydraul.o inpfile.o input1.o input2.o input3.o \
+mempool.o output.o quality.o report.o rules.o smatrix.o

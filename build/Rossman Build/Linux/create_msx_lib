@@ -1,0 +1,9 @@
+#!/bin/sh
+# Creates the epanetmsx shared library
+# (do not include mempool.c & hash.c since these appear in the epanet library)
+gcc -O2 -fPIC -c msxcompiler.c msxfuncs.c \
+mathexpr.c msxchem.c msxfile.c msxinp.c msxout.c msxproj.c \
+msxqual.c msxrpt.c msxtank.c msxtoolkit.c msxutils.c newton.c rk5.c ros2.c
+gcc -shared -L. -lm -ldl -lepanet -o libepanetmsx.so msxcompiler.o msxfuncs.o \
+mathexpr.o msxchem.o msxfile.o msxinp.o msxout.o msxproj.o \
+msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o 
