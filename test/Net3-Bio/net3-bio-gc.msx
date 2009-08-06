@@ -8,6 +8,7 @@ SOLVER      RK5
 TIMESTEP    300
 RTOL        0.001
 ATOL        0.0001
+COMPILER    GC
 
 [SPECIES]
 BULK   TL    MG   0.01  0.001  ;Lake tracer

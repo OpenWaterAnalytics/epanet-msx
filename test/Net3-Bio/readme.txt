@@ -8,4 +8,6 @@ example network Net3. The files included are:
                     average conditions over the last 48 hours of a
                     360 hour simulation
   net3-bio.msx  --  the MSX reaction file
+  net3-bio-[gc|vc].msx -- the MSX reaction file with COMPILER
+                    option turned on
   net3-bio.rpt  --  the report file containing the MSX results
