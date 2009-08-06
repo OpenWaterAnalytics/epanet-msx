@@ -10,7 +10,7 @@
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
 **  LAST UPDATE:   10/10/08
-**	BUG FIX:   BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
+**	BUG FIX:       BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
 **                 BUG ID ??  MSXsolveH & MSXusehydfile, L. Rossman 10/05/2008
 **
 **  These functions can be used in conjunction with the original EPANET

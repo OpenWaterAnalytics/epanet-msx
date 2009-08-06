@@ -7,7 +7,7 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.00
+**  VERSION:       1.1.00
 **  LAST UPDATE:   09/12/08
 **  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
 				   

@@ -4,7 +4,7 @@
 **  DESCRIPTION:   Numerical solution of a system of first order
 **                 ordinary differential equations dY/dt = F(t,Y).
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
-**  VERSION:       1.00                                               
+**  VERSION:       1.1.00                                               
 **  LAST UPDATE:   3/1/07
 **
 **  This is an explicit Runge-Kutta method of order (4)5  

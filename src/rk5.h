@@ -3,7 +3,7 @@
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Header file for the ODE solver contained in RK5.C.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
-**  VERSION:       1.00                                               
+**  VERSION:       1.1.00                                               
 **  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
