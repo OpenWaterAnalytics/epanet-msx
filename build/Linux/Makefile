@@ -71,7 +71,7 @@ docdir = $(datarootdir)/doc/epanetmsx
 CC = gcc
 CFLAGS = -g -O3 -fPIC
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
-LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(libdir) -lm
+LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(libdir) -lm -ldl
 
 # Installer
 INSTALL = install

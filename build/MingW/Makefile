@@ -100,7 +100,7 @@ CC = $(MinGWdir)/bin/gcc
 dlltool = $(MinGWdir)/bin/dlltool
 CFLAGS = -g -O3
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
-LDFLAGS = -L . -L $(winlibdir) -W1,-rpath,$(bindir) -l$(epanetlibname)
+LDFLAGS = -L . -L $(winlibdir) -W1,-rpath,$(bindir) -l$(epanetlibname) -ldl
 
 # Installer
 INSTALL = install

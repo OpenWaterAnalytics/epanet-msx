@@ -78,7 +78,7 @@ CC = /bin/gcc
 dlltool = /bin/dlltool
 CFLAGS = -g -O3
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
-LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(bindir) -l$(epanetlibname)
+LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(bindir) -l$(epanetlibname) -ldl
 
 # Installer
 INSTALL = install
