@@ -76,7 +76,7 @@ docdir = $(datarootdir)/doc/epanet
 # Compiler and flags
 CC = /bin/gcc
 dlltool = /bin/dlltool
-CFLAGS = -g -O
+CFLAGS = -g -O3
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
 LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(bindir) -l$(epanetlibname)
 
@@ -87,12 +87,13 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 # Files for the shared object library
 epanetmsx_objs=hash.o mempool.o mathexpr.o msxchem.o msxfile.o msxinp.o msxout.o msxproj.o \
-	              msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o
+	              msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o \
+	              msxcompiler.o msxfuncs.o
 # Epanetmsx main program
 epanetmsx_main=msxmain
 # Epanetmsx header files
 epanetmsx_heads=hash.h mempool.h mathexpr.h msxdict.h msxtypes.h msxutils.h \
-	               newton.h rk5.h ros2.h $(epanetmsxincludedir)/epanetmsx.h
+	               newton.h rk5.h ros2.h msxfuncs.h $(epanetmsxincludedir)/epanetmsx.h
 # Epanetmsx main program header files
 epanetmsx_main_heads = $(epanetmsxincludedir)/epanetmsx.h
 

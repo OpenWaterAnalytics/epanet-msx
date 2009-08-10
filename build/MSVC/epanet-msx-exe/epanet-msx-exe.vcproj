@@ -165,6 +165,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Installing library and executable files"
+				CommandLine="copy .\Release\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanet2.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanet2.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanetmsx.exe &quot;%HOME%&quot;\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

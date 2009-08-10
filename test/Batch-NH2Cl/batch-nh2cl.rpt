@@ -1,24 +1,24 @@
-  Page 1                                    Mon Mar 19 15:28:48 2007
+  Page 1                                    Mon Aug 10 13:53:40 2009
 
   ******************************************************************
   *                           E P A N E T                          *
   *                   Hydraulic and Water Quality                  *
   *                   Analysis for Pipe Networks                   *
-  *                           Version 2.0                          *
+  *                         Version 2.00.12                        *
   ******************************************************************
   
-  Analysis begun Mon Mar 19 15:28:48 2007
+  Analysis begun Mon Aug 10 13:53:40 2009
 
-  Processing MSX input file batch-nh2cl.msx
+  Processing MSX input file Batch-NH2CL/batch-nh2cl.msx
   
   
-Page 1                                               EPANET-MSX 1.0
+Page 1                                               EPANET-MSX 1.1
   
   ******************************************************************
   *                      E P A N E T  -  M S X                     *
   *                   Multi-Species Water Quality                  *
   *                   Analysis for Pipe  Networks                  *
-  *                           Version 1.0                          *
+  *                           Version 1.1                          *
   ******************************************************************
   
   Batch Chloramine Decay Example
@@ -199,4 +199,4 @@
    167:00      0.0392
    168:00      0.0392
   
-  Analysis ended Mon Mar 19 15:29:00 2007
+  Analysis ended Mon Aug 10 13:53:48 2009

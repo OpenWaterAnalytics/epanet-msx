@@ -1,15 +1,15 @@
-  Page 1                                    Tue Aug 14 09:18:21 2007
+  Page 1                                    Mon Aug 10 13:53:35 2009
 
   ******************************************************************
   *                           E P A N E T                          *
   *                   Hydraulic and Water Quality                  *
   *                   Analysis for Pipe Networks                   *
-  *                         Version 2.00.11                        *
+  *                         Version 2.00.12                        *
   ******************************************************************
   
   EPANET-MSX Example Network 
    
-      Input Data File ................... example.inp
+      Input Data File ................... As5Adsorb/example.inp
       Number of Junctions................ 4
       Number of Reservoirs............... 1
       Number of Tanks ................... 0
@@ -19,7 +19,10 @@
       Headloss Formula .................. Hazen-Williams
       Hydraulic Timestep ................ 1.00 hrs
       Hydraulic Accuracy ................ 0.001000
-      Maximum Trials .................... 40
+      Status Check Frequency ............ 2
+      Maximum Trials Checked ............ 10
+      Damping Limit Threshold ........... 0.000000
+      Maximum Trials .................... 200
       Quality Analysis .................. None
       Specific Gravity .................. 1.00
       Relative Kinematic Viscosity ...... 1.00
@@ -30,18 +33,18 @@
          No Nodes
          No Links
    
-  Analysis begun Tue Aug 14 09:18:21 2007
+  Analysis begun Mon Aug 10 13:53:36 2009
 
-  Processing MSX input file example.msx
+  Processing MSX input file As5Adsorb/example.msx
   
   
-Page 1                                               EPANET-MSX 1.0
+Page 1                                               EPANET-MSX 1.1
   
   ******************************************************************
   *                      E P A N E T  -  M S X                     *
   *                   Multi-Species Water Quality                  *
   *                   Analysis for Pipe  Networks                  *
-  *                           Version 1.0                          *
+  *                           Version 1.1                          *
   ******************************************************************
   
   Arsenic Oxidation/Adsorption Example
@@ -140,4 +143,4 @@
     46:00        9.64        9.64       48.98        0.57
     48:00        9.75        9.75       48.99        0.57
   
-  Analysis ended Tue Aug 14 09:18:22 2007
+  Analysis ended Mon Aug 10 13:53:37 2009

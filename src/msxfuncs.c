@@ -25,8 +25,8 @@
 #endif
 
 #ifdef WINDOWS
-  #include <windows.h>
-  HANDLE hDLL;
+#include <windows.h>
+HANDLE hDLL;
 #else
   #include <dlfcn.h>
   void *hDLL; 
@@ -50,11 +50,19 @@ int MSXfuncs_load(char * libName)
 {
 
 #ifdef WINDOWS
+	// Convert to a wchar_t* for compatibility with LoadLibrary()
+	size_t origsize = strlen(libName) + 1;
+	const size_t newsize = 256;
+	wchar_t wlibName[256];
+	if (origsize <= newsize)
+		mbstowcs(wlibName, libName, origsize);
+	else 
+		return -1;
 
-    hDLL = LoadLibrary(libName);
-    if (hDLL == NULL) return 1;
-	
-    MSXgetPipeRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetPipeRates");
+	hDLL = LoadLibrary(wlibName);
+	if (hDLL == NULL) return 1;
+
+	MSXgetPipeRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetPipeRates");
     MSXgetTankRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetTankRates");
     MSXgetPipeEquil    = (MSXGETEQUIL)    GetProcAddress(hDLL, "MSXgetPipeEquil");
     MSXgetTankEquil    = (MSXGETEQUIL)    GetProcAddress(hDLL, "MSXgetTankEquil");
@@ -125,6 +133,15 @@ int MSXfuncs_run(char* cmdLine)
   STARTUPINFO si;
   PROCESS_INFORMATION  pi;
 
+  // Convert to a wchar_t* for compatibility with CreateProcess()
+  size_t origsize = strlen(cmdLine) + 1;
+  const size_t newsize = 256;
+  wchar_t wcmdLine[256];
+  if (origsize <= newsize)
+	  mbstowcs(wcmdLine, cmdLine, origsize);
+  else 
+	  return -1;
+
   // --- initialize data structures
 
   memset(&si, 0, sizeof(si));
@@ -138,8 +155,13 @@ int MSXfuncs_run(char* cmdLine)
 
   // --- execute the command line in a new console window
 
-  exitCode = CreateProcess(NULL, cmdLine, NULL, NULL, 0,
+  exitCode = CreateProcess(NULL, wcmdLine, NULL, NULL, 0,
 		 CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+  if (exitCode == 0)
+  {
+	  exitCode = GetLastError();
+	  return exitCode;
+  }
 
   // --- wait for program to end
 

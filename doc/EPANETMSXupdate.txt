@@ -1,0 +1,15 @@
+MSX 1.00.01
+05/05/2008
+
+The following bugs are fixed.
+
+1. Report file specified in the [REPORT] section of the msx configuration file is not generated. Instead the multispecies 
+modeling results are written to the EPANET report file.
+
+2. Memory violation error may occur when toolkit function MSXsavemsxfile is called.
+
+3. A source node which is defined as “setpoint” source behaves like “flowpaced” source and vice versa.
+
+4. MSXsetpattern did not set the current patternvalue index to be the first.
+
+Pipe roughness is added as a reserved hydraulic variable. The keyword is Kc. 

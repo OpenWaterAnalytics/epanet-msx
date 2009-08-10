@@ -118,7 +118,7 @@ int MSXcompiler_open()
 
     else if ( MSX.Compiler == GC )
     {
-	sprintf(cmd, "gcc -c -O2 %s", srcFile);
+	sprintf(cmd, "gcc -c -O3 %s", srcFile);
 	err = MSXfuncs_run(cmd);
 	sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
 	err = MSXfuncs_run(cmd);
@@ -127,7 +127,7 @@ int MSXcompiler_open()
 #else
     if ( MSX.Compiler == GC )
     {
-        sprintf(cmd, "gcc -c -fPIC -O2 %s", srcFile);
+        sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
         err = system(cmd);
         sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
         err = system(cmd);

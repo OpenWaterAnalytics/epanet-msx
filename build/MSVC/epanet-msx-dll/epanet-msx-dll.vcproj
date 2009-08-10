@@ -66,6 +66,7 @@
 				OutputFile="$(OutDir)\epanetmsx.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)epanet-msx-dll.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -142,6 +143,7 @@
 				OutputFile="$(OutDir)\epanetmsx.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)epanet-msx-dll.pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -167,6 +169,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Installing Library Files..."
+				CommandLine="copy .\Release\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanet2.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanet2.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
