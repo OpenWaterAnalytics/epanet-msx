@@ -1,0 +1,141 @@
+EXPORTS
+    Adjust @1 DATA
+    Ak @2 DATA
+    Alloc @3
+    AllocFreePool @4
+    AllocInit @5
+    AllocReset @6
+    AllocSetPool @7
+    Compiled @8 DATA
+    Fname @9 DATA
+    HTcreate @10
+    HTfind @11
+    HTfindKey @12
+    HTfree @13
+    HTinsert @14
+    Itmax @15 DATA
+    K1 @16 DATA
+    K2 @17 DATA
+    K3 @18 DATA
+    K4 @19 DATA
+    K5 @20 DATA
+    K6 @21 DATA
+    MAXIT @22 DATA
+    MSX @23 DATA
+    MSXaddpattern @24
+    MSXchem_close @25
+    MSXchem_equil @26
+    MSXchem_getVariableStr @27
+    MSXchem_open @28
+    MSXchem_react @29
+    MSXclose @30
+    MSXcompiler_close @31
+    MSXcompiler_open @32
+    MSXfile_save @33
+    MSXfuncs_free @34
+    MSXfuncs_load @35
+    MSXfuncs_run @36
+    MSXgetID @37
+    MSXgetIDlen @38
+    MSXgetPipeEquil @39 DATA
+    MSXgetPipeFormulas @40 DATA
+    MSXgetPipeRates @41 DATA
+    MSXgetTankEquil @42 DATA
+    MSXgetTankFormulas @43 DATA
+    MSXgetTankRates @44 DATA
+    MSXgetconstant @45
+    MSXgetcount @46
+    MSXgeterror @47
+    MSXgetindex @48
+    MSXgetinitqual @49
+    MSXgetparameter @50
+    MSXgetpatternlen @51
+    MSXgetpatternvalue @52
+    MSXgetqual @53
+    MSXgetsource @54
+    MSXgetspecies @55
+    MSXinit @56
+    MSXinp_countMsxObjects @57
+    MSXinp_countNetObjects @58
+    MSXinp_getSpeciesUnits @59
+    MSXinp_readMsxData @60
+    MSXinp_readNetData @61
+    MSXopen @62
+    MSXout_getLinkQual @63
+    MSXout_getNodeQual @64
+    MSXout_open @65
+    MSXout_saveFinalResults @66
+    MSXout_saveInitialResults @67
+    MSXout_saveResults @68
+    MSXproj_addObject @69
+    MSXproj_close @70
+    MSXproj_findID @71
+    MSXproj_findObject @72
+    MSXproj_getErrmsg @73
+    MSXproj_open @74
+    MSXqual_addSeg @75
+    MSXqual_close @76
+    MSXqual_getFreeSeg @77
+    MSXqual_getLinkQual @78
+    MSXqual_getNodeQual @79
+    MSXqual_init @80
+    MSXqual_isSame @81
+    MSXqual_open @82
+    MSXqual_removeSeg @83
+    MSXqual_step @84
+    MSXreport @85
+    MSXrpt_write @86
+    MSXrpt_writeLine @87
+    MSXsavemsxfile @88
+    MSXsaveoutfile @89
+    MSXsetconstant @90
+    MSXsetinitqual @91
+    MSXsetparameter @92
+    MSXsetpattern @93
+    MSXsetpatternvalue @94
+    MSXsetsource @95
+    MSXsolveH @96
+    MSXsolveQ @97
+    MSXstep @98
+    MSXtank_mix1 @99
+    MSXtank_mix2 @100
+    MSXtank_mix3 @101
+    MSXtank_mix4 @102
+    MSXusehydfile @103
+    MSXutils_findmatch @104
+    MSXutils_getDouble @105
+    MSXutils_getFloat @106
+    MSXutils_getInt @107
+    MSXutils_getTempName @108
+    MSXutils_match @109
+    MSXutils_strToSeconds @110
+    MSXutils_strcomp @111
+    MathFunc @112 DATA
+    NUMSIG @113 DATA
+    Nmax @114 DATA
+    Report @115 DATA
+    TempName @116 DATA
+    Ynew @117 DATA
+    createMatrix @118
+    factorize @119
+    freeMatrix @120
+    hDLL @121 DATA
+    hash @122
+    jacobian @123
+    libFile @124 DATA
+    mathexpr_create @125
+    mathexpr_delete @126
+    mathexpr_eval @127
+    mathexpr_getStr @128
+    newton_close @129
+    newton_open @130
+    newton_solve @131
+    objFile @132 DATA
+    rk5_close @133
+    rk5_integrate @134
+    rk5_open @135
+    ros2_close @136
+    ros2_integrate @137
+    ros2_open @138
+    solve @139
+    srcFile @140 DATA
