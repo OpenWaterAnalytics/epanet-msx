@@ -13,6 +13,7 @@
 **  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
 ******************************************************************************/
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>

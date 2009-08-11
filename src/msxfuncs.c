@@ -9,6 +9,7 @@
 **  LAST UPDATE:   10/20/08
 *******************************************************************************/
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 
 // --- define WINDOWS
@@ -25,6 +26,8 @@
 #endif
 
 #ifdef WINDOWS
+#undef _UNICODE
+#undef UNICODE
 #include <windows.h>
 HANDLE hDLL;
 #else
@@ -50,16 +53,7 @@ int MSXfuncs_load(char * libName)
 {
 
 #ifdef WINDOWS
-	// Convert to a wchar_t* for compatibility with LoadLibrary()
-	size_t origsize = strlen(libName) + 1;
-	const size_t newsize = 256;
-	wchar_t wlibName[256];
-	if (origsize <= newsize)
-		mbstowcs(wlibName, libName, origsize);
-	else 
-		return -1;
-
-	hDLL = LoadLibrary(wlibName);
+	hDLL = LoadLibrary(libName);
 	if (hDLL == NULL) return 1;
 
 	MSXgetPipeRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetPipeRates");
@@ -133,15 +127,6 @@ int MSXfuncs_run(char* cmdLine)
   STARTUPINFO si;
   PROCESS_INFORMATION  pi;
 
-  // Convert to a wchar_t* for compatibility with CreateProcess()
-  size_t origsize = strlen(cmdLine) + 1;
-  const size_t newsize = 256;
-  wchar_t wcmdLine[256];
-  if (origsize <= newsize)
-	  mbstowcs(wcmdLine, cmdLine, origsize);
-  else 
-	  return -1;
-
   // --- initialize data structures
 
   memset(&si, 0, sizeof(si));
@@ -155,7 +140,7 @@ int MSXfuncs_run(char* cmdLine)
 
   // --- execute the command line in a new console window
 
-  exitCode = CreateProcess(NULL, wcmdLine, NULL, NULL, 0,
+  exitCode = CreateProcess(NULL, cmdLine, NULL, NULL, 0,
 		 CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
   if (exitCode == 0)
   {

@@ -17,6 +17,7 @@
 **    SPRINGER-VERLAG (1993)               
 ***********************************************************************/
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <math.h>
 #include "rk5.h"
