@@ -1,4 +1,19 @@
-These compilation instructions are for the Microsoft Visual C++ 6.0 compiler.
+Microsoft Visual Studio
+-----------------------
+The following configuration properties should be set in the
+properties for all configurations of the MSX VC project, to ensure
+generation of a correct DLL and executable.
+
+General -> Character Set -> NOT SET (uses ASCII character set)
+C/C++   -> Detect 64-bit Portability Issues -> NO (prevents a "deprecated option" warning message from appearing)
+C/C++   -> Code Generation -> Runtime Library -> Multi-threaded DLL (Release) -or- Multi-threaded Debug DLL (Debug)
+C/C++   -> Code Generation -> Floating Point Model -> Precise
+C/C++   -> Advanced -> Compile As -> Compile As C Code
+C/C++   -> Preprocessor -> Preprocessor Definitions -> _CRT_SECURE_NO_WARNINGS (prevents "non safe code" warning messages)
+
+
+These compilation instructions are for the Microsoft Visual C++
+6.0 compiler.
 
 To compile the function library form of EPANET-MSX:
 
@@ -33,7 +48,3 @@ To compile the command line executable version of EPANET-MSX:
 
    to create EPANETMSX.EXE which will be found in the MSXEXE\Release
    directory.
-
-
-
-

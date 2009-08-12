@@ -18,7 +18,6 @@
 				   FS 09/23/08 
 *******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 

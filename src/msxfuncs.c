@@ -9,7 +9,6 @@
 **  LAST UPDATE:   10/20/08
 *******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 
 // --- define WINDOWS
@@ -26,8 +25,6 @@
 #endif
 
 #ifdef WINDOWS
-#undef _UNICODE
-#undef UNICODE
 #include <windows.h>
 HANDLE hDLL;
 #else

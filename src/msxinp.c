@@ -13,7 +13,6 @@
 **  BUG FIX:	   BUG ID 09 (add roughness as a hydraulic variable) Feng Shang 01/29/2008	
 *******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -387,12 +386,12 @@ int  getLineLength(char *line)
 */
 {
     char *comment;
-    int lineLength = strlen(line);
+    int lineLength = (int)strlen(line);
     if ( lineLength >= MAXLINE )
     {
     // --- don't count comment if present
         comment = strchr(line, ';');
-        if ( comment ) lineLength = comment - line;    // Pointer math here
+        if ( comment ) lineLength = (int)(comment - line);    // Pointer math here
     }
     return lineLength;
 }
@@ -1331,13 +1330,13 @@ int  getTokens(char *s)
 
     c = strchr(s,';');
     if (c) *c = '\0';
-    len = strlen(s);
+    len = (int)strlen(s);
 
     // --- scan s for tokens until nothing left
 
     while (len > 0 && n < MAXTOKS)
     {
-        m = strcspn(s,SEPSTR);              // find token length 
+        m = (int)strcspn(s,SEPSTR);              // find token length 
         if (m == 0) s++;                    // no token found
         else
         {
@@ -1345,7 +1344,7 @@ int  getTokens(char *s)
             {
                 s++;                        // start token after quote
                 len--;                      // reduce length of s
-                m = strcspn(s,"\"\n");      // find end quote or new line
+                m = (int)strcspn(s,"\"\n"); // find end quote or new line
             }
             s[m] = '\0';                    // null-terminate the token
             Tok[n] = s;                     // save pointer to token 
@@ -1437,4 +1436,3 @@ int traceTermPath(int i, int istar, int n)                                     /
 	}
 	return 0;
 }
-

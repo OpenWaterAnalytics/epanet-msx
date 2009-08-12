@@ -45,15 +45,15 @@ the "advanced" tab. At the bottom select "Environment
 Variables".
 
 6. Copy the values for the environment variables PATH, LIB,
-LIBPATH, and INCLUDE, from the file env_list.txt (just the
-values specified to the right of the = sign). Paste them into
-the environment variables of the same name by selecting the
-environment variable from the list and selecting "edit".
-Completely replace the current value with the new value. The
-environment variables LIB, LIBPATH, and INCLUDE may not be
-defined, in which case you will need to create new environment
-variables with these names by selecting "new". Select "OK"
-after this is completed.
+LIBPATH, DevEnvDir, and INCLUDE, from the file env_list.txt
+(just the values specified to the right of the = sign). Paste
+them into the environment variables of the same name by
+selecting the environment variable from the list and selecting
+"edit". Completely replace the current value with the new
+value. The environment variables LIB, LIBPATH, DevEnvDir, and
+INCLUDE may not be defined, in which case you will need to
+create new environment variables with these names by selecting
+"new". Select "OK" after this is completed.
 
 7. Test your environment by opening up a new command prompt
 window and typing "CL" at the prompt. You should see output

@@ -13,7 +13,9 @@
 # MinGW installation, and uses the MinGW gcc compiler from
 # the MinGW install directory.
 # The current release of MinGW can be obtained from
-# http://sourceforge.net/project/showfiles.php?group_id=2435
+# http://www.mingw.org/wiki/Getting_Started -- the easiest
+# approach is to download the latest MingW installer and
+# accept all of the defaults.
 # The current release of the Cygwin environment can be
 # obtained from http://www.cygwin.com
 
@@ -54,7 +56,7 @@ SHELL = /bin/sh
 # MinGW top level install directory, accessible from build environment
 MinGWdir = /cygdrive/c/MinGW
 # Microsoft lib tool directory (for creating an MS import library)
-MSVClibexe = c:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\bin\\lib
+MSVClibexe = c:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\bin\\lib
 
 # Target filenames
 # svnname.sh constructs a name: <prefix><root><Rev><postfix>
@@ -100,7 +102,7 @@ CC = $(MinGWdir)/bin/gcc
 dlltool = $(MinGWdir)/bin/dlltool
 CFLAGS = -g -O3
 CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
-LDFLAGS = -L . -L $(winlibdir) -W1,-rpath,$(bindir) -l$(epanetlibname) -ldl
+LDFLAGS = -L . -L $(winlibdir) -W1,-rpath,$(bindir) -l$(epanetlibname)
 
 # Installer
 INSTALL = install
@@ -109,12 +111,13 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 # Files for the shared object library
 epanetmsx_objs=hash.o mempool.o mathexpr.o msxchem.o msxfile.o msxinp.o msxout.o msxproj.o \
-	              msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o
+	              msxqual.o msxrpt.o msxtank.o msxtoolkit.o msxutils.o newton.o rk5.o ros2.o \
+	              msxcompiler.o msxfuncs.o
 # Epanetmsx main program
 epanetmsx_main=msxmain
 # Epanetmsx header files
 epanetmsx_heads=hash.h mempool.h mathexpr.h msxdict.h msxtypes.h msxutils.h \
-	               newton.h rk5.h ros2.h $(epanetmsxincludedir)/epanetmsx.h
+	               newton.h rk5.h ros2.h msxfuncs.h $(epanetmsxincludedir)/epanetmsx.h
 # Epanetmsx main program header files
 epanetmsx_main_heads = $(epanetmsxincludedir)/epanetmsx.h
 

@@ -42,7 +42,6 @@
 **	  31 = ^
 ******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <ctype.h>
 #include <malloc.h>
 #include <string.h>

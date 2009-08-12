@@ -13,7 +13,6 @@
 **    problems", SIAM J. Sci. Comput., 20:1456-1480, July 1999.
 *******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdlib.h>
 #include <math.h>
 #include "msxutils.h"

@@ -13,7 +13,6 @@
 **  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
