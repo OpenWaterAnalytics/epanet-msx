@@ -1,32 +1,30 @@
 # Linux Makefile for EPANET-MSX
 
 # This will build EPANET-MSX as a shared object
-# library (libepanetmsx_gcc_<Rev>.so) under Linux,
-# and a standalone executable (epanetmsx_gcc_<Rev>) that is linked
+# library (libepanetmsx.so) under Linux,
+# and a standalone executable (epanetmsx) that is linked
 # to this shared object library.
-# <Rev> is the atomic revision number of the EPANET SVN repo,
-# so the results of each build can be unambiguously tracked to a repo Rev.
 
 # The following targets are defined (for execution in
 # the build directory):
 # make
-#     -Builds libepanetmsx_gcc_<Rev>.so, epanetmsx_gcc_<Rev>
+#     -Builds libepanetmsx.so, epanetmsx
 # make install
-#     -Creates shell wrapper runepanetmsx_<Rev>.sh that
-#      executes epanetmsx_gcc_<Rev>.
-#      The runepanetmsx_<Rev>.sh wrapper simply exports
+#     -Creates shell wrapper runepanetmsx.sh that
+#      executes epanetmsx.
+#      The runepanetmsx.sh wrapper simply exports
 #      environment variables so that the library is found at runtime,
 #      allowing you to specify your own locations for installing
 #      the libraries.
-#     -Installs epanetmsx_gcc_<Rev>, and runepanetmsx_<Rev>.sh
+#     -Installs epanetmsx, and runepanetmsx.sh
 #      in <prefix>/bin, where <prefix> defaults to ~ (and can be set
 #      below to something different - see "Install directories")
-#     -Installs libepanetmsx_gcc_<Rev>.so (shared library) in <prefix>/lib
+#     -Installs libepanetmsx.so (shared library) in <prefix>/lib
 #     -Installs epanetmsx.h in <prefix>/include.  This is the required
 #      header file for the EPANET programmer's toolkit, and thus
 #      <prefix>/include should be on your CPP include search path
 #      for subsequent use of the toolkit and linking with the shared
-#      library libepanetmsx_gcc_<Rev>.so
+#      library libepanetmsx.so
 # make clean
 #     -Removes object and library files, returning the build directory
 #      to its pristine state.
@@ -38,19 +36,14 @@ SHELL = /bin/sh
 # or the compiler flags, but these defaults should be fine.
 
 # Target filenames
-# svnname.sh constructs a name: <prefix><root><Rev><postfix>
-# where <Rev> is the atomic revision number of the svn repo.
-epanetsvnpath = ../../../../BASE
-epanetrootname := $(shell ../svnname.sh $(epanetsvnpath) "" epanet_gcc_ "")
-epanetmsxsvnpath = ../../..
-epanetmsxrootname := $(shell ../svnname.sh $(epanetmsxsvnpath) "" epanetmsx_gcc_ "")
+epanetrootname := epanet2
+epanetmsxrootname := epanetmsx
 soname := lib$(epanetmsxrootname).so
 exename := $(epanetmsxrootname)
 # Shell wrapper
 runcmdtemplate = runepanetmsx.sh.template
-runcmdname = $(shell ../svnname.sh $(epanetmsxsvnpath) "" runepanetmsx_ .sh)
+runcmdname = runepanetmsx.sh
 # Location of EPANET-MSX toolkit includes
-epanetincludedir = $(epanetsvnpath)/trunk/include
 epanetmsxincludedir = ../../include
 # Search path for sources
 epanetmsxsrcdir = ../../src
@@ -70,7 +63,7 @@ docdir = $(datarootdir)/doc/epanetmsx
 # gcc
 CC = gcc
 CFLAGS = -g -O3 -fPIC
-CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(epanetincludedir)
+CPPFLAGS = -I $(srcdir) -I $(epanetmsxincludedir) -I $(includedir)
 LDFLAGS = -L . -L $(libdir) -W1,-rpath,$(libdir) -lm -ldl
 
 # Installer
