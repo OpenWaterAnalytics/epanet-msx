@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\BASE\trunk\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\include&quot;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,8 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="epanet2.lib"
 				OutputFile="$(OutDir)\epanetmsx.dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Jim\My Documents\lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)epanet-msx-dll.pdb"
 				SubSystem="2"
@@ -90,6 +92,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy .\Debug\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Debug\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy ..\..\..\include\epanetmsx.h &quot;%HOME%&quot;\include&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -119,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\BASE\trunk\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\include&quot;"
 				PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -140,8 +143,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="epanet2.lib"
 				OutputFile="$(OutDir)\epanetmsx.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Jim\My Documents\lib&quot;"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(TargetDir)epanet-msx-dll.pdb"
 				SubSystem="2"
@@ -170,7 +175,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Installing Library Files..."
-				CommandLine="copy .\Release\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanet2.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanet2.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;"
+				CommandLine="copy .\Release\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy ..\..\..\include\epanetmsx.h &quot;%HOME%&quot;\include&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

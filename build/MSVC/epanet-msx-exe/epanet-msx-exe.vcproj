@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\BASE\trunk\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,8 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="epanet2.lib epanetmsx.lib"
 				OutputFile="$(OutDir)\epanetmsx.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Jim\My Documents\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -88,6 +90,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Installing executable files"
+				CommandLine="copy .\Debug\epanetmsx.exe &quot;%HOME%&quot;\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -117,7 +121,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\MSX\trunk\include&quot;;&quot;C:\Documents and Settings\Jim\My Documents\ENGCVS\EPANET\BASE\trunk\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Jim\My Documents\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -137,8 +141,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="epanet2.lib epanetmsx.lib"
 				OutputFile="$(OutDir)\epanetmsx.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Jim\My Documents\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -165,8 +171,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				Description="Installing library and executable files"
-				CommandLine="copy .\Release\epanetmsx.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanet2.dll &quot;%HOME%&quot;\bin&#x0D;&#x0A;copy .\Release\epanetmsx.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanet2.lib &quot;%HOME%&quot;\lib&#x0D;&#x0A;copy .\Release\epanetmsx.exe &quot;%HOME%&quot;\bin&#x0D;&#x0A;"
+				Description="Installing executable files"
+				CommandLine="copy .\Release\epanetmsx.exe &quot;%HOME%&quot;\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -188,10 +194,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\include\epanetmsx.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
