@@ -733,7 +733,7 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
     PrevLex = 0;
     CurLex = 0;
     S = formula;
-    Len = strlen(S);
+    Len = (int)strlen(S);
     Pos = 0;
     Bc = 0;
     tree = getTree();

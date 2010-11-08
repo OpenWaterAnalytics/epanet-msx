@@ -134,13 +134,18 @@ int MSXcompiler_open()
     }
     else return ERR_COMPILE_FAILED;
 #endif
-    Compiled = TRUE;
+    Compiled = err==0;
 
 // --- load the compiled chemistry functions from the library file
 
-    err = MSXfuncs_load(libFile);
-    if ( err == 1 ) return ERR_COMPILE_FAILED;
-    if ( err == 2 ) return ERR_COMPILED_LOAD;
+	if(Compiled) {
+		err = MSXfuncs_load(libFile);
+	    if ( err == 1 ) return ERR_COMPILE_FAILED;
+		if ( err == 2 ) return ERR_COMPILED_LOAD;
+	} else {
+		MSXcompiler_close();
+		return ERR_COMPILE_FAILED;
+	}
     return 0;
 }
 

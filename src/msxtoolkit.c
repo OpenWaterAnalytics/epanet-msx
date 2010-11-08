@@ -75,6 +75,7 @@ int  DLLEXPORT  MSXopen(char *fname)
 
     if ( err )
     {
+
 	ENwriteline(MSXproj_getErrmsg(err));
 	ENwriteline("");
     }
@@ -380,10 +381,10 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
     if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIES:   *len = strlen(MSX.Species[index].id); break;
-        case CONSTANT:  *len = strlen(MSX.Const[index].id);   break;
-        case PARAMETER: *len = strlen(MSX.Param[index].id);   break;
-        case PATTERN:   *len = strlen(MSX.Pattern[index].id); break;
+        case SPECIES:   *len = (int)strlen(MSX.Species[index].id); break;
+        case CONSTANT:  *len = (int)strlen(MSX.Const[index].id);   break;
+        case PARAMETER: *len = (int)strlen(MSX.Param[index].id);   break;
+        case PATTERN:   *len = (int)strlen(MSX.Pattern[index].id); break;
     }
     return 0;
 }

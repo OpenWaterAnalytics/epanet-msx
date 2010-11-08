@@ -25,21 +25,21 @@
 #endif
 
 // --- define DLLEXPORT
-
-#ifdef WINDOWS
-  #ifdef __cplusplus
-  #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
+#ifndef DLLEXPORT
+  #ifdef WINDOWS
+    #ifdef __cplusplus
+    #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
+    #else
+    #define DLLEXPORT __declspec(dllexport) __stdcall
+    #endif
   #else
-  #define DLLEXPORT __declspec(dllexport) __stdcall
-  #endif
-#else
-  #ifdef __cplusplus
-  #define DLLEXPORT extern "C"
-  #else
-  #define DLLEXPORT
-  #endif
-#endif  
-
+    #ifdef __cplusplus
+    #define DLLEXPORT extern "C"
+    #else
+    #define DLLEXPORT
+    #endif
+  #endif  
+#endif
 // --- define MSX constants
 
 #define MSX_NODE      0

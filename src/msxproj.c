@@ -204,7 +204,7 @@ int   MSXproj_addObject(int type, char *id, int n)
 // --- use memory from the hash tables' common memory pool to store
 //     a copy of the object's ID string
 
-    len = strlen(id) + 1;
+    len = (int)strlen(id) + 1;
     newID = (char *) Alloc(len*sizeof(char));
     strcpy(newID, id);
 
@@ -518,6 +518,14 @@ void deleteObjects()
     {
         FREE(MSX.Node[i].c);
         FREE(MSX.Node[i].c0);
+		if(MSX.Node[i].sources) {
+			struct Ssource *p=MSX.Node[i].sources;
+			while(p != NULL) {
+				MSX.Node[i].sources=p->next;
+				FREE(p);
+				p=MSX.Node[i].sources;
+			}
+		}
     }
     if (MSX.Link) for (i=1; i<=MSX.Nobjects[LINK]; i++)
     {
@@ -531,7 +539,6 @@ void deleteObjects()
     }
 
 // --- free memory used by time patterns
-
     if (MSX.Pattern) for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
     {
         listItem = MSX.Pattern[i].first;

@@ -26,7 +26,7 @@
 
 #ifdef WINDOWS
 #include <windows.h>
-HANDLE hDLL;
+HMODULE hDLL;
 #else
   #include <dlfcn.h>
   void *hDLL; 
@@ -50,8 +50,8 @@ int MSXfuncs_load(char * libName)
 {
 
 #ifdef WINDOWS
-	hDLL = LoadLibrary(libName);
-	if (hDLL == NULL) return 1;
+	hDLL = LoadLibraryA(libName);
+	if (hDLL == NULL) return GetLastError();
 
 	MSXgetPipeRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetPipeRates");
     MSXgetTankRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetTankRates");
@@ -120,7 +120,7 @@ int MSXfuncs_run(char* cmdLine)
 {
 #ifdef WINDOWS
 
-  unsigned long exitCode;
+  BOOL exitCode;
   STARTUPINFO si;
   PROCESS_INFORMATION  pi;
 
@@ -137,7 +137,7 @@ int MSXfuncs_run(char* cmdLine)
 
   // --- execute the command line in a new console window
 
-  exitCode = CreateProcess(NULL, cmdLine, NULL, NULL, 0,
+  exitCode = CreateProcessA(NULL, cmdLine, NULL, NULL, 0,
 		 CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
   if (exitCode == 0)
   {
