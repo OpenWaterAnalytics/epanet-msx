@@ -58,20 +58,28 @@ int main(int argc, char *argv[])
     int    err, done = 1;
     long   t, tleft;
     long   oldHour, newHour;
+	char *inpFile, *repFile, *outFile;
 
 // --- check command line arguments
 
-    if ( argc < 4 )
+    if ( argc < 4 || argc > 5 )
     {
-        printf("\n Too few command line arguments.\n");
+		printf("\nInvalid command line arguments:\n\n");
+        printf("usage: epanet_msx <inp_file> <msx_file> <report_file> [binary_output_file]\n");
         return 0;
     }
-
+	inpFile=argv[1];
+	repFile=argv[3];
+	if(argc ==5) {
+		outFile=argv[4];
+	} else {
+		outFile="";
+	}
 // --- open EPANET file
 
     printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
     printf("\n  o Processing EPANET input file");
-    err = ENopen(argv[1], argv[3], "");
+    err = ENopen(inpFile, repFile, outFile);
     do
     {
         if (err)
