@@ -101,9 +101,8 @@ int MSXcompiler_open()
 #endif
 
 // --- write the chemistry functions to the source code file
-
     f = fopen(srcFile, "wt");
-    if ( f == NULL ) return ERR_COMPILE_FAILED;
+    if ( f == NULL ) return ERR_CREATE_CHEM_SRC;
     writeSrcFile(f);
     fclose(f);
 
@@ -123,7 +122,7 @@ int MSXcompiler_open()
 	sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
 	err = MSXfuncs_run(cmd);
     }
-    else return ERR_COMPILE_FAILED;
+    else return ERR_INVALID_COMPILER;
 #else
     if ( MSX.Compiler == GC )
     {
@@ -132,7 +131,7 @@ int MSXcompiler_open()
         sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
         err = system(cmd);
     }
-    else return ERR_COMPILE_FAILED;
+    else return ERR_INVALID_COMPILER;
 #endif
     Compiled = err==0;
 

@@ -256,8 +256,10 @@ typedef  float REAL4;
            ERR_MSX_OPENED,             // 520
            ERR_OPEN_RPT_FILE,          // 521                                  //(LR-11/20/07, to fix bug 08)
            
-           ERR_COMPILE_FAILED,         // 522                                  //1.1.00
-           ERR_COMPILED_LOAD,          // 523                                  //1.1.00
+           ERR_CREATE_CHEM_SRC,        // 522                                  //1.1.00
+           ERR_INVALID_COMPILER,       // 523                                  //1.1.00
+           ERR_COMPILE_FAILED,         // 524                                  //1.1.00
+           ERR_COMPILED_LOAD,          // 525                                  //1.1.00
 
            ERR_MAX};
 
