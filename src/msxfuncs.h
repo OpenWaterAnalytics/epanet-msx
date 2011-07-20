@@ -13,9 +13,9 @@
 #define MSXFUNCS_H
 
 // Define pointers for each group of chemistry functions
-typedef void (*MSXGETRATES)(double *, double *, double * , double *, double *);
-typedef void (*MSXGETEQUIL)(double *, double *, double * , double *, double *);
-typedef void (*MSXGETFORMULAS)(double *, double *, double *, double *);
+typedef void (*MSXGETRATES)(double *, double *, double * , double *, double *, int, double);
+typedef void (*MSXGETEQUIL)(double *, double *, double * , double *, double *, int, double);
+typedef void (*MSXGETFORMULAS)(double *, double *, double *, double *, int);
 
 // Declare each chemistry function
 MSXGETRATES    MSXgetPipeRates;

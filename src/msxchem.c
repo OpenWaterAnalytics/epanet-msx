@@ -856,7 +856,7 @@ void evalPipeFormulas(double *c)
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar);
+	    MSXgetPipeFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = MSX.C1[m];
@@ -897,7 +897,7 @@ void evalTankFormulas(double *c)
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar);
+	    MSXgetTankFormulas(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = MSX.C1[m];
@@ -1086,7 +1086,7 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeRates(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
+	    MSXgetPipeRates(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
         for (i=1; i<=n; i++)
         {
             m = PipeRateSpecies[i];
@@ -1146,7 +1146,7 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankRates(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
+	    MSXgetTankRates(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
         for (i=1; i<=n; i++)
         {
             m = TankRateSpecies[i];
@@ -1195,7 +1195,7 @@ void getPipeEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeEquil(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
+	    MSXgetPipeEquil(MSX.C1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
         for (i=1; i<=n; i++)
         {
             m = PipeEquilSpecies[i];
@@ -1244,7 +1244,7 @@ void getTankEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankEquil(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
+	    MSXgetTankEquil(MSX.C1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
         for (i=1; i<=n; i++)
         {
             m = TankEquilSpecies[i];
@@ -1262,3 +1262,160 @@ void getTankEquil(double t, double y[], int n, double f[])
     }
 }
 
+#ifdef VARDEBUG
+char *getHeaderString()
+{
+	static char hs[1024];
+	int i;
+	hs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			char s[20];
+			sprintf(s,"\\tc[%d]",i+1);
+			strcat(hs,s);
+		}
+	}
+/*
+	if(LastIndex[PARAMETER] > 0) {
+		for(i=0;i<LastIndex[PARAMETER];i++) {
+			char s[20];
+			sprintf(s,"\\tp[%d]",i+1);
+			strcat(hs,s);
+		}
+	}
+	if(LastIndex[CONSTANT] > 0) {
+		for(i=0;i<LastIndex[CONSTANT];i++) {
+			char s[20];
+			sprintf(s,"\\tk[%d]",i+1);
+			strcat(hs,s);
+		}
+	}
+	for(i=0;i<7;i++) {
+		char s[20];
+		sprintf(s,"\\th[%d]",i+1);
+		strcat(hs,s);
+	}
+*/
+	return hs;
+}
+static char vfs[1024];
+char *getVarFmtString()
+{
+	int i;
+	vfs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			strcat(vfs,"\\t%g");
+		}
+	}
+/*
+	if(LastIndex[PARAMETER] > 0) {
+		for(i=0;i<LastIndex[PARAMETER];i++) {
+			strcat(vfs,"\\t%g");
+		}
+	}
+	if(LastIndex[CONSTANT] > 0) {
+		for(i=0;i<LastIndex[CONSTANT];i++) {
+			strcat(vfs,"\\t%g");
+		}
+	}
+	for(i=0;i<7;i++) {
+		strcat(vfs,"\\t%g");
+	}
+*/
+
+	return vfs;
+}
+static char ffs[1024];
+char *getFFmtString(int isNull)
+{
+	int i;
+	ffs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			if(isNull)
+				strcat(ffs,"\\t");
+			else 
+				strcat(ffs,"\\t%g");
+		}
+	}
+	return ffs;
+}
+static char cfs[1024];
+char *getCFmtString()
+{
+	int i;
+	cfs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			strcat(cfs,"\\t%g");
+		}
+	}
+	return cfs;
+}
+static char cs[1024];
+char *getCString()
+{
+	int i;
+	cs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			char s[20];
+			sprintf(s,",c[%d]",i+1);
+			strcat(cs,s);
+		}
+	}
+	return cs;
+}
+static char vs[1024];
+char *getVarString()
+{
+	int i;
+	vfs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			char s[20];
+			sprintf(s,",c[%d]",i+1);
+			strcat(vs,s);
+		}
+	}
+/*
+	if(LastIndex[PARAMETER] > 0) {
+		for(i=0;i<LastIndex[PARAMETER];i++) {
+			char s[20];
+			sprintf(s,",p[%d]",i+1);
+			strcat(vs,s);
+		}
+	}
+	if(LastIndex[CONSTANT] > 0) {
+		for(i=0;i<LastIndex[CONSTANT];i++) {
+			char s[20];
+			sprintf(s,",k[%d]",i+1);
+			strcat(vs,s);
+		}
+	}
+	for(i=0;i<7;i++) {
+		char s[20];
+		sprintf(s,",h[%d]",i+1);
+		strcat(vs,s);
+	}
+*/
+	return vs;
+}
+static char fs[1024];
+char *getFString(int isNull)
+{
+	int i;
+	fs[0]='\0';
+	if(LastIndex[SPECIES] > 0) {
+		for(i=0;i<LastIndex[SPECIES];i++) {
+			if(!isNull) {
+				char s[20];
+				sprintf(s,",f[%d]",i+1);
+				strcat(fs,s);
+			}
+		}
+	}
+	return fs;
+}
+#endif

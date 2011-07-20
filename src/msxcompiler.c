@@ -180,7 +180,6 @@ void MSXcompiler_close()
 #endif
     }
 }
-
 //=============================================================================
 
 void  writeSrcFile(FILE* f)
@@ -210,7 +209,9 @@ void  writeSrcFile(FILE* f)
     int i;
     char e[1024];
     char headers[] =
-
+#ifdef VARDEBUG
+" #include <stdio.h>\n"
+#endif
 " /*  Machine Generated EPANET-MSX File - Do Not Edit */ \n\n"
 " #include <math.h> \n"
 " \n"
@@ -237,8 +238,16 @@ void  writeSrcFile(FILE* f)
 " void  DLLEXPORT  MSXgetTankEquil(double *, double *, double *, double *, double *); \n"
 " void  DLLEXPORT  MSXgetPipeFormulas(double *, double *, double *, double *); \n"
 " void  DLLEXPORT  MSXgetTankFormulas(double *, double *, double *, double *); \n"
-" double term(int, double *, double *, double *, double *); \n";
-
+" double term(int, double *, double *, double *, double *); \n"
+#ifdef VARDEBUG
+" static FILE *fp=NULL;\n"
+" static void writeHeader();\n"
+" static void ensureFileOpen();\n"
+" static void writeVars(char *,double *, double *, double *, double *, double *);\n"
+" static void writeF(char *,double *);\n"
+" static void writeC(char *,double *);\n"
+#endif
+"";
     char mathFuncs[] = 
 
     " double coth(double); \n"
@@ -266,7 +275,48 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f, "%s", headers);
     fprintf(f, "%s", mathFuncs);
+#ifdef VARDEBUG
+	fprintf(f,
+" void ensureFileOpen() {\n"
+"   if(fp==NULL) {\n"
+"     fp=fopen(\"debug_vars.txt\",\"w\");\n"
+"     writeHeader();\n"
+"   }\n"
+" }\n");
+	fprintf(f,
+" void writeHeader()\n"
+" {\n"
+"    fprintf(fp,\"Time\\tObjID\\t%s\\n\");\n"
+"    fflush(fp);\n"
+" }\n",getHeaderString());
 
+	fprintf(f,
+" void writeVars(double t, int eid, char *id,double c[], double k[], double p[], double h[], double f[])\n"
+" {\n"
+"    if(f==NULL) {\n"
+"      fprintf(fp,\"%%g\\t%%d\\t%%s%s%s\",t,eid,id%s%s);\n",
+getVarFmtString(),getFFmtString(1),getVarString(),getFString(1));
+
+	fprintf(f,
+"    } else {\n"
+"      fprintf(fp,\"%%g\t%%d\t%%s%s%s\",t,eid,id%s%s);\n"
+"    }\n"
+"    fflush(fp);\n"
+" }\n",getVarFmtString(),getFFmtString(0),getVarString(),getFString(0));
+
+	fprintf(f,
+" void writeF(double f[])\n"
+" {\n"
+"    fprintf(fp,\"%s\\n\"%s);\n"
+"    fflush(fp);\n"
+" }\n",getFFmtString(0),getFString(0));
+	fprintf(f,
+" void writeC(double c[])\n"
+" {\n"
+"    fprintf(fp,\"%s\\n\"%s);\n"
+"    fflush(fp);\n"
+" }\n",getCFmtString(),getCString());
+#endif
 // --- write term functions
 
     fprintf(f,
@@ -286,73 +336,115 @@ void  writeSrcFile(FILE* f)
 // --- write pipe rate functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
+"\n void DLLEXPORT MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[], int TheLink, double t)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(t,TheLink,\"PR\",c,k,p,h,f);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == RATE )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeF(f);\n");
+#endif
     fprintf(f, " }\n");
     
 // --- write tank rate functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
+"\n void DLLEXPORT MSXgetTankRates(double c[], double k[], double p[], double h[], double f[], int TheTank, double t)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(t,TheTank,\"TR\",c,k,p,h,f);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == RATE )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeF(f);\n");
+#endif
     fprintf(f, " }\n");
 
 // --- write pipe equilibrium functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
+"\n void DLLEXPORT MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[], int TheLink, double t)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(t,TheLink,\"PE\",c,k,p,h,f);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == EQUIL )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeF(f);\n");
+#endif
     fprintf(f, " }\n");
     
 // --- write tank equilibrium functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
+"\n void DLLEXPORT MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[], int TheTank, double t)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(t,TheTank,\"TE\",c,k,p,h,f);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == EQUIL )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeF(f);\n");
+#endif
     fprintf(f, " }\n");
 
 // --- write pipe formula functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeFormulas(double c[], double k[],  double p[], double h[])\n { \n");
+"\n void DLLEXPORT MSXgetPipeFormulas(double c[], double k[],  double p[], double h[], int TheLink)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(-1,TheLink,\"PF\",c,k,p,h,NULL);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == FORMULA )
             fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeC(c);\n");
+#endif
     fprintf(f, " }\n");
     
 // --- write tank formula functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankFormulas(double c[], double k[], double p[], double h[])\n { \n");
+"\n void DLLEXPORT MSXgetTankFormulas(double c[], double k[], double p[], double h[], int TheTank)\n { \n");
+#ifdef VARDEBUG
+	fprintf(f,"  ensureFileOpen();\n");
+	fprintf(f,"  writeVars(-1,TheTank,\"TF\",c,k,p,h,NULL);\n");
+#endif
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == FORMULA )
             fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
+#ifdef VARDEBUG
+	fprintf(f,"  writeC(c);\n");
+#endif
     fprintf(f, " }\n");
     fprintf(f, "\n");
 }

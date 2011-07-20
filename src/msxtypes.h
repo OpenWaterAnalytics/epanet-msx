@@ -453,3 +453,12 @@ typedef struct                         // MSX PROJECT VARIABLES
    Stank    *Tank;                     // Tank data
    Spattern *Pattern;                  // Pattern data
 } MSXproject;
+#ifdef VARDEBUG
+char *getHeaderString();
+char *getVarFmtString();
+char *getFFmtString(int isNull);
+char *getVarString();
+char *getFString(int isNull);
+char *getCFmtString();
+char *getCString();
+#endif
