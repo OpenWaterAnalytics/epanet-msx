@@ -1,0 +1,424 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		22E3FA241432A0EE0001579B /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA071432A0EE0001579B /* hash.c */; };
+		22E3FA251432A0EE0001579B /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA081432A0EE0001579B /* hash.h */; };
+		22E3FA261432A0EE0001579B /* mathexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA091432A0EE0001579B /* mathexpr.c */; };
+		22E3FA271432A0EE0001579B /* mathexpr.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA0A1432A0EE0001579B /* mathexpr.h */; };
+		22E3FA281432A0EE0001579B /* mempool.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA0B1432A0EE0001579B /* mempool.c */; };
+		22E3FA291432A0EE0001579B /* mempool.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA0C1432A0EE0001579B /* mempool.h */; };
+		22E3FA2A1432A0EE0001579B /* msxchem.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA0D1432A0EE0001579B /* msxchem.c */; };
+		22E3FA2B1432A0EE0001579B /* msxcompiler.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA0E1432A0EE0001579B /* msxcompiler.c */; };
+		22E3FA2C1432A0EE0001579B /* msxdict.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA0F1432A0EE0001579B /* msxdict.h */; };
+		22E3FA2D1432A0EE0001579B /* msxfile.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA101432A0EE0001579B /* msxfile.c */; };
+		22E3FA2E1432A0EE0001579B /* msxfuncs.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA111432A0EE0001579B /* msxfuncs.c */; };
+		22E3FA2F1432A0EE0001579B /* msxfuncs.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA121432A0EE0001579B /* msxfuncs.h */; };
+		22E3FA301432A0EE0001579B /* msxinp.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA131432A0EE0001579B /* msxinp.c */; };
+		22E3FA321432A0EE0001579B /* msxout.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA151432A0EE0001579B /* msxout.c */; };
+		22E3FA331432A0EE0001579B /* msxproj.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA161432A0EE0001579B /* msxproj.c */; };
+		22E3FA341432A0EE0001579B /* msxqual.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA171432A0EE0001579B /* msxqual.c */; };
+		22E3FA351432A0EE0001579B /* msxrpt.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA181432A0EE0001579B /* msxrpt.c */; };
+		22E3FA361432A0EE0001579B /* msxtank.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA191432A0EE0001579B /* msxtank.c */; };
+		22E3FA371432A0EE0001579B /* msxtoolkit.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA1A1432A0EE0001579B /* msxtoolkit.c */; };
+		22E3FA381432A0EE0001579B /* msxtypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA1B1432A0EE0001579B /* msxtypes.h */; };
+		22E3FA391432A0EE0001579B /* msxutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA1C1432A0EE0001579B /* msxutils.c */; };
+		22E3FA3A1432A0EE0001579B /* msxutils.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA1D1432A0EE0001579B /* msxutils.h */; };
+		22E3FA3B1432A0EE0001579B /* newton.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA1E1432A0EE0001579B /* newton.c */; };
+		22E3FA3C1432A0EE0001579B /* newton.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA1F1432A0EE0001579B /* newton.h */; };
+		22E3FA3D1432A0EE0001579B /* rk5.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA201432A0EE0001579B /* rk5.c */; };
+		22E3FA3E1432A0EE0001579B /* rk5.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA211432A0EE0001579B /* rk5.h */; };
+		22E3FA3F1432A0EE0001579B /* ros2.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA221432A0EE0001579B /* ros2.c */; };
+		22E3FA401432A0EE0001579B /* ros2.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA231432A0EE0001579B /* ros2.h */; };
+		22E3FA431432A10D0001579B /* epanetmsx.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA421432A10D0001579B /* epanetmsx.h */; };
+		22E3FA461432A1620001579B /* malloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA451432A1610001579B /* malloc.h */; };
+		22E3FA481432A21B0001579B /* libepanet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3FA471432A21B0001579B /* libepanet.dylib */; };
+		22E3FA571432A2630001579B /* msxmain.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA141432A0EE0001579B /* msxmain.c */; };
+		22E3FA581432A26E0001579B /* libepanetmsx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3F9FC1432A0860001579B /* libepanetmsx.dylib */; };
+		22E3FA591432A2C50001579B /* libepanet.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3FA471432A21B0001579B /* libepanet.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		22E3FA4B1432A24D0001579B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		22E3F9FC1432A0860001579B /* libepanetmsx.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libepanetmsx.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		22E3FA071432A0EE0001579B /* hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hash.c; path = ../../../src/hash.c; sourceTree = "<group>"; };
+		22E3FA081432A0EE0001579B /* hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hash.h; path = ../../../src/hash.h; sourceTree = "<group>"; };
+		22E3FA091432A0EE0001579B /* mathexpr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mathexpr.c; path = ../../../src/mathexpr.c; sourceTree = "<group>"; };
+		22E3FA0A1432A0EE0001579B /* mathexpr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mathexpr.h; path = ../../../src/mathexpr.h; sourceTree = "<group>"; };
+		22E3FA0B1432A0EE0001579B /* mempool.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mempool.c; path = ../../../src/mempool.c; sourceTree = "<group>"; };
+		22E3FA0C1432A0EE0001579B /* mempool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mempool.h; path = ../../../src/mempool.h; sourceTree = "<group>"; };
+		22E3FA0D1432A0EE0001579B /* msxchem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxchem.c; path = ../../../src/msxchem.c; sourceTree = "<group>"; };
+		22E3FA0E1432A0EE0001579B /* msxcompiler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxcompiler.c; path = ../../../src/msxcompiler.c; sourceTree = "<group>"; };
+		22E3FA0F1432A0EE0001579B /* msxdict.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = msxdict.h; path = ../../../src/msxdict.h; sourceTree = "<group>"; };
+		22E3FA101432A0EE0001579B /* msxfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxfile.c; path = ../../../src/msxfile.c; sourceTree = "<group>"; };
+		22E3FA111432A0EE0001579B /* msxfuncs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxfuncs.c; path = ../../../src/msxfuncs.c; sourceTree = "<group>"; };
+		22E3FA121432A0EE0001579B /* msxfuncs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = msxfuncs.h; path = ../../../src/msxfuncs.h; sourceTree = "<group>"; };
+		22E3FA131432A0EE0001579B /* msxinp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxinp.c; path = ../../../src/msxinp.c; sourceTree = "<group>"; };
+		22E3FA141432A0EE0001579B /* msxmain.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxmain.c; path = ../../../src/msxmain.c; sourceTree = "<group>"; };
+		22E3FA151432A0EE0001579B /* msxout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxout.c; path = ../../../src/msxout.c; sourceTree = "<group>"; };
+		22E3FA161432A0EE0001579B /* msxproj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxproj.c; path = ../../../src/msxproj.c; sourceTree = "<group>"; };
+		22E3FA171432A0EE0001579B /* msxqual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxqual.c; path = ../../../src/msxqual.c; sourceTree = "<group>"; };
+		22E3FA181432A0EE0001579B /* msxrpt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxrpt.c; path = ../../../src/msxrpt.c; sourceTree = "<group>"; };
+		22E3FA191432A0EE0001579B /* msxtank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxtank.c; path = ../../../src/msxtank.c; sourceTree = "<group>"; };
+		22E3FA1A1432A0EE0001579B /* msxtoolkit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxtoolkit.c; path = ../../../src/msxtoolkit.c; sourceTree = "<group>"; };
+		22E3FA1B1432A0EE0001579B /* msxtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = msxtypes.h; path = ../../../src/msxtypes.h; sourceTree = "<group>"; };
+		22E3FA1C1432A0EE0001579B /* msxutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = msxutils.c; path = ../../../src/msxutils.c; sourceTree = "<group>"; };
+		22E3FA1D1432A0EE0001579B /* msxutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = msxutils.h; path = ../../../src/msxutils.h; sourceTree = "<group>"; };
+		22E3FA1E1432A0EE0001579B /* newton.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = newton.c; path = ../../../src/newton.c; sourceTree = "<group>"; };
+		22E3FA1F1432A0EE0001579B /* newton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = newton.h; path = ../../../src/newton.h; sourceTree = "<group>"; };
+		22E3FA201432A0EE0001579B /* rk5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rk5.c; path = ../../../src/rk5.c; sourceTree = "<group>"; };
+		22E3FA211432A0EE0001579B /* rk5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rk5.h; path = ../../../src/rk5.h; sourceTree = "<group>"; };
+		22E3FA221432A0EE0001579B /* ros2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ros2.c; path = ../../../src/ros2.c; sourceTree = "<group>"; };
+		22E3FA231432A0EE0001579B /* ros2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ros2.h; path = ../../../src/ros2.h; sourceTree = "<group>"; };
+		22E3FA421432A10D0001579B /* epanetmsx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = epanetmsx.h; sourceTree = "<group>"; };
+		22E3FA451432A1610001579B /* malloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = malloc.h; sourceTree = "<group>"; };
+		22E3FA471432A21B0001579B /* libepanet.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libepanet.dylib; path = ../../../../../BASE/trunk/build/Xcode/epanet/Debug/libepanet.dylib; sourceTree = "<group>"; };
+		22E3FA4D1432A24D0001579B /* runepanetmsx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = runepanetmsx; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		22E3F9F91432A0860001579B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E3FA481432A21B0001579B /* libepanet.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22E3FA4A1432A24D0001579B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E3FA581432A26E0001579B /* libepanetmsx.dylib in Frameworks */,
+				22E3FA591432A2C50001579B /* libepanet.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		22E3F9F11432A0850001579B = {
+			isa = PBXGroup;
+			children = (
+				22E3FA471432A21B0001579B /* libepanet.dylib */,
+				22E3FA441432A14E0001579B /* macincludes */,
+				22E3FA411432A10D0001579B /* include */,
+				22E3FA061432A0D80001579B /* source */,
+				22E3F9FD1432A0860001579B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		22E3F9FD1432A0860001579B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				22E3F9FC1432A0860001579B /* libepanetmsx.dylib */,
+				22E3FA4D1432A24D0001579B /* runepanetmsx */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		22E3FA061432A0D80001579B /* source */ = {
+			isa = PBXGroup;
+			children = (
+				22E3FA071432A0EE0001579B /* hash.c */,
+				22E3FA081432A0EE0001579B /* hash.h */,
+				22E3FA091432A0EE0001579B /* mathexpr.c */,
+				22E3FA0A1432A0EE0001579B /* mathexpr.h */,
+				22E3FA0B1432A0EE0001579B /* mempool.c */,
+				22E3FA0C1432A0EE0001579B /* mempool.h */,
+				22E3FA0D1432A0EE0001579B /* msxchem.c */,
+				22E3FA0E1432A0EE0001579B /* msxcompiler.c */,
+				22E3FA0F1432A0EE0001579B /* msxdict.h */,
+				22E3FA101432A0EE0001579B /* msxfile.c */,
+				22E3FA111432A0EE0001579B /* msxfuncs.c */,
+				22E3FA121432A0EE0001579B /* msxfuncs.h */,
+				22E3FA131432A0EE0001579B /* msxinp.c */,
+				22E3FA141432A0EE0001579B /* msxmain.c */,
+				22E3FA151432A0EE0001579B /* msxout.c */,
+				22E3FA161432A0EE0001579B /* msxproj.c */,
+				22E3FA171432A0EE0001579B /* msxqual.c */,
+				22E3FA181432A0EE0001579B /* msxrpt.c */,
+				22E3FA191432A0EE0001579B /* msxtank.c */,
+				22E3FA1A1432A0EE0001579B /* msxtoolkit.c */,
+				22E3FA1B1432A0EE0001579B /* msxtypes.h */,
+				22E3FA1C1432A0EE0001579B /* msxutils.c */,
+				22E3FA1D1432A0EE0001579B /* msxutils.h */,
+				22E3FA1E1432A0EE0001579B /* newton.c */,
+				22E3FA1F1432A0EE0001579B /* newton.h */,
+				22E3FA201432A0EE0001579B /* rk5.c */,
+				22E3FA211432A0EE0001579B /* rk5.h */,
+				22E3FA221432A0EE0001579B /* ros2.c */,
+				22E3FA231432A0EE0001579B /* ros2.h */,
+			);
+			name = source;
+			sourceTree = "<group>";
+		};
+		22E3FA411432A10D0001579B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				22E3FA421432A10D0001579B /* epanetmsx.h */,
+			);
+			name = include;
+			path = ../../../include;
+			sourceTree = "<group>";
+		};
+		22E3FA441432A14E0001579B /* macincludes */ = {
+			isa = PBXGroup;
+			children = (
+				22E3FA451432A1610001579B /* malloc.h */,
+			);
+			name = macincludes;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		22E3F9FA1432A0860001579B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E3FA251432A0EE0001579B /* hash.h in Headers */,
+				22E3FA271432A0EE0001579B /* mathexpr.h in Headers */,
+				22E3FA291432A0EE0001579B /* mempool.h in Headers */,
+				22E3FA2C1432A0EE0001579B /* msxdict.h in Headers */,
+				22E3FA2F1432A0EE0001579B /* msxfuncs.h in Headers */,
+				22E3FA381432A0EE0001579B /* msxtypes.h in Headers */,
+				22E3FA3A1432A0EE0001579B /* msxutils.h in Headers */,
+				22E3FA3C1432A0EE0001579B /* newton.h in Headers */,
+				22E3FA3E1432A0EE0001579B /* rk5.h in Headers */,
+				22E3FA401432A0EE0001579B /* ros2.h in Headers */,
+				22E3FA431432A10D0001579B /* epanetmsx.h in Headers */,
+				22E3FA461432A1620001579B /* malloc.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		22E3F9FB1432A0860001579B /* epanetmsx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22E3FA001432A0860001579B /* Build configuration list for PBXNativeTarget "epanetmsx" */;
+			buildPhases = (
+				22E3F9F81432A0860001579B /* Sources */,
+				22E3F9F91432A0860001579B /* Frameworks */,
+				22E3F9FA1432A0860001579B /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = epanetmsx;
+			productName = epanetmsx;
+			productReference = 22E3F9FC1432A0860001579B /* libepanetmsx.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		22E3FA4C1432A24D0001579B /* runepanetmsx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22E3FA541432A24E0001579B /* Build configuration list for PBXNativeTarget "runepanetmsx" */;
+			buildPhases = (
+				22E3FA491432A24D0001579B /* Sources */,
+				22E3FA4A1432A24D0001579B /* Frameworks */,
+				22E3FA4B1432A24D0001579B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = runepanetmsx;
+			productName = runepanetmsx;
+			productReference = 22E3FA4D1432A24D0001579B /* runepanetmsx */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		22E3F9F31432A0850001579B /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 22E3F9F61432A0850001579B /* Build configuration list for PBXProject "epanetmsx" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 22E3F9F11432A0850001579B;
+			productRefGroup = 22E3F9FD1432A0860001579B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				22E3F9FB1432A0860001579B /* epanetmsx */,
+				22E3FA4C1432A24D0001579B /* runepanetmsx */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22E3F9F81432A0860001579B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E3FA241432A0EE0001579B /* hash.c in Sources */,
+				22E3FA261432A0EE0001579B /* mathexpr.c in Sources */,
+				22E3FA281432A0EE0001579B /* mempool.c in Sources */,
+				22E3FA2A1432A0EE0001579B /* msxchem.c in Sources */,
+				22E3FA2B1432A0EE0001579B /* msxcompiler.c in Sources */,
+				22E3FA2D1432A0EE0001579B /* msxfile.c in Sources */,
+				22E3FA2E1432A0EE0001579B /* msxfuncs.c in Sources */,
+				22E3FA301432A0EE0001579B /* msxinp.c in Sources */,
+				22E3FA321432A0EE0001579B /* msxout.c in Sources */,
+				22E3FA331432A0EE0001579B /* msxproj.c in Sources */,
+				22E3FA341432A0EE0001579B /* msxqual.c in Sources */,
+				22E3FA351432A0EE0001579B /* msxrpt.c in Sources */,
+				22E3FA361432A0EE0001579B /* msxtank.c in Sources */,
+				22E3FA371432A0EE0001579B /* msxtoolkit.c in Sources */,
+				22E3FA391432A0EE0001579B /* msxutils.c in Sources */,
+				22E3FA3B1432A0EE0001579B /* newton.c in Sources */,
+				22E3FA3D1432A0EE0001579B /* rk5.c in Sources */,
+				22E3FA3F1432A0EE0001579B /* ros2.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22E3FA491432A24D0001579B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22E3FA571432A2630001579B /* msxmain.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		22E3F9FE1432A0860001579B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../../BASE/trunk/include\"";
+			};
+			name = Debug;
+		};
+		22E3F9FF1432A0860001579B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../../BASE/trunk/include\"";
+			};
+			name = Release;
+		};
+		22E3FA011432A0860001579B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		22E3FA021432A0860001579B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		22E3FA551432A24E0001579B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../BASE/trunk/build/Xcode/epanet/Debug\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		22E3FA561432A24E0001579B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../../../BASE/trunk/build/Xcode/epanet/Debug\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		22E3F9F61432A0850001579B /* Build configuration list for PBXProject "epanetmsx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22E3F9FE1432A0860001579B /* Debug */,
+				22E3F9FF1432A0860001579B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22E3FA001432A0860001579B /* Build configuration list for PBXNativeTarget "epanetmsx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22E3FA011432A0860001579B /* Debug */,
+				22E3FA021432A0860001579B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		22E3FA541432A24E0001579B /* Build configuration list for PBXNativeTarget "runepanetmsx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22E3FA551432A24E0001579B /* Debug */,
+				22E3FA561432A24E0001579B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 22E3F9F31432A0850001579B /* Project object */;
+}

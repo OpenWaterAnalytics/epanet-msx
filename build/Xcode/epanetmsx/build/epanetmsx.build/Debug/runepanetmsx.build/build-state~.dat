@@ -1,0 +1,76 @@
+Trunepanetmsx
+v3
+r1
+cCheck dependencies
+cCompileC build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler
+
+N/Developer/SDKs/MacOSX10.7.sdk
+c000000004E1106D400000000000000EE
+t1309738708
+s238
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c
+c000000004D7902440000000000001645
+t1299776068
+s5701
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/Debug/libepanetmsx.dylib
+c000000004E826A9F000000000002D8CC
+t1317169823
+s186572
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/Debug/runepanetmsx
+t2
+s0
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/main.o
+t2
+s0
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o
+t2
+s0
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/runepanetmsx.LinkFileList
+c000000004E826AF300000000000000B2
+t1317169907
+s178
+
+N/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/runepanetmsx/main.c
+c000000004E826ACE0000000000000110
+t1317169870
+s272
+
+CBuild AST from /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c
+r0
+
+CBuild AST from /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/runepanetmsx/main.c
+r0
+
+CCheck dependencies
+r0
+lSLF03#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies4a409473a232b441^df4f9573a232b441^---0#1#0#--18"Check dependencies
+
+CCompileC build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/main.o /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/runepanetmsx/main.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler
+s338862707.583662
+e338862707.634045
+r0
+xCompileC
+xbuild/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o
+x/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c
+xnormal
+xx86_64
+xc
+xcom.apple.compilers.llvm.clang.1_0.compiler
+o/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c:33:10: fatal error: 'epanet2.h' file not found [2]
+o #include "epanet2.h"                   // EPANET toolkit header file
+o          ^
+o1 error generated.
+lSLF03#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection129"Compile /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.ca7929573a232b441^b938a273a232b441^-274"/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c:33:10: fatal error: 'epanet2.h' file not found [2] #include "epanet2.h"                   // EPANET toolkit header file          ^1 error generated.1(21%IDEActivityLogMessage2@26"'epanet2.h' file not found-338862707#0#173#-2#-23%DVTTextDocumentLocation3@106"file://localhost/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/src/msxmain.c0000000000000000^32#9#32#9#18446744073709551615#0#29"Lexical or Preprocessor Issue--0#0#0#-19%DVTDocumentLocation4@137"file://localhost/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c0000000000000000^2576"CompileC build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o ../../../src/msxmain.c normal x86_64 c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx    setenv LANG en_US.US-ASCII    /Developer/usr/bin/clang -x c -arch x86_64 -fmessage-length=0 -fdiagnostics-print-source-range-info -fdiagnostics-show-category=id -fdiagnostics-parseable-fixits -std=gnu99 -Wno-trigraphs -fpascal-strings -O0 -Wmissing-prototypes -Wreturn-type -Wparentheses -Wswitch -Wno-unused-parameter -Wunused-variable -Wunused-value -Wshorten-64-to-32 -DDEBUG=1 -isysroot /Developer/SDKs/MacOSX10.7.sdk -fasm-blocks -mmacosx-version-min=10.7 -gdwarf-2 -iquote /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/runepanetmsx-generated-files.hmap -I/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/runepanetmsx-own-target-headers.hmap -I/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/runepanetmsx-all-target-headers.hmap -iquote /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/runepanetmsx-project-headers.hmap -I/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/Debug/include -I/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/DerivedSources/x86_64 -I/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/DerivedSources -F/Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/Debug -MMD -MT dependencies -MF /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.d -c /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/../../../src/msxmain.c -o /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/epanetmsx.build/Debug/runepanetmsx.build/Objects-normal/x86_64/msxmain.o
+
+CLd /Users/sam/Documents/Software/Code_Repositories/EPANET_SourceForge/MSX/trunk/build/Xcode/epanetmsx/build/Debug/runepanetmsx normal x86_64
+r0
+
