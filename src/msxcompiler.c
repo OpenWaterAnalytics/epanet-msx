@@ -83,57 +83,57 @@ int MSXcompiler_open()
 // --- get the name of a temporary file with directory path stripped from it
 //     and replace any '.' characters in it (for the Borland compiler to work)
 
-    Fname = MSXutils_getTempName(TempName) ;
+        Fname = MSXutils_getTempName(TempName) ;
 
 // --- assign names to source code and compiled files
 
-    strcpy(srcFile, Fname);
-    strcat(srcFile, ".c");
-    strcpy(objFile, Fname);
-    strcat(objFile, ".o");
+        strcpy(srcFile, Fname);
+        strcat(srcFile, ".c");
+        strcpy(objFile, Fname);
+        strcat(objFile, ".o");
 #ifdef WINDOWS
-    strcpy(libFile, Fname);
-    strcat(libFile, ".dll");
+        strcpy(libFile, Fname);
+        strcat(libFile, ".dll");
 #else
-    strcpy(libFile, "lib");
-    strcat(libFile, Fname);
-    strcat(libFile, ".so");
+        strcpy(libFile, "lib");
+        strcat(libFile, Fname);
+        strcat(libFile, ".so");
 #endif
 
 // --- write the chemistry functions to the source code file
-    f = fopen(srcFile, "wt");
-    if ( f == NULL ) return ERR_CREATE_CHEM_SRC;
-    writeSrcFile(f);
-    fclose(f);
+        f = fopen(srcFile, "wt");
+        if ( f == NULL ) return ERR_CREATE_CHEM_SRC;
+        writeSrcFile(f);
+        fclose(f);
 
 // --- compile the source code file to a dynamic link library file
 
 #ifdef WINDOWS
-    if ( MSX.Compiler == VC )
-    {
-	sprintf(cmd, "CL /O2 /LD /nologo %s", srcFile);
-        err = MSXfuncs_run(cmd);
-    }
+        if ( MSX.Compiler == VC )
+        {
+	        sprintf(cmd, "CL /O2 /LD /nologo %s", srcFile);
+            err = MSXfuncs_run(cmd);
+        }
 
-    else if ( MSX.Compiler == GC )
-    {
-	sprintf(cmd, "gcc -c -O3 %s", srcFile);
-	err = MSXfuncs_run(cmd);
-	sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
-	err = MSXfuncs_run(cmd);
-    }
-    else return ERR_INVALID_COMPILER;
+        else if ( MSX.Compiler == GC )
+        {
+    	    sprintf(cmd, "gcc -c -O3 %s", srcFile);
+	        err = MSXfuncs_run(cmd);
+	        sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
+    	    err = MSXfuncs_run(cmd);
+        }
+        else return ERR_INVALID_COMPILER;
 #else
-    if ( MSX.Compiler == GC )
-    {
-        sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
-        err = system(cmd);
-        sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
-        err = system(cmd);
-    }
-    else return ERR_INVALID_COMPILER;
+        if ( MSX.Compiler == GC )
+        {
+            sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
+            err = system(cmd);
+            sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
+            err = system(cmd);
+        }
+        else return ERR_INVALID_COMPILER;
 #endif
-    Compiled = err==0;
+        Compiled = err==0;
 
 // --- load the compiled chemistry functions from the library file
 
@@ -232,12 +232,12 @@ void  writeSrcFile(FILE* f)
 "   #define DLLEXPORT \n"
 " #endif \n"
 "  \n"
-" void  DLLEXPORT  MSXgetPipeRates(double *, double *, double *, double *, double *); \n"
-" void  DLLEXPORT  MSXgetTankRates(double *, double *, double *, double *, double *); \n"
-" void  DLLEXPORT  MSXgetPipeEquil(double *, double *, double *, double *, double *); \n"
-" void  DLLEXPORT  MSXgetTankEquil(double *, double *, double *, double *, double *); \n"
-" void  DLLEXPORT  MSXgetPipeFormulas(double *, double *, double *, double *); \n"
-" void  DLLEXPORT  MSXgetTankFormulas(double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[], int TheLink, double t); \n"
+" void  DLLEXPORT  MSXgetTankRates(double c[], double k[], double p[], double h[], double f[], int TheTank, double t); \n"
+" void  DLLEXPORT  MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[], int TheLink, double t); \n"
+" void  DLLEXPORT  MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[], int TheTank, double t); \n"
+" void  DLLEXPORT  MSXgetPipeFormulas(double c[], double k[],  double p[], double h[], int TheLink); \n"
+" void  DLLEXPORT  MSXgetTankFormulas(double c[], double k[], double p[], double h[], int TheTank); \n"
 " double term(int, double *, double *, double *, double *); \n"
 #ifdef VARDEBUG
 " static FILE *fp=NULL;\n"
