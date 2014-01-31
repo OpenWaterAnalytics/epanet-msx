@@ -338,15 +338,19 @@ int factorize(double **a, int n, double *w, int *indx)
     double big, dum, sum, temp;
 
     for (i = 1; i <= n; i++) 
-    { 
-	/*Loop over rows to get the implicit scaling information.*/
-	big = 0.0;
-	for (j = 1;j <= n;j++)
-	    if ((temp = fabs(a[i][j])) > big) big = temp;
-        if (big == 0.0) 
-	return 0;  /* Warning for singular matrix*/
-	/*No nonzero largest element.*/
-	w[i] = 1.0/big; /*Save the scaling.*/
+    {
+      /*Loop over rows to get the implicit scaling information.*/
+      big = 0.0;
+      for (j = 1;j <= n;j++) {
+        if ((temp = fabs(a[i][j])) > big) {
+          big = temp;
+        }
+      }
+      if (big == 0.0) {
+        return 0;  /* Warning for singular matrix*/
+      }
+      /*No nonzero largest element.*/
+      w[i] = 1.0/big; /*Save the scaling.*/
     }
     for (j = 1;j <= n;j++) /**for each column*/
     { 

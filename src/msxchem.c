@@ -784,7 +784,9 @@ int evalPipeEquil(double *c)
     }
     errcode = newton_solve(Yequil, NumPipeEquilSpecies, MAXIT, NUMSIG,
                            getPipeEquil);
-    if ( errcode < 0 ) return ERR_NEWTON;
+  if ( errcode < 0 ) {
+    return ERR_NEWTON;
+  }
     for (i=1; i<=NumPipeEquilSpecies; i++)
     {
         m = PipeEquilSpecies[i];
@@ -822,7 +824,9 @@ int evalTankEquil(double *c)
     }
     errcode = newton_solve(Yequil, NumTankEquilSpecies, MAXIT, NUMSIG,
                            getTankEquil);
-    if ( errcode < 0 ) return ERR_NEWTON;
+  if ( errcode < 0 ) {
+    return ERR_NEWTON;
+  }
     for (i=1; i<=NumTankEquilSpecies; i++)
     {
         m = TankEquilSpecies[i];

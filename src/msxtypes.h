@@ -15,12 +15,12 @@
 ***********************************************************************/
 
 #include "mathexpr.h"
-
+#include <sqlite3.h>
 //-----------------------------------------------------------------------------
 //  Definition of 4-byte integers & reals
 //-----------------------------------------------------------------------------
 typedef  int   INT4;
-typedef  float REAL4;
+typedef  double REAL4;
 
 //-----------------------------------------------------------------------------
 //  Macros for memory allocation
@@ -391,13 +391,23 @@ typedef struct                         // FILE OBJECT
    FILE*         file;                 // FILE structure pointer
 }  TFile;
 
+typedef struct
+{
+  char name[MAXFNAME];
+  sqlite3 *dbHandle;
+  sqlite3_stmt *selectStmt;
+  sqlite3_stmt *insertStmt;
+} SqliteDb;
+
 typedef struct                         // MSX PROJECT VARIABLES
 {
    TFile  HydFile,                     // EPANET hydraulics file
           MsxFile,                     // MSX input file
-          OutFile,                     // MSX binary output file
-          TmpOutFile,                  // Scratch MSX binary output file
+//          OutFile,                     // MSX binary output file
+          //TmpOutFile,                  // Scratch MSX binary output file
           RptFile;                     // MSX report file
+  
+  SqliteDb ResultsDb;          // for results db
 
    char   Title[MAXLINE+1],            // Project title
           Msg[MAXLINE+1];              // Message string

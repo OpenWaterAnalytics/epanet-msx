@@ -213,9 +213,9 @@ int MSXinp_readNetData()
 */
 {
     int   errcode = 0;
-	int   i, k, n, t = 0;
+    int   i, k, n, t = 0;
     int   n1 = 0, n2 = 0;
-    float diam = 0.0, len = 0.0, v0 = 0.0, xmix = 0.0, vmix = 0.0;
+    EN_API_FLOAT_TYPE diam = 0.0, len = 0.0, v0 = 0.0, xmix = 0.0, vmix = 0.0;
 
 	float roughness = 0.0;   /*Feng Shang, Bug ID 8,  01/29/2008*/
 // --- get flow units & time parameters
@@ -262,7 +262,7 @@ int MSXinp_readNetData()
         CALL(errcode, ENgetlinknodes(i, &n1, &n2));
         CALL(errcode, ENgetlinkvalue(i, EN_DIAMETER, &diam));
         CALL(errcode, ENgetlinkvalue(i, EN_LENGTH, &len));
-	CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
+        CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
         if ( !errcode )
         {
             MSX.Link[i].n1 = n1;

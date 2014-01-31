@@ -4,21 +4,21 @@
 **
 */
 
-#define HTMAXSIZE 1999
+#define MSXHASHTABLEMAXSIZE 128000
 #define NOTFOUND  0
 
-struct HTentry
+typedef struct MsxHashEntryStruct
 {
 	char 	*key;
 	int 	data;
-	struct	HTentry *next;
-};
+	struct MsxHashEntryStruct *next;
+} MsxHashEntry;
 
-typedef struct HTentry *HTtable;
+typedef MsxHashEntry *MsxHashTable;
 
-HTtable *HTcreate(void);
-int     HTinsert(HTtable *, char *, int);
-int 	HTfind(HTtable *, char *);
-char    *HTfindKey(HTtable *, char *);
-void	HTfree(HTtable *);
+MsxHashTable *MsxHashTableCreate(void);
+int     MsxHashTableInsert(MsxHashTable *, char *, int);
+int 	MsxHashTableFind(MsxHashTable *, char *);
+char    *MsxHashTableFindKey(MsxHashTable *, char *);
+void	MsxHashTableFree(MsxHashTable *);
 	

@@ -12,95 +12,104 @@
 //      HTinsert() - inserts a string & its index value into a hash table
 //      HTfind()   - retrieves the index value of a string from a table
 //      HTfree()   - frees a hash table
+
+//    subsequently modified and improved by sam hatchett via open water analytics 1.2014
 //-----------------------------------------------------------------------------
 
 #include <malloc.h>
 #include <string.h>
 #include "hash.h"
 
-/* Use Fletcher's checksum to compute 2-byte hash of string */
-unsigned int hash(char *str)
+unsigned int _hash(char *str);
+unsigned int _hash(char *str)
 {
-    unsigned int sum1= 0, check1;
-    unsigned long sum2= 0L;
-	while(  '\0' != *str  )
-    {
-        sum1 += (*str);
-        str++;
-        if (  255 <= sum1  ) sum1 -= 255;
-        sum2 += sum1;
+  unsigned int hash = 5381;
+  int c;
+  
+  while ((c = *str++)) {
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  }
+  unsigned int retHash = hash % MSXHASHTABLEMAXSIZE;
+  return retHash;
+}
+
+MsxHashTable *MsxHashTableCreate(void)
+{
+  int i;
+  MsxHashTable *ht = (MsxHashTable *) calloc(MSXHASHTABLEMAXSIZE, sizeof(MsxHashTable));
+  if (ht != NULL) {
+    for (i=0; i<MSXHASHTABLEMAXSIZE; i++) {
+      ht[i] = NULL;
     }
-    check1= sum2;
-    check1 %= 255;
-    check1= 255 - (sum1+check1) % 255;
-    sum1= 255 - (sum1+check1) % 255;
-    return( ( ( check1 << 8 )  |  sum1  ) % HTMAXSIZE);
+  }
+  return(ht);
 }
 
-HTtable *HTcreate()
+int     MsxHashTableInsert(MsxHashTable *ht, char *key, int data)
 {
-        int i;
-        HTtable *ht = (HTtable *) calloc(HTMAXSIZE, sizeof(HTtable));
-        if (ht != NULL) for (i=0; i<HTMAXSIZE; i++) ht[i] = NULL;
-        return(ht);
+  unsigned int i = _hash(key);
+  MsxHashEntry *entry;
+  if ( i >= MSXHASHTABLEMAXSIZE ) {
+    return(0);
+  }
+  entry = (MsxHashEntry *) malloc(sizeof(MsxHashEntry));
+  if (entry == NULL) {
+    return(0);
+  }
+  entry->key = key;
+  entry->data = data;
+  entry->next = ht[i];
+  ht[i] = entry;
+  return(1);
 }
 
-int     HTinsert(HTtable *ht, char *key, int data)
+int 	MsxHashTableFind(MsxHashTable *ht, char *key)
 {
-        unsigned int i = hash(key);
-        struct HTentry *entry;
-        if ( i >= HTMAXSIZE ) return(0);
-        entry = (struct HTentry *) malloc(sizeof(struct HTentry));
-        if (entry == NULL) return(0);
-        entry->key = key;
-        entry->data = data;
-        entry->next = ht[i];
-        ht[i] = entry;
-        return(1);
+  unsigned int i = _hash(key);
+  MsxHashEntry *entry;
+  if ( i >= MSXHASHTABLEMAXSIZE ) {
+    return(NOTFOUND);
+  }
+  entry = ht[i];
+  while (entry != NULL)
+  {
+    if ( strcmp(entry->key,key) == 0 ) {
+      return(entry->data);
+    }
+    entry = entry->next;
+  }
+  return(NOTFOUND);
 }
 
-int     HTfind(HTtable *ht, char *key)
+char    *MsxHashTableFindKey(MsxHashTable *ht, char *key)
 {
-        unsigned int i = hash(key);
-        struct HTentry *entry;
-        if ( i >= HTMAXSIZE ) return(NOTFOUND);
-        entry = ht[i];
-        while (entry != NULL)
-        {
-            if ( strcmp(entry->key,key) == 0 ) return(entry->data);
-            entry = entry->next;
-        }
-        return(NOTFOUND);
+  unsigned int i = _hash(key);
+  MsxHashEntry *entry;
+  if ( i >= MSXHASHTABLEMAXSIZE ) {
+    return(NULL);
+  }
+  entry = ht[i];
+  while (entry != NULL)
+  {
+    if ( strcmp(entry->key,key) == 0 ) return(entry->key);
+    entry = entry->next;
+  }
+  return(NULL);
 }
 
-char    *HTfindKey(HTtable *ht, char *key)
+void	MsxHashTableFree(MsxHashTable *ht)
 {
-        unsigned int i = hash(key);
-        struct HTentry *entry;
-        if ( i >= HTMAXSIZE ) return(NULL);
-        entry = ht[i];
-        while (entry != NULL)
-        {
-            if ( strcmp(entry->key,key) == 0 ) return(entry->key);
-            entry = entry->next;
-        }
-        return(NULL);
-}
-
-void    HTfree(HTtable *ht)
-{
-        struct HTentry *entry,
-                       *nextentry;
-        int i;
-        for (i=0; i<HTMAXSIZE; i++)
-        {
-            entry = ht[i];
-            while (entry != NULL)
-            {
-                nextentry = entry->next;
-                free(entry);
-                entry = nextentry;
-            }
-        }
-        free(ht);
+  MsxHashEntry *entry, *nextentry;
+  int i;
+  for (i=0; i<MSXHASHTABLEMAXSIZE; i++)
+  {
+    entry = ht[i];
+    while (entry != NULL)
+    {
+      nextentry = entry->next;
+      free(entry);
+      entry = nextentry;
+    }
+  }
+  free(ht);
 }

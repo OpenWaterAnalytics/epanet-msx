@@ -120,7 +120,9 @@ int newton_solve(double x[], int n, int maxit, int numsig,
 
         // --- factorize the Jacobian
 
-        if ( !factorize(J, n, W, Indx) ) return -1;
+    if ( !factorize(J, n, W, Indx) ) {
+      return -1;
+    }
 
         // --- solve for the updates to x (returned in F)
 

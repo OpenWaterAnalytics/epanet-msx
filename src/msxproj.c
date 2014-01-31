@@ -30,7 +30,7 @@ MSXproject  MSX;                            // MSX project data
 //  Local variables
 //-----------------
 static alloc_handle_t  *HashPool;           // Memory pool for hash tables
-static HTtable  *Htable[MAX_OBJECTS];       // Hash tables for object ID names
+static MsxHashTable  *Htable[MAX_OBJECTS];       // Hash tables for object ID names
 
 static char * Errmsg[] =
     {"unknown error code.",
@@ -156,22 +156,22 @@ void MSXproj_close()
 
     if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);                          //(LR-11/20/07, to fix bug 08)
     if ( MSX.HydFile.file ) fclose(MSX.HydFile.file);
-    if ( MSX.TmpOutFile.file && MSX.TmpOutFile.file != MSX.OutFile.file )
-        fclose(MSX.TmpOutFile.file);
-    if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
+//    if ( MSX.TmpOutFile.file && MSX.TmpOutFile.file != MSX.OutFile.file )
+//        fclose(MSX.TmpOutFile.file);
+//    if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
 
     // --- delete all temporary files
 
     if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
-    if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
-    remove(MSX.TmpOutFile.name);
+//    if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
+//    remove(MSX.TmpOutFile.name);
 
     // --- free all allocated memory
 
     MSX.RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
     MSX.HydFile.file = NULL;
-    MSX.OutFile.file = NULL;
-    MSX.TmpOutFile.file = NULL;
+//    MSX.OutFile.file = NULL;
+//    MSX.TmpOutFile.file = NULL;
     deleteObjects();
     deleteHashTables();
     MSX.ProjectOpened = FALSE;
@@ -210,7 +210,7 @@ int   MSXproj_addObject(int type, char *id, int n)
 
 // --- insert object's ID into the hash table for that type of object
 
-    result = HTinsert(Htable[type], newID, n);
+    result = MsxHashTableInsert(Htable[type], newID, n);
     if ( result == 0 ) result = -1;
     return result;
 }
@@ -230,7 +230,7 @@ int   MSXproj_findObject(int type, char *id)
 **    index of object with given ID, or -1 if ID not found.
 */
 {
-    return HTfind(Htable[type], id);
+    return MsxHashTableFind(Htable[type], id);
 }
 
 //=============================================================================
@@ -248,7 +248,7 @@ char * MSXproj_findID(int type, char *id)
 **    pointer to location where object's ID string is stored.
 */
 {
-    return HTfindKey(Htable[type], id);
+    return MsxHashTableFindKey(Htable[type], id);
 }
 
 //=============================================================================
@@ -284,11 +284,11 @@ void setDefaults()
     MSX.RptFile.file = NULL;                                                   //(LR-11/20/07)
     MSX.HydFile.file = NULL;
     MSX.HydFile.mode = USED_FILE;
-    MSX.OutFile.file = NULL;
-    MSX.OutFile.mode = SCRATCH_FILE;
-    MSX.TmpOutFile.file = NULL;
-    MSXutils_getTempName(MSX.OutFile.name);                                    //1.1.00
-    MSXutils_getTempName(MSX.TmpOutFile.name);                                 //1.1.00
+//    MSX.OutFile.file = NULL;
+//    MSX.OutFile.mode = SCRATCH_FILE;
+//    MSX.TmpOutFile.file = NULL;
+    MSXutils_getTempName(MSX.ResultsDb.name);                                    //1.1.00
+//    MSXutils_getTempName(MSX.TmpOutFile.name);                                 //1.1.00
     strcpy(MSX.RptFile.name, "");
     strcpy(MSX.Title, "");
     MSX.Rptflag = 0;
@@ -436,9 +436,9 @@ int createObjects()
 
 // --- create arrays for demands, heads, & flows
 
-    MSX.D = (float *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
-    MSX.H = (float *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
-    MSX.Q = (float *) calloc(MSX.Nobjects[LINK]+1, sizeof(float));
+    MSX.D = (REAL4 *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
+    MSX.H = (REAL4 *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
+    MSX.Q = (REAL4 *) calloc(MSX.Nobjects[LINK]+1, sizeof(float));
 
 // --- create arrays for current & initial concen. of each species for each node
 
@@ -610,7 +610,7 @@ int createHashTables()
 
     for (j = 0; j < MAX_OBJECTS ; j++)
     {
-         Htable[j] = HTcreate();
+         Htable[j] = MsxHashTableCreate();
          if ( Htable[j] == NULL ) return ERR_MEMORY;
     }
 
@@ -638,7 +638,7 @@ void deleteHashTables()
 
     for (j = 0; j < MAX_OBJECTS; j++)
     {
-        if ( Htable[j] != NULL ) HTfree(Htable[j]);
+        if ( Htable[j] != NULL ) MsxHashTableFree(Htable[j]);
     }
 
 // --- free the object ID memory pool

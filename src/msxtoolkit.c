@@ -264,11 +264,11 @@ int  DLLEXPORT  MSXsaveoutfile(char *fname)
     int   c;
 
     if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( !MSX.OutFile.file ) return ERR_OPEN_OUT_FILE;
-    if ( (f = fopen(fname,"w+b") ) == NULL) return ERR_OPEN_OUT_FILE;
-    fseek(MSX.OutFile.file, 0, SEEK_SET);
-    while ( (c = fgetc(MSX.OutFile.file)) != EOF) fputc(c, f);
-    fclose(f);
+//    if ( !MSX.OutFile.file ) return ERR_OPEN_OUT_FILE;
+//    if ( (f = fopen(fname,"w+b") ) == NULL) return ERR_OPEN_OUT_FILE;
+//    fseek(MSX.OutFile.file, 0, SEEK_SET);
+//    while ( (c = fgetc(MSX.OutFile.file)) != EOF) fputc(c, f);
+//    fclose(f);
     return 0;
 }
 

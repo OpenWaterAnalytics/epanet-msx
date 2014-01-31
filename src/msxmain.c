@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <float.h>
 
-#include "epanet2.h"                   // EPANET toolkit header file
+#include <epanet2.h>                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
 int main(int argc, char *argv[])

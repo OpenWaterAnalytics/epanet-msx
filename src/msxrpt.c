@@ -92,10 +92,10 @@ int  MSXrpt_write()
 // --- check that results are available
 
     if ( MSX.Nperiods < 1 )    return 0;
-    if ( MSX.OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
-    fseek(MSX.OutFile.file, -recordsize, SEEK_END);
-    fread(&magic, sizeof(INT4), 1, MSX.OutFile.file);
-    if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
+//    if ( MSX.OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
+//    fseek(MSX.OutFile.file, -recordsize, SEEK_END);
+//    fread(&magic, sizeof(INT4), 1, MSX.OutFile.file);
+//    if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
 
 // --- write program logo & project title
 

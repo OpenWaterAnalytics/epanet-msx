@@ -34,7 +34,7 @@
     #endif
   #else
     #ifdef __cplusplus
-    #define DLLEXPORT extern "C"
+    #define DLLEXPORT
     #else
     #define DLLEXPORT
     #endif
