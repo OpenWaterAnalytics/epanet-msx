@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		22986C821BAAFEBC00ED41A7 /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22986C811BAAFEBC00ED41A7 /* libsqlite3.a */; };
+		2200ED1A1C779843009A6C5F /* libepanet-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2242976C1C56B4D40098135D /* libepanet-static.a */; };
+		2242976B1C56B3850098135D /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2242976A1C56B3850098135D /* libsqlite3.a */; };
 		22BEDCFF187E0B6A00855B68 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA071432A0EE0001579B /* hash.c */; };
 		22BEDD00187E0B6A00855B68 /* mathexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA091432A0EE0001579B /* mathexpr.c */; };
 		22BEDD01187E0B6A00855B68 /* mempool.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA0B1432A0EE0001579B /* mempool.c */; };
@@ -26,7 +27,6 @@
 		22BEDD0E187E0B6A00855B68 /* newton.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA1E1432A0EE0001579B /* newton.c */; };
 		22BEDD0F187E0B6A00855B68 /* rk5.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA201432A0EE0001579B /* rk5.c */; };
 		22BEDD10187E0B6A00855B68 /* ros2.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA221432A0EE0001579B /* ros2.c */; };
-		22BEDD11187E0B7900855B68 /* libepanet-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E8C2DC18649F1600947D28 /* libepanet-static.a */; };
 		22BEDD13187E0BA500855B68 /* malloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA451432A1610001579B /* malloc.h */; };
 		22BEDD14187E0BA500855B68 /* epanetmsx.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA421432A10D0001579B /* epanetmsx.h */; };
 		22BEDD15187E0BA500855B68 /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA081432A0EE0001579B /* hash.h */; };
@@ -87,7 +87,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		22986C811BAAFEBC00ED41A7 /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = ../../../../../../../../usr/local/lib/libsqlite3.a; sourceTree = "<group>"; };
+		2242976A1C56B3850098135D /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = ../../../../../../../../usr/local/com.citilogics.dev/lib/libsqlite3.a; sourceTree = "<group>"; };
+		2242976C1C56B4D40098135D /* libepanet-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libepanet-static.a"; path = "../../../../../../Library/Developer/Xcode/DerivedData/Polaris_Workspace-bijkkdhbgewbqbfyejxrprsuqxmt/Build/Products/Debug/libepanet-static.a"; sourceTree = "<group>"; };
 		22BEDCFB187E0B5300855B68 /* libepanetmsx-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libepanetmsx-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22E3F9FC1432A0860001579B /* libepanetmsx.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libepanetmsx.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		22E3FA071432A0EE0001579B /* hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hash.c; path = ../../../src/hash.c; sourceTree = "<group>"; };
@@ -130,8 +131,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22986C821BAAFEBC00ED41A7 /* libsqlite3.a in Frameworks */,
-				22BEDD11187E0B7900855B68 /* libepanet-static.a in Frameworks */,
+				2200ED1A1C779843009A6C5F /* libepanet-static.a in Frameworks */,
+				2242976B1C56B3850098135D /* libsqlite3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,7 +158,8 @@
 		22E3F9F11432A0850001579B = {
 			isa = PBXGroup;
 			children = (
-				22986C811BAAFEBC00ED41A7 /* libsqlite3.a */,
+				2242976C1C56B4D40098135D /* libepanet-static.a */,
+				2242976A1C56B3850098135D /* libsqlite3.a */,
 				22E8C2DC18649F1600947D28 /* libepanet-static.a */,
 				22E3FA441432A14E0001579B /* macincludes */,
 				22E3FA411432A10D0001579B /* include */,
@@ -447,7 +449,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Build/Products/Debug",
-					/usr/local/lib,
+					/usr/local/com.citilogics.dev/lib,
+					/usr/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -485,7 +488,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Build/Products/Debug",
-					/usr/local/lib,
+					/usr/local/com.citilogics.dev/lib,
+					/usr/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -576,6 +580,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Build/Products/Debug",
+					/usr/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -596,6 +601,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Build/Products/Debug",
+					/usr/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

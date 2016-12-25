@@ -462,14 +462,14 @@ void getTsNameForNode(int iNode, const Sspecies *species, char *tsNameOut)
 {
   char nodeName[MAXLINE];
   ENgetnodeid(iNode, nodeName);
-  sprintf(tsNameOut, "N %s %s", nodeName, species->id);
+  sprintf(tsNameOut, "N_%s_%s", nodeName, species->id);
 }
 
 void getTsNameForLink(int iLink, const Sspecies *species, char *tsNameOut)
 {
   char linkName[MAXLINE];
   ENgetlinkid(iLink, linkName);
-  sprintf(tsNameOut, "L %s %s", linkName, species->id);
+  sprintf(tsNameOut, "L_%s_%s", linkName, species->id);
 }
 
 void saveValue(const char* tsName, double value, time_t time)
