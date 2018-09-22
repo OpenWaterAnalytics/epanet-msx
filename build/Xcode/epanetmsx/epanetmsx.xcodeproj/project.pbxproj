@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2200ED1A1C779843009A6C5F /* libepanet-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2242976C1C56B4D40098135D /* libepanet-static.a */; };
-		2242976B1C56B3850098135D /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2242976A1C56B3850098135D /* libsqlite3.a */; };
+		158D66A52155EB580070D00C /* libepanet-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 158D66A42155EB580070D00C /* libepanet-static.a */; };
 		22BEDCFF187E0B6A00855B68 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA071432A0EE0001579B /* hash.c */; };
 		22BEDD00187E0B6A00855B68 /* mathexpr.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA091432A0EE0001579B /* mathexpr.c */; };
 		22BEDD01187E0B6A00855B68 /* mempool.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA0B1432A0EE0001579B /* mempool.c */; };
@@ -71,7 +70,6 @@
 		22E3FA461432A1620001579B /* malloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 22E3FA451432A1610001579B /* malloc.h */; };
 		22E3FA571432A2630001579B /* msxmain.c in Sources */ = {isa = PBXBuildFile; fileRef = 22E3FA141432A0EE0001579B /* msxmain.c */; };
 		22E3FA581432A26E0001579B /* libepanetmsx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3F9FC1432A0860001579B /* libepanetmsx.dylib */; };
-		22E8C2DD18649F1600947D28 /* libepanet-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E8C2DC18649F1600947D28 /* libepanet-static.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -87,7 +85,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2242976A1C56B3850098135D /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = ../../../../../../../../usr/local/com.citilogics.dev/lib/libsqlite3.a; sourceTree = "<group>"; };
+		158D66A42155EB580070D00C /* libepanet-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libepanet-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2242976C1C56B4D40098135D /* libepanet-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libepanet-static.a"; path = "../../../../../../Library/Developer/Xcode/DerivedData/Polaris_Workspace-bijkkdhbgewbqbfyejxrprsuqxmt/Build/Products/Debug/libepanet-static.a"; sourceTree = "<group>"; };
 		22BEDCFB187E0B5300855B68 /* libepanetmsx-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libepanetmsx-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22E3F9FC1432A0860001579B /* libepanetmsx.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libepanetmsx.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,7 +121,6 @@
 		22E3FA421432A10D0001579B /* epanetmsx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = epanetmsx.h; sourceTree = "<group>"; };
 		22E3FA451432A1610001579B /* malloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = malloc.h; sourceTree = "<group>"; };
 		22E3FA4D1432A24D0001579B /* runepanetmsx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = runepanetmsx; sourceTree = BUILT_PRODUCTS_DIR; };
-		22E8C2DC18649F1600947D28 /* libepanet-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libepanet-static.a"; path = "../../../../../../Library/Developer/Xcode/DerivedData/Build/Products/Debug/libepanet-static.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,8 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2200ED1A1C779843009A6C5F /* libepanet-static.a in Frameworks */,
-				2242976B1C56B3850098135D /* libsqlite3.a in Frameworks */,
+				158D66A52155EB580070D00C /* libepanet-static.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +136,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22E8C2DD18649F1600947D28 /* libepanet-static.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,16 +150,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		158D66A32155EB570070D00C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				158D66A42155EB580070D00C /* libepanet-static.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		22E3F9F11432A0850001579B = {
 			isa = PBXGroup;
 			children = (
 				2242976C1C56B4D40098135D /* libepanet-static.a */,
-				2242976A1C56B3850098135D /* libsqlite3.a */,
-				22E8C2DC18649F1600947D28 /* libepanet-static.a */,
 				22E3FA441432A14E0001579B /* macincludes */,
 				22E3FA411432A10D0001579B /* include */,
 				22E3FA061432A0D80001579B /* source */,
 				22E3F9FD1432A0860001579B /* Products */,
+				158D66A32155EB570070D00C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
