@@ -7,6 +7,17 @@
 **  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
+typedef struct {
+
+    double** A;                     // Jacobian matrix
+    double* K1;                    // Intermediate solutions
+    double* K2;
+    double* Ynew;                  // Updated function values
+    int*    Jindx;                 // Jacobian column indexes
+    int     Nmax;                  // Max. number of equations
+    int     Adjust;                // use adjustable step size
+}MSXRosenbrock;
+
 // Opens the ODE solver system
 int  ros2_open(int n, int adjust);
 

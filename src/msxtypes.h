@@ -15,6 +15,7 @@
 ***********************************************************************/
 
 #include "mathexpr.h"
+#include "mempool.h"
 
 //-----------------------------------------------------------------------------
 //  Definition of 4-byte integers & reals
@@ -78,13 +79,13 @@ typedef  float REAL4;
 #define   AFDperCFS    1.9837
 #define   MGDperCFS    0.64632
 #define   IMGDperCFS   0.5382
-#define   LPSperCFS    28.317
+#define   LPSperCFS    28.3168466 //28.317
 #define   LPMperCFS    1699.0
 #define   CMHperCFS    101.94
 #define   CMDperCFS    2446.6
 #define   MLDperCFS    2.4466
 #define   M3perFT3     0.028317
-#define   LperFT3      28.317
+#define   LperFT3      28.317//28.3168466 //28.317
 #define   MperFT       0.3048
 #define   PSIperFT     0.4333
 #define   KPAperPSI    6.895
@@ -315,6 +316,7 @@ typedef struct                         // LINK OBJECT
    double len;                         // length
    char   rpt;                         // reporting flag
    double *c0;                         // initial species concentrations
+   double *reacted;
    double *param;                      // kinetic parameter values
    double roughness;		       // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
 }  Slink;
@@ -331,6 +333,7 @@ typedef struct                         // TANK OBJECT
    double vMix;                        // mixing compartment size
    double *param;                      // kinetic parameter values
    double *c;                          // current species concentrations
+   double *reacted;
 }  Stank;
 
 
@@ -339,6 +342,7 @@ struct Sseg                            // PIPE SEGMENT OBJECT
     double    hstep;                   // integration time step
     double    v;                       // segment volume
     double    *c;                      // species concentrations
+    double    * lastc;                 // species concentrations of previous step 
     struct    Sseg *prev;              // ptr. to previous segment
     struct    Sseg *next;              // ptr. to next segment
 };
@@ -390,6 +394,33 @@ typedef struct                         // FILE OBJECT
    char          mode;                 // see FileModeType enumeration below
    FILE*         file;                 // FILE structure pointer
 }  TFile;
+
+
+
+struct Sadjlist           // Node Adjacency List Item
+{
+    int    node;           // index of connecting node
+    int    link;           // index of connecting link
+    struct Sadjlist* next; // next item in list
+};
+
+typedef struct Sadjlist* Padjlist; // Pointer to adjacency list
+
+typedef enum {
+    NEGATIVE = -1,  // flow in reverse of pre-assigned direction
+    ZERO_FLOW = 0,   // zero flow
+    POSITIVE = 1    // flow in pre-assigned direction
+} FlowDirection;
+
+typedef struct                 // Mass Balance Components
+{
+    double   * initial;         // initial mass in system
+    double   * inflow;          // mass inflow to system
+    double   * outflow;         // mass outflow from system
+    double   * reacted;         // mass reacted in system
+    double   * final;           // final mass in system
+    double   * ratio;           // ratio of mass added to mass lost
+} SmassBalance;
 
 typedef struct                         // MSX PROJECT VARIABLES
 {
@@ -452,6 +483,20 @@ typedef struct                         // MSX PROJECT VARIABLES
    Slink    *Link;                     // Link data
    Stank    *Tank;                     // Tank data
    Spattern *Pattern;                  // Pattern data
+   
+   char      HasWallSpecies;  // wall species indicator
+   char      OutOfMemory;     // out of memory indicator
+   Padjlist* Adjlist;                   // Node adjacency lists
+   Pseg* NewSeg;         // new segment added to each pipe
+   Pseg  FreeSeg;        // pointer to unused segment
+   FlowDirection *FlowDir;        // flow direction for each pipe
+   SmassBalance MassBalance;
+   alloc_handle_t* QualPool;       // memory pool
+
+   double* MassIn;        // mass inflow of each species to each node
+   double* SourceIn;      // external mass inflow of each species from WQ source;
+   int* SortedNodes;
+
 } MSXproject;
 #ifdef VARDEBUG
 char *getHeaderString();
