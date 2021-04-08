@@ -2,12 +2,13 @@
 **  MODULE:        MSXFUNCS.C
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   compiles chemistry functions to a shared dynamic library.
-**  COPYRIGHT:     Copyright (C) 2006 Feng Shang, Lewis Rossman, and James Uber.
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/20/08
+**  LAST UPDATE:   11/01/10
 *******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 
@@ -51,7 +52,7 @@ int MSXfuncs_load(char * libName)
 
 #ifdef WINDOWS
 	hDLL = LoadLibraryA(libName);
-	if (hDLL == NULL) return GetLastError();
+	if (hDLL == NULL) return 1;
 
 	MSXgetPipeRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetPipeRates");
     MSXgetTankRates    = (MSXGETRATES)    GetProcAddress(hDLL, "MSXgetTankRates");
@@ -78,7 +79,7 @@ int MSXfuncs_load(char * libName)
     {
         MSXfuncs_free();
         hDLL = NULL;
-	return 2;
+        return 2;
     }
     return 0;
 }
@@ -120,8 +121,8 @@ int MSXfuncs_run(char* cmdLine)
 {
 #ifdef WINDOWS
 
-  BOOL exitCode;
-  STARTUPINFO si;
+  unsigned long exitCode;
+  STARTUPINFOA si;
   PROCESS_INFORMATION  pi;
 
   // --- initialize data structures

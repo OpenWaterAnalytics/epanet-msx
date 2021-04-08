@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   2/8/11
 *******************************************************************************/
 
 // Gets the name of a temporary file                                           //1.1.00

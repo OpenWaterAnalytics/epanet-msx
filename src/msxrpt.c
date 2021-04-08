@@ -9,9 +9,10 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/06/08
+**  LAST UPDATE:   2/8/11
 **  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>

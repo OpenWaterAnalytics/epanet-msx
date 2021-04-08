@@ -7,8 +7,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.1.00 
-**  LAST UPDATE:   7/31/07
+**  VERSION:       1.1 
+**  LAST UPDATE:   11/01/10
 *******************************************************************************/
 
 #ifndef EPANETMSX_H
@@ -25,7 +25,8 @@
 #endif
 
 // --- define DLLEXPORT
-#ifndef DLLEXPORT
+
+#ifndef DLLEXPORT                                                              // ttaxon - 9/7/10
   #ifdef WINDOWS
     #ifdef __cplusplus
     #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
@@ -40,6 +41,7 @@
     #endif
   #endif  
 #endif
+
 // --- define MSX constants
 
 #define MSX_NODE      0

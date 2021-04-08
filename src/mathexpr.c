@@ -7,40 +7,42 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   2/8/11
+**  BUG FIXES:     Problems related to '^' operator (L.Rossman, 11/03/10)
 ******************************************************************************/
 /*
 **   Operand codes:
-** 	   1 = (
-** 	   2 = )
-** 	   3 = +
-** 	   4 = - (subtraction)
-** 	   5 = *
-** 	   6 = /
-** 	   7 = number
-** 	   8 = user-defined variable
-** 	   9 = - (negative)
-**	  10 = cos
-**	  11 = sin
-**	  12 = tan
-**	  13 = cot
-**	  14 = abs
-**	  15 = sgn
-**	  16 = sqrt
-**	  17 = log
-**	  18 = exp
-**	  19 = asin
-**	  20 = acos
-**	  21 = atan
-**	  22 = acot
-**    23 = sinh
-**	  24 = cosh
-**	  25 = tanh
-**	  26 = coth
-**	  27 = log10
-**    28 = step (x<=0 ? 0 : 1)
-**	  31 = ^
+** 	1 = (
+** 	2 = )
+** 	3 = +
+** 	4 = - (subtraction)
+** 	5 = *
+** 	6 = /
+** 	7 = number
+** 	8 = user-defined variable
+** 	9 = - (negative)
+**	10 = cos
+**	11 = sin
+**	12 = tan
+**	13 = cot
+**	14 = abs
+**	15 = sgn
+**	16 = sqrt
+**	17 = log
+**	18 = exp
+**	19 = asin
+**	20 = acos
+**	21 = atan
+**	22 = acot
+**  23 = sinh
+**	24 = cosh
+**	25 = tanh
+**	26 = coth
+**	27 = log10
+**  28 = step (x<=0 ? 0 : 1)
+**	31 = ^
 ******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <ctype.h>
 #include <malloc.h>
@@ -53,7 +55,7 @@
 #define MAX_STACK_SIZE  1024
 
 //***************************************************                          //1.1.00
-#define MAX_TERM_SIZE  256
+#define MAX_TERM_SIZE  1024
 struct MathTerm
 {
     char s[MAX_TERM_SIZE];
@@ -129,10 +131,10 @@ int  sametext(char *s1, char *s2)
 **    1 if strings are the same, 0 otherwise.
 */
 {
-   int i;
-   for (i=0; toupper(s1[i]) == toupper(s2[i]); i++)
-     if (!s1[i+1] && !s2[i+1]) return(1);
-   return(0);
+    int i;
+    for (i=0; toupper(s1[i]) == toupper(s2[i]); i++)
+        if (!s1[i+1] && !s2[i+1]) return(1);
+    return(0);
 }
 
 //=============================================================================
@@ -267,7 +269,7 @@ int getOperand()
       case '-': code = 4;
                 if (Pos < Len-1 &&
                     isDigit(S[Pos+1]) &&
-                        (CurLex == 0 || CurLex == 1))
+                    (CurLex == 0 || CurLex == 1))
                 {
                     Pos++;
                     Fvalue = -getNumber();
@@ -338,11 +340,8 @@ ExprTree * newNode()
 
 ExprTree * getSingleOp(int *lex)
 {
-    int bracket;
     int opcode;
     ExprTree *left;
-    ExprTree *right;
-    ExprTree *node;
 
     /* --- open parenthesis, so continue to grow the tree */
     if ( *lex == 1 )
@@ -388,41 +387,9 @@ ExprTree * getSingleOp(int *lex)
     }   
     *lex = getLex();
 
-    /* --- exponentiation */
-    while ( *lex == 31 )
-    {
-        *lex = getLex();
-        bracket = 0;
-        if ( *lex == 1 )
-        {
-            bracket = 1;
-            *lex = getLex();
-        }
-        if ( *lex != 7 )
-        {
-            Err = 1;
-            return NULL;
-        }
-        right = newNode();
-        right->opcode = *lex;
-        right->fvalue = Fvalue;
-        node = newNode();
-        node->left = left;
-        node->right = right;
-        node->opcode = 31;
-        left = node;
-        if (bracket)
-        {
-            *lex = getLex();
-            if ( *lex != 2 )
-            {
-                Err = 1;
-                return NULL;
-            }
-        }
-        *lex = getLex();
-    }
-    return left;
+    /* --- exponentiation */  // code deleted                                  //(L.Rossman - 11/03/10)
+
+	return left;
 }
 
 //=============================================================================
@@ -436,7 +403,7 @@ ExprTree * getOp(int *lex)
     int neg = 0;
 
     *lex = getLex();
-    if (PrevLex == 0 || PrevLex == 1)
+    if (PrevLex == 0 || PrevLex == 1 )
     {
         if ( *lex == 4 )
         {
@@ -446,7 +413,7 @@ ExprTree * getOp(int *lex)
         else if ( *lex == 3) *lex = getLex();
     }
     left = getSingleOp(lex);
-    while ( *lex == 5 || *lex == 6 )
+    while ( *lex == 5 || *lex == 6 || *lex == 31)                              //(L.Rossman - 11/03/10)
     {
         opcode = *lex;
         *lex = getLex();
@@ -512,24 +479,22 @@ ExprTree * getTree()
 void traverseTree(ExprTree *tree, MathExpr **expr)
 // Converts binary tree to linked list (postfix format)
 {
-	MathExpr *node;
-	if ( tree == NULL) {
-		return;
-	}
-	else
-	{
-		traverseTree(tree->left,  expr);
-		traverseTree(tree->right, expr);
-		node = (MathExpr *) malloc(sizeof(MathExpr));
-		node->fvalue = tree->fvalue;
-		node->opcode = tree->opcode;
-		node->ivar = tree->ivar;
-		node->next = NULL;
-		node->prev = (*expr);
-		if (*expr) (*expr)->next = node;
-		(*expr) = node;
-		return;
-	}
+    MathExpr *node;
+    if ( tree == NULL) return;
+    else
+    {
+        traverseTree(tree->left,  expr);
+        traverseTree(tree->right, expr);
+        node = (MathExpr *) malloc(sizeof(MathExpr));
+        node->fvalue = tree->fvalue;
+        node->opcode = tree->opcode;
+        node->ivar = tree->ivar;
+        node->next = NULL;
+        node->prev = (*expr);
+        if (*expr) (*expr)->next = node;
+        (*expr) = node;
+        return;
+    }
 }
 
 //=============================================================================
@@ -554,159 +519,185 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 //     since this function can be called recursively.
 
     double ExprStack[MAX_STACK_SIZE];
-	MathExpr *node = expr;
-	double r1, r2;
-	int stackindex = 0;
+    MathExpr *node = expr;
+    double r1, r2;
+    int stackindex = 0;
     ExprStack[0] = 0.0;
 
-	while(node != NULL)
-	{
-		switch (node->opcode)
-		{
-			case 3:  
-				r1 = ExprStack[stackindex];
-				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 + r1;
-				break;
-			case 4:  
-				r1 = ExprStack[stackindex];
-				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 - r1;
-				break;
-			case 5:  
-				r1 = ExprStack[stackindex];
-				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 * r1;
-				break;
-			case 6:  
-				r1 = ExprStack[stackindex];
-				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 / r1;
-				break;				
-			case 7:  
-				stackindex++;
-				ExprStack[stackindex] = node->fvalue;
-				break;
-			case 8:
-                if (getVariableValue != NULL)
-                r1 = getVariableValue(node->ivar);
-                else r1 = 0.0;
-				stackindex++;
-				ExprStack[stackindex] = r1;
-				break;
-			case 9: 
-				ExprStack[stackindex] = -ExprStack[stackindex];
-				break;
-			case 10: 
-				r1 = ExprStack[stackindex];
-				r2 = cos(r1);
-				ExprStack[stackindex] = r2;
-				break;
-			case 11: 
-				r1 = ExprStack[stackindex];
-				r2 = sin(r1);
-				ExprStack[stackindex] = r2;
-				break;
-			case 12: 
-				r1 = ExprStack[stackindex];
-				r2 = tan(r1);
-				ExprStack[stackindex] = r2;
-				break;
-			case 13: 
-				r1 = ExprStack[stackindex];
-				r2 = 1.0/tan( r1 );    
-				ExprStack[stackindex] = r2;
-				break;
-			case 14: 
-				r1 = ExprStack[stackindex];
-				r2 = fabs( r1 );       
-				ExprStack[stackindex] = r2;
-				break;
-			case 15: 
-				r1 = ExprStack[stackindex];
-				if (r1 < 0.0) r2 = -1.0;
-				else if (r1 > 0.0) r2 = 1.0;
-				else r2 = 0.0;
-				ExprStack[stackindex] = r2;
-				break;
-			case 16: 
-				r1 = ExprStack[stackindex];
-                r2 = sqrt( r1 );     
-				ExprStack[stackindex] = r2;
-				break;
-			case 17: 
-				r1 = ExprStack[stackindex];
-                r2 = log(r1);
-				ExprStack[stackindex] = r2;
-				break;
-			case 18: 
-				r1 = ExprStack[stackindex];
-				r2 = exp(r1);
-				ExprStack[stackindex] = r2;
-				break;
-			case 19: 
-				r1 = ExprStack[stackindex];
-				r2 = asin( r1 );
-				ExprStack[stackindex] = r2;
-				break;
-			case 20: 
-				r1 = ExprStack[stackindex];
-				r2 = acos( r1 );      
-				ExprStack[stackindex] = r2;
-				break;
-			case 21: 
-				r1 = ExprStack[stackindex];
-				r2 = atan( r1 );      
-				ExprStack[stackindex] = r2;
-				break;
-			case 22: 
-				r1 = ExprStack[stackindex];
-				r2 = 1.57079632679489661923 - atan(r1);  
-				ExprStack[stackindex] = r2;
-				break;
-			case 23:
-				r1 = ExprStack[stackindex];
-				r2 = (exp(r1)-exp(-r1))/2.0;
-				ExprStack[stackindex] = r2;
-				break;
-			case 24: 
-				r1 = ExprStack[stackindex];
-				r2 = (exp(r1)+exp(-r1))/2.0;
-				ExprStack[stackindex] = r2;
-				break;
-			case 25: 
-				r1 = ExprStack[stackindex];
-				r2 = (exp(r1)-exp(-r1))/(exp(r1)+exp(-r1));
-				ExprStack[stackindex] = r2;
-				break;
-			case 26: 
-				r1 = ExprStack[stackindex];
-				r2 = (exp(r1)+exp(-r1))/(exp(r1)-exp(-r1));
-				ExprStack[stackindex] = r2;
-				break;
-			case 27: 
-				r1 = ExprStack[stackindex];
-				r2 = log10( r1 );     
-				ExprStack[stackindex] = r2;
-				break;
-            case 28:
- 				r1 = ExprStack[stackindex];
-				if (r1 <= 0.0) r2 = 0.0;
-				else           r2 = 1.0;
-				ExprStack[stackindex] = r2;
-				break;
-			case 31: 
-				r1 = ExprStack[stackindex];
-				r2 = ExprStack[stackindex-1];
-                r2 = exp(r1*log(r2));
-				ExprStack[stackindex-1] = r2;
-				stackindex--;
-				break;
-		}
+    while(node != NULL)
+    {
+        switch (node->opcode)
+        {
+          case 3:  
+            r1 = ExprStack[stackindex];
+            stackindex--;
+            r2 = ExprStack[stackindex];
+            ExprStack[stackindex] = r2 + r1;
+            break;
+
+          case 4:  
+            r1 = ExprStack[stackindex];
+            stackindex--;
+            r2 = ExprStack[stackindex];
+            ExprStack[stackindex] = r2 - r1;
+            break;
+
+          case 5:  
+            r1 = ExprStack[stackindex];
+            stackindex--;
+            r2 = ExprStack[stackindex];
+            ExprStack[stackindex] = r2 * r1;
+            break;
+
+          case 6:  
+            r1 = ExprStack[stackindex];
+            stackindex--;
+            r2 = ExprStack[stackindex];
+            ExprStack[stackindex] = r2 / r1;
+            break;
+
+          case 7:  
+            stackindex++;
+            ExprStack[stackindex] = node->fvalue;
+            break;
+
+          case 8:
+            if (getVariableValue != NULL)
+            r1 = getVariableValue(node->ivar);
+            else r1 = 0.0;
+            stackindex++;
+            ExprStack[stackindex] = r1;
+            break;
+
+          case 9: 
+            ExprStack[stackindex] = -ExprStack[stackindex];
+            break;
+
+          case 10: 
+            r1 = ExprStack[stackindex];
+            r2 = cos(r1);
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 11: 
+            r1 = ExprStack[stackindex];
+            r2 = sin(r1);
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 12: 
+            r1 = ExprStack[stackindex];
+            r2 = tan(r1);
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 13: 
+            r1 = ExprStack[stackindex];
+            r2 = 1.0/tan( r1 );    
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 14: 
+            r1 = ExprStack[stackindex];
+            r2 = fabs( r1 );       
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 15: 
+            r1 = ExprStack[stackindex];
+            if (r1 < 0.0) r2 = -1.0;
+            else if (r1 > 0.0) r2 = 1.0;
+            else r2 = 0.0;
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 16: 
+            r1 = ExprStack[stackindex];
+            r2 = sqrt( r1 );     
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 17: 
+            r1 = ExprStack[stackindex];
+            r2 = log(r1);
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 18: 
+            r1 = ExprStack[stackindex];
+            r2 = exp(r1);
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 19: 
+            r1 = ExprStack[stackindex];
+            r2 = asin( r1 );
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 20: 
+            r1 = ExprStack[stackindex];
+            r2 = acos( r1 );      
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 21: 
+            r1 = ExprStack[stackindex];
+            r2 = atan( r1 );      
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 22: 
+            r1 = ExprStack[stackindex];
+            r2 = 1.57079632679489661923 - atan(r1);  
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 23:
+            r1 = ExprStack[stackindex];
+            r2 = (exp(r1)-exp(-r1))/2.0;
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 24: 
+            r1 = ExprStack[stackindex];
+            r2 = (exp(r1)+exp(-r1))/2.0;
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 25: 
+            r1 = ExprStack[stackindex];
+            r2 = (exp(r1)-exp(-r1))/(exp(r1)+exp(-r1));
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 26: 
+            r1 = ExprStack[stackindex];
+            r2 = (exp(r1)+exp(-r1))/(exp(r1)-exp(-r1));
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 27: 
+            r1 = ExprStack[stackindex];
+            r2 = log10( r1 );     
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 28:
+            r1 = ExprStack[stackindex];
+            if (r1 <= 0.0) r2 = 0.0;
+            else           r2 = 1.0;
+            ExprStack[stackindex] = r2;
+            break;
+
+          case 31:                                                             //(L.Rossman - 11/03/10)
+            r1 = ExprStack[stackindex];
+            stackindex--;
+            r2 = ExprStack[stackindex];
+			r2 = pow(r2, r1);                            
+            ExprStack[stackindex] = r2;
+            break;
+        }
         node = node->next;
     }
     r1 = ExprStack[stackindex];
@@ -733,7 +724,7 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
     PrevLex = 0;
     CurLex = 0;
     S = formula;
-    Len = (int)strlen(S);
+    Len = strlen(S);
     Pos = 0;
     Bc = 0;
     tree = getTree();
@@ -754,143 +745,167 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
 //=============================================================================
 
 char * mathexpr_getStr(MathExpr* expr, char* exprStr,                          //1.1.00
-					   char * (*getVariableStr) (int, char *))
+                       char * (*getVariableStr) (int, char *))
 {
-	Term TermStack[50];
-	MathExpr *node = expr;
-	char r1[MAX_TERM_SIZE], r2[MAX_TERM_SIZE];
-	int stackindex = 0;
+    Term TermStack[50];
+    MathExpr *node = expr;
+    char r1[MAX_TERM_SIZE], r2[MAX_TERM_SIZE];
+    int stackindex = 0;
 
-	strcpy(TermStack[0].s, "");
-	while(node != NULL)
-	{
-		switch (node->opcode)
-		{
-		case 3:  
-			strcpy(r1, TermStack[stackindex].s);
-			stackindex--;
-			strcpy(r2, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "(%s) + (%s)", r2, r1);
-			break;
-		case 4:  
-			strcpy(r1, TermStack[stackindex].s);
-			stackindex--;
-			strcpy(r2, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "(%s) - (%s)", r2, r1);
-			break;
-		case 5:  
-			strcpy(r1, TermStack[stackindex].s);
-			stackindex--;
-			strcpy(r2, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "(%s) * (%s)", r2, r1);
-			break;
-		case 6:  
-			strcpy(r1, TermStack[stackindex].s);
-			stackindex--;
-			strcpy(r2, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "(%s) / (%s)", r2, r1);
-			break;				
-		case 7:  
-			stackindex++;
-			sprintf(TermStack[stackindex].s, "%.6g", node->fvalue);
-			break;
-		case 8:
-			if (getVariableStr != NULL)
-				strcpy(r1, getVariableStr(node->ivar, r2));
-			else
-				strcpy(r1, "");
-			stackindex++;
-			strcpy(TermStack[stackindex].s, r1);
-			break;
-		case 9: 
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "-(%s)", r1);
-			break;
-		case 10:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "cos(%s)", r1);
-			break;
-		case 11:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "sin(%s)", r1);
-			break;
-		case 12:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "tan(%s)", r1);
-			break;
-		case 13:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "cot(%s)", r1);
-			break;
-		case 14:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "abs(%s)", r1);
-			break;
-		case 15:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "sgn(%s)", r1);
-			break;
-		case 16:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "sqrt(%s)", r1);
-			break;
-		case 17:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "log(%s)", r1);
-			break;
-		case 18:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "exp(%s)", r1);
-			break;
-		case 19:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "asin(%s)", r1);
-			break;
-		case 20:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "acos(%s)", r1);
-			break;
-		case 21:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "atan(%s)", r1);
-			break;
-		case 22:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "acot(%s)", r1);
-			break;
-		case 23:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "sinh(%s)", r1);
-			break;
-		case 24:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "cosh(%s)", r1);
-			break;
-		case 25:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "tanh(%s)", r1);
-			break;
-		case 26:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "coth(%s)", r1);
-			break;
-		case 27:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "log10(%s)", r1);
-			break;
-		case 28:
-			strcpy(r1, TermStack[stackindex].s);
-			sprintf(TermStack[stackindex].s, "step(%s)", r1);
-			break;
-		case 31: 
-			strcpy(r1, TermStack[stackindex].s);
-			strcpy(r2, TermStack[stackindex-1].s);
-			sprintf(TermStack[stackindex-1].s, "pow(%s,%s)", r2, r1);
-			stackindex--;
-			break;
-		}
-		node = node->next;
-	}
-	strcpy(exprStr, TermStack[stackindex].s);
-	return exprStr;
+    strcpy(TermStack[0].s, "");
+    while(node != NULL)
+    {
+        switch (node->opcode)
+        {
+          case 3:  
+            strcpy(r1, TermStack[stackindex].s);
+            stackindex--;
+            strcpy(r2, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "(%s) + (%s)", r2, r1);
+            break;
+
+          case 4:  
+            strcpy(r1, TermStack[stackindex].s);
+            stackindex--;
+            strcpy(r2, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "(%s) - (%s)", r2, r1);
+            break;
+
+          case 5:  
+            strcpy(r1, TermStack[stackindex].s);
+            stackindex--;
+            strcpy(r2, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "(%s) * (%s)", r2, r1);
+            break;
+
+          case 6:  
+            strcpy(r1, TermStack[stackindex].s);
+            stackindex--;
+            strcpy(r2, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "(%s) / (%s)", r2, r1);
+            break;
+
+          case 7:  
+            stackindex++;
+            sprintf(TermStack[stackindex].s, "%.6g", node->fvalue);
+            break;
+
+          case 8:
+            if (getVariableStr != NULL) strcpy(r1, getVariableStr(node->ivar, r2));
+            else strcpy(r1, "");
+            stackindex++;
+            strcpy(TermStack[stackindex].s, r1);
+            break;
+
+          case 9: 
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "-(%s)", r1);
+            break;
+
+          case 10:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "cos(%s)", r1);
+            break;
+
+          case 11:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "sin(%s)", r1);
+            break;
+
+          case 12:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "tan(%s)", r1);
+            break;
+
+          case 13:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "cot(%s)", r1);
+            break;
+
+          case 14:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "abs(%s)", r1);
+            break;
+
+          case 15:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "sgn(%s)", r1);
+            break;
+
+          case 16:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "sqrt(%s)", r1);
+            break;
+
+          case 17:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "log(%s)", r1);
+            break;
+
+          case 18:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "exp(%s)", r1);
+            break;
+
+          case 19:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "asin(%s)", r1);
+            break;
+
+          case 20:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "acos(%s)", r1);
+            break;
+
+          case 21:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "atan(%s)", r1);
+            break;
+
+          case 22:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "acot(%s)", r1);
+            break;
+
+          case 23:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "sinh(%s)", r1);
+            break;
+
+          case 24:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "cosh(%s)", r1);
+            break;
+
+          case 25:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "tanh(%s)", r1);
+            break;
+
+          case 26:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "coth(%s)", r1);
+            break;
+
+          case 27:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "log10(%s)", r1);
+            break;
+
+          case 28:
+            strcpy(r1, TermStack[stackindex].s);
+            sprintf(TermStack[stackindex].s, "step(%s)", r1);
+            break;
+
+          case 31: 
+            strcpy(r1, TermStack[stackindex].s);
+            strcpy(r2, TermStack[stackindex-1].s);
+            sprintf(TermStack[stackindex-1].s, "pow(%s,%s)", r2, r1);
+            stackindex--;
+            break;
+        }
+        node = node->next;
+    }
+    strcpy(exprStr, TermStack[stackindex].s);
+    return exprStr;
 }

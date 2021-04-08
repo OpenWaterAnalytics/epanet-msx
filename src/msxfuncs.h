@@ -6,16 +6,16 @@
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **  VERSION:       1.1.00
-**  LAST UPDATE:   09/29/08
+**  LAST UPDATE:   11/01/10
 ***********************************************************************/
 
 #ifndef MSXFUNCS_H
 #define MSXFUNCS_H
 
 // Define pointers for each group of chemistry functions
-typedef void (*MSXGETRATES)(double *, double *, double * , double *, double *, int, double);
-typedef void (*MSXGETEQUIL)(double *, double *, double * , double *, double *, int, double);
-typedef void (*MSXGETFORMULAS)(double *, double *, double *, double *, int);
+typedef void (*MSXGETRATES)(double *, double *, double * , double *, double *);
+typedef void (*MSXGETEQUIL)(double *, double *, double * , double *, double *);
+typedef void (*MSXGETFORMULAS)(double *, double *, double *, double *);
 
 // Declare each chemistry function
 MSXGETRATES    MSXgetPipeRates;

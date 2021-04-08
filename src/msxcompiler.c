@@ -6,8 +6,9 @@
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/20/08
+**  LAST UPDATE:   11/01/10
 *******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,7 +46,6 @@ extern MSXproject  MSX;       // MSX project data
 //  Imported functions
 //--------------------
 char * MSXchem_getVariableStr(int i, char *s);
-void   MSXrpt_writeLine(char *line);
 
 //  Exported functions
 //--------------------
@@ -83,68 +83,72 @@ int MSXcompiler_open()
 // --- get the name of a temporary file with directory path stripped from it
 //     and replace any '.' characters in it (for the Borland compiler to work)
 
-        Fname = MSXutils_getTempName(TempName) ;
+    Fname = MSXutils_getTempName(TempName) ;
 
 // --- assign names to source code and compiled files
 
-        strcpy(srcFile, Fname);
-        strcat(srcFile, ".c");
-        strcpy(objFile, Fname);
-        strcat(objFile, ".o");
+    strcpy(srcFile, Fname);
+    strcat(srcFile, ".c");
+    strcpy(objFile, Fname);
+    strcat(objFile, ".o");
 #ifdef WINDOWS
-        strcpy(libFile, Fname);
-        strcat(libFile, ".dll");
+    strcpy(libFile, Fname);
+    strcat(libFile, ".dll");
 #else
-        strcpy(libFile, "lib");
-        strcat(libFile, Fname);
-        strcat(libFile, ".so");
+    strcpy(libFile, "lib");
+    strcat(libFile, Fname);
+    strcat(libFile, ".so");
 #endif
 
 // --- write the chemistry functions to the source code file
-        f = fopen(srcFile, "wt");
-        if ( f == NULL ) return ERR_CREATE_CHEM_SRC;
-        writeSrcFile(f);
-        fclose(f);
+
+    f = fopen(srcFile, "wt");
+    if ( f == NULL ) return ERR_COMPILE_FAILED;
+    writeSrcFile(f);
+    fclose(f);
 
 // --- compile the source code file to a dynamic link library file
 
 #ifdef WINDOWS
-        if ( MSX.Compiler == VC )
-        {
-	        sprintf(cmd, "CL /O2 /LD /nologo %s", srcFile);
-            err = MSXfuncs_run(cmd);
-        }
+    if ( MSX.Compiler == VC )
+    {
+	sprintf(cmd, "CL /O2 /LD /nologo %s", srcFile);
+        err = MSXfuncs_run(cmd);
+    }
 
-        else if ( MSX.Compiler == GC )
-        {
-    	    sprintf(cmd, "gcc -c -O3 %s", srcFile);
-	        err = MSXfuncs_run(cmd);
-	        sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
-    	    err = MSXfuncs_run(cmd);
-        }
-        else return ERR_INVALID_COMPILER;
+    else if ( MSX.Compiler == GC )
+    {
+	sprintf(cmd, "gcc -c -O3 %s", srcFile);
+	err = MSXfuncs_run(cmd);
+	sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
+	err = MSXfuncs_run(cmd);
+    }
+    else return ERR_COMPILE_FAILED;
 #else
-        if ( MSX.Compiler == GC )
-        {
-            sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
-            err = system(cmd);
-            sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
-            err = system(cmd);
-        }
-        else return ERR_INVALID_COMPILER;
+    if ( MSX.Compiler == GC )
+    {
+        sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
+        err = system(cmd);
+        sprintf(cmd, "gcc -lm -shared -o %s %s", libFile, objFile);
+        err = system(cmd);
+    }
+    else return ERR_COMPILE_FAILED;
 #endif
-        Compiled = err==0;
+    Compiled = (err == 0);                                                     // ttaxon - 9/7/10
 
 // --- load the compiled chemistry functions from the library file
 
-	if(Compiled) {
-		err = MSXfuncs_load(libFile);
-	    if ( err == 1 ) return ERR_COMPILE_FAILED;
-		if ( err == 2 ) return ERR_COMPILED_LOAD;
-	} else {
-		MSXcompiler_close();
-		return ERR_COMPILE_FAILED;
-	}
+    if ( Compiled)                                                             // ttaxon - 9/7/10
+    {
+        err = MSXfuncs_load(libFile);
+        if ( err == 1 ) return ERR_COMPILE_FAILED;
+        if ( err == 2 ) return ERR_COMPILED_LOAD;
+    }
+    else                                                                       // ttaxon - 9/7/10   
+    {
+        MSXcompiler_close(); 
+        return ERR_COMPILE_FAILED; 
+    } 
     return 0;
 }
 
@@ -180,6 +184,7 @@ void MSXcompiler_close()
 #endif
     }
 }
+
 //=============================================================================
 
 void  writeSrcFile(FILE* f)
@@ -209,9 +214,7 @@ void  writeSrcFile(FILE* f)
     int i;
     char e[1024];
     char headers[] =
-#ifdef VARDEBUG
-" #include <stdio.h>\n"
-#endif
+
 " /*  Machine Generated EPANET-MSX File - Do Not Edit */ \n\n"
 " #include <math.h> \n"
 " \n"
@@ -232,22 +235,14 @@ void  writeSrcFile(FILE* f)
 "   #define DLLEXPORT \n"
 " #endif \n"
 "  \n"
-" void  DLLEXPORT  MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[], int TheLink, double t); \n"
-" void  DLLEXPORT  MSXgetTankRates(double c[], double k[], double p[], double h[], double f[], int TheTank, double t); \n"
-" void  DLLEXPORT  MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[], int TheLink, double t); \n"
-" void  DLLEXPORT  MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[], int TheTank, double t); \n"
-" void  DLLEXPORT  MSXgetPipeFormulas(double c[], double k[],  double p[], double h[], int TheLink); \n"
-" void  DLLEXPORT  MSXgetTankFormulas(double c[], double k[], double p[], double h[], int TheTank); \n"
-" double term(int, double *, double *, double *, double *); \n"
-#ifdef VARDEBUG
-" static FILE *fp=NULL;\n"
-" static void writeHeader();\n"
-" static void ensureFileOpen();\n"
-" static void writeVars(char *,double *, double *, double *, double *, double *);\n"
-" static void writeF(char *,double *);\n"
-" static void writeC(char *,double *);\n"
-#endif
-"";
+" void  DLLEXPORT  MSXgetPipeRates(double *, double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetTankRates(double *, double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetPipeEquil(double *, double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetTankEquil(double *, double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetPipeFormulas(double *, double *, double *, double *); \n"
+" void  DLLEXPORT  MSXgetTankFormulas(double *, double *, double *, double *); \n"
+" double term(int, double *, double *, double *, double *); \n";
+
     char mathFuncs[] = 
 
     " double coth(double); \n"
@@ -275,48 +270,7 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f, "%s", headers);
     fprintf(f, "%s", mathFuncs);
-#ifdef VARDEBUG
-	fprintf(f,
-" void ensureFileOpen() {\n"
-"   if(fp==NULL) {\n"
-"     fp=fopen(\"debug_vars.txt\",\"w\");\n"
-"     writeHeader();\n"
-"   }\n"
-" }\n");
-	fprintf(f,
-" void writeHeader()\n"
-" {\n"
-"    fprintf(fp,\"Time\\tObjID\\t%s\\n\");\n"
-"    fflush(fp);\n"
-" }\n",getHeaderString());
 
-	fprintf(f,
-" void writeVars(double t, int eid, char *id,double c[], double k[], double p[], double h[], double f[])\n"
-" {\n"
-"    if(f==NULL) {\n"
-"      fprintf(fp,\"%%g\\t%%d\\t%%s%s%s\",t,eid,id%s%s);\n",
-getVarFmtString(),getFFmtString(1),getVarString(),getFString(1));
-
-	fprintf(f,
-"    } else {\n"
-"      fprintf(fp,\"%%g\t%%d\t%%s%s%s\",t,eid,id%s%s);\n"
-"    }\n"
-"    fflush(fp);\n"
-" }\n",getVarFmtString(),getFFmtString(0),getVarString(),getFString(0));
-
-	fprintf(f,
-" void writeF(double f[])\n"
-" {\n"
-"    fprintf(fp,\"%s\\n\"%s);\n"
-"    fflush(fp);\n"
-" }\n",getFFmtString(0),getFString(0));
-	fprintf(f,
-" void writeC(double c[])\n"
-" {\n"
-"    fprintf(fp,\"%s\\n\"%s);\n"
-"    fflush(fp);\n"
-" }\n",getCFmtString(),getCString());
-#endif
 // --- write term functions
 
     fprintf(f,
@@ -336,115 +290,73 @@ getVarFmtString(),getFFmtString(1),getVarString(),getFString(1));
 // --- write pipe rate functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[], int TheLink, double t)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(t,TheLink,\"PR\",c,k,p,h,f);\n");
-#endif
+"\n void DLLEXPORT MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == RATE )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeF(f);\n");
-#endif
     fprintf(f, " }\n");
     
 // --- write tank rate functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankRates(double c[], double k[], double p[], double h[], double f[], int TheTank, double t)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(t,TheTank,\"TR\",c,k,p,h,f);\n");
-#endif
+"\n void DLLEXPORT MSXgetTankRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == RATE )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeF(f);\n");
-#endif
     fprintf(f, " }\n");
 
 // --- write pipe equilibrium functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[], int TheLink, double t)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(t,TheLink,\"PE\",c,k,p,h,f);\n");
-#endif
+"\n void DLLEXPORT MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == EQUIL )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeF(f);\n");
-#endif
     fprintf(f, " }\n");
     
 // --- write tank equilibrium functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[], int TheTank, double t)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(t,TheTank,\"TE\",c,k,p,h,f);\n");
-#endif
+"\n void DLLEXPORT MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == EQUIL )
             fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeF(f);\n");
-#endif
     fprintf(f, " }\n");
 
 // --- write pipe formula functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetPipeFormulas(double c[], double k[],  double p[], double h[], int TheLink)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(-1,TheLink,\"PF\",c,k,p,h,NULL);\n");
-#endif
+"\n void DLLEXPORT MSXgetPipeFormulas(double c[], double k[],  double p[], double h[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].pipeExprType == FORMULA )
             fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeC(c);\n");
-#endif
     fprintf(f, " }\n");
     
 // --- write tank formula functions
 
     fprintf(f,
-"\n void DLLEXPORT MSXgetTankFormulas(double c[], double k[], double p[], double h[], int TheTank)\n { \n");
-#ifdef VARDEBUG
-	fprintf(f,"  ensureFileOpen();\n");
-	fprintf(f,"  writeVars(-1,TheTank,\"TF\",c,k,p,h,NULL);\n");
-#endif
+"\n void DLLEXPORT MSXgetTankFormulas(double c[], double k[], double p[], double h[])\n { \n");
     for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
     {
         if ( MSX.Species[i].tankExprType == FORMULA )
             fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
-#ifdef VARDEBUG
-	fprintf(f,"  writeC(c);\n");
-#endif
     fprintf(f, " }\n");
     fprintf(f, "\n");
 }
