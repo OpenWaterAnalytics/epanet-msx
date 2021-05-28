@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
-
+#include "epanet2_2.h"
 #include "epanet2.h"                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     long   t, tleft;
     long   oldHour, newHour;
 	char *inpFile, *repFile, *outFile;
+    EN_Project ph;
+ 
 
 // --- check command line arguments
 
@@ -79,13 +81,14 @@ int main(int argc, char *argv[])
 
     printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
     printf("\n  o Processing EPANET input file");
+    EN_createproject(&ph);
     err = ENopen(inpFile, repFile, outFile);
     do
     {
         if (err)
         {
             printf("\n\n... Cannot read EPANET file; error code = %d\n", err);
-            ENclose();
+            EN_close(ph);
             return 0;
         }
 

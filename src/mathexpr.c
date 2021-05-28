@@ -550,166 +550,172 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 //  Mathematica expression evaluation using a stack
 {
     
-// --- Note: the ExprStack array must be declared locally and not globally
+// --- Note: the exprStack array must be declared locally and not globally
 //     since this function can be called recursively.
 
-    double ExprStack[MAX_STACK_SIZE];
+    double exprStack[MAX_STACK_SIZE];
 	MathExpr *node = expr;
 	double r1, r2;
 	int stackindex = 0;
-    ExprStack[0] = 0.0;
+    exprStack[0] = 0.0;
 
 	while(node != NULL)
 	{
 		switch (node->opcode)
 		{
 			case 3:  
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 + r1;
+				r2 = exprStack[stackindex];
+				exprStack[stackindex] = r2 + r1;
 				break;
 			case 4:  
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 - r1;
+				r2 = exprStack[stackindex];
+				exprStack[stackindex] = r2 - r1;
 				break;
 			case 5:  
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 * r1;
+				r2 = exprStack[stackindex];
+				exprStack[stackindex] = r2 * r1;
 				break;
 			case 6:  
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				stackindex--;
-				r2 = ExprStack[stackindex];
-				ExprStack[stackindex] = r2 / r1;
+				r2 = exprStack[stackindex];
+				exprStack[stackindex] = r2 / r1;
 				break;				
 			case 7:  
 				stackindex++;
-				ExprStack[stackindex] = node->fvalue;
+				exprStack[stackindex] = node->fvalue;
 				break;
 			case 8:
                 if (getVariableValue != NULL)
                 r1 = getVariableValue(node->ivar);
                 else r1 = 0.0;
 				stackindex++;
-				ExprStack[stackindex] = r1;
+				exprStack[stackindex] = r1;
 				break;
 			case 9: 
-				ExprStack[stackindex] = -ExprStack[stackindex];
+				exprStack[stackindex] = -exprStack[stackindex];
 				break;
 			case 10: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = cos(r1);
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 11: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = sin(r1);
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 12: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = tan(r1);
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 13: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = 1.0/tan( r1 );    
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 14: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = fabs( r1 );       
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 15: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				if (r1 < 0.0) r2 = -1.0;
 				else if (r1 > 0.0) r2 = 1.0;
 				else r2 = 0.0;
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 16: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
                 r2 = sqrt( r1 );     
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 17: 
-				r1 = ExprStack[stackindex];
-                r2 = log(r1);
-				ExprStack[stackindex] = r2;
+				r1 = exprStack[stackindex];
+                if (r1 > 0)
+                    r2 = log(r1);
+                else
+                    r2 = 0;
+				exprStack[stackindex] = r2;
 				break;
 			case 18: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = exp(r1);
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 19: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = asin( r1 );
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 20: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = acos( r1 );      
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 21: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = atan( r1 );      
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 22: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = 1.57079632679489661923 - atan(r1);  
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 23:
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = (exp(r1)-exp(-r1))/2.0;
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 24: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = (exp(r1)+exp(-r1))/2.0;
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 25: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = (exp(r1)-exp(-r1))/(exp(r1)+exp(-r1));
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 26: 
-				r1 = ExprStack[stackindex];
+				r1 = exprStack[stackindex];
 				r2 = (exp(r1)+exp(-r1))/(exp(r1)-exp(-r1));
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 27: 
-				r1 = ExprStack[stackindex];
-				r2 = log10( r1 );     
-				ExprStack[stackindex] = r2;
+				r1 = exprStack[stackindex];
+                if (r1 > 0)
+                    r2 = log10(r1);
+                else
+                    r2 = 0;
+				exprStack[stackindex] = r2;
 				break;
             case 28:
- 				r1 = ExprStack[stackindex];
+ 				r1 = exprStack[stackindex];
 				if (r1 <= 0.0) r2 = 0.0;
 				else           r2 = 1.0;
-				ExprStack[stackindex] = r2;
+				exprStack[stackindex] = r2;
 				break;
 			case 31: 
-				r1 = ExprStack[stackindex];
-				r2 = ExprStack[stackindex-1];
+				r1 = exprStack[stackindex];
+				r2 = exprStack[stackindex-1];
                 r2 = exp(r1*log(r2));
-				ExprStack[stackindex-1] = r2;
+				exprStack[stackindex-1] = r2;
 				stackindex--;
 				break;
 		}
         node = node->next;
     }
-    r1 = ExprStack[stackindex];
+    r1 = exprStack[stackindex];
     return r1;
 }
 

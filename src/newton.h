@@ -11,6 +11,15 @@
 **  LAST UPDATE:   3/1/07
 ******************************************************************************/
 
+typedef struct
+{
+    int      Nmax;          // max. number of equations
+    int* Indx;         // permutation vector of row indexes     
+    double* F;            // function & adjustment vector
+    double* W;            // work vector
+    double** J;           // Jacobian matrix
+}MSXNewton;
+
 // Opens the equation solver system
 int  newton_open(int n);
 

@@ -7,6 +7,21 @@
 **  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
+typedef struct
+{
+    int      Nmax;          // max. number of equations
+    int      Itmax;         // max. number of integration steps
+    int      Adjust;        // use adjustable step size
+    double* Ak;           // work arrays
+    double* K1;
+    double* K2;
+    double* K3;
+    double* K4;
+    double* K5;
+    double* K6;
+    double* Ynew;         // updated solution
+    void     (*Report) (double, double*, int);
+}MSXRungeKutta;
 // Opens the ODE solver system
 int  rk5_open(int n, int itmax, int adjust);
 
