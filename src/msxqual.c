@@ -8,8 +8,9 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/20/08
+**  LAST UPDATE:   2/8/11
 ******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -60,6 +61,10 @@ extern void   MSXtank_mix4(int i, double vIn, double *massin, double vnet);
 int    MSXout_open(void);
 int    MSXout_saveResults(void);
 int    MSXout_saveFinalResults(void);
+
+void   MSXerr_clearMathError(void);                                            //1.1.00
+int    MSXerr_mathError(void);                                                 //1.1.00
+char*  MSXerr_writeMathErrorMsg(void);                                         //1.1.00
 
 //  Exported functions
 //--------------------
@@ -157,7 +162,7 @@ int  MSXqual_open()
     MSX.LastSeg  = (Pseg *) calloc(n, sizeof(Pseg));
     MSX.NewSeg = (Pseg *) calloc(n, sizeof(Pseg));
 
-// --- allocate memory used flow direction in each link
+// --- allocate memory used for flow direction in each link
 
     MSX.FlowDir  = (FlowDirection *) calloc(n, sizeof(FlowDirection));
 
@@ -682,6 +687,7 @@ int  transport(long tstep)
 
 // --- repeat until time step is exhausted
 
+    MSXerr_clearMathError();                // clear math error flag           //1.1.00
     qtime = 0;
     while (!MSX.OutOfMemory &&
            !errcode &&
@@ -695,6 +701,12 @@ int  transport(long tstep)
         
         topological_transport(dt);          //replace accumulate, updateNodes, sourceInput and release
 
+		if (MSXerr_mathError())             // check for any math error        //1.1.00
+		{
+			MSXerr_writeMathErrorMsg();
+			errcode = ERR_ILLEGAL_MATH;
+		}
+        
    }
    return errcode;
 }

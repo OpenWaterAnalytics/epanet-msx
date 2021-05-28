@@ -9,19 +9,21 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/10/08
-**	BUG FIX:       BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
-**                 BUG ID ??  MSXsolveH & MSXusehydfile, L. Rossman 10/05/2008
+**  LAST UPDATE:   2/8/11
+**  BUG FIXES:     BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
+**                 File mode bug in MSXsolveH & MSXusehydfile, L. Rossman 10/05/2008
+**                 Possible unterminated string copy, L. Rossman 11/01/10
 **
 **  These functions can be used in conjunction with the original EPANET
 **  toolkit functions to model water quality fate and transport of
 **  multiple interacting chemcial species within piping networks. See the
-**  EPANETMSX.C module for an example of how these functions were used to
+**  MSXMAIN.C module for an example of how these functions were used to
 **  extend the original command line version of EPANET to include multiple
 **  chemical species. Consult the EPANET and EPANET-MSX Users Manuals for
 **  detailed descriptions of the input data file formats required by both
 **  the original EPANET and its multi-species extension.
 *******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -75,9 +77,8 @@ int  DLLEXPORT  MSXopen(char *fname)
 
     if ( err )
     {
-
-	ENwriteline(MSXproj_getErrmsg(err));
-	ENwriteline("");
+        ENwriteline(MSXproj_getErrmsg(err));
+        ENwriteline("");
     }
 
     return err;
@@ -115,7 +116,7 @@ int   DLLEXPORT  MSXsolveH()
 // --- create a temporary hydraulics file
 
     MSXutils_getTempName(MSX.HydFile.name);                                    //1.1.00
-    MSX.HydFile.mode = SCRATCH_FILE;                                           //(LR-10/05/08, to fix bug ??)
+    MSX.HydFile.mode = SCRATCH_FILE;                                           //(LR-10/05/08)
 
 // --- use EPANET to solve for & save hydraulics results
 
@@ -151,14 +152,14 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 
     if ( MSX.HydFile.file )
     {
-	fclose(MSX.HydFile.file);
-        if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);      //(LR-10/05/08, to fix bug ??)   
+        fclose(MSX.HydFile.file);
+        if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);      //(LR-10/05/08)   
     } 
 	
 
 // --- open hydraulics file
 
-    //MSX.HydFile.mode = USED_FILE;                                            //(LR-10/05/08, to fix bug ??)
+    //MSX.HydFile.mode = USED_FILE;                                            //(LR-10/05/08)
     MSX.HydFile.file = fopen(fname, "rb");
     if (!MSX.HydFile.file) return ERR_OPEN_HYD_FILE;
 
@@ -381,10 +382,10 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
     if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIES:   *len = (int)strlen(MSX.Species[index].id); break;
-        case CONSTANT:  *len = (int)strlen(MSX.Const[index].id);   break;
-        case PARAMETER: *len = (int)strlen(MSX.Param[index].id);   break;
-        case PATTERN:   *len = (int)strlen(MSX.Pattern[index].id); break;
+        case SPECIES:   *len = strlen(MSX.Species[index].id); break;
+        case CONSTANT:  *len = strlen(MSX.Const[index].id);   break;
+        case PARAMETER: *len = strlen(MSX.Param[index].id);   break;
+        case PATTERN:   *len = strlen(MSX.Pattern[index].id); break;
     }
     return 0;
 }
@@ -428,6 +429,7 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
         case PARAMETER: strncpy(id, MSX.Param[index].id, len);   break;
         case PATTERN:   strncpy(id, MSX.Pattern[index].id, len); break;
     }
+	id[len] = '\0';                                                            //(L. Rossman - 11/01/10)
     return 0;
 }
 
@@ -1116,8 +1118,8 @@ int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
         MSX.Pattern[pat].length++;
     }
 	
-	MSX.Pattern[pat].interval = 0;						//Feng Shang   04/17/2008
-	MSX.Pattern[pat].current = MSX.Pattern[pat].first;    //Feng Shang   04/17/2008
+    MSX.Pattern[pat].interval = 0;			  //Feng Shang   04/17/2008
+    MSX.Pattern[pat].current = MSX.Pattern[pat].first;    //Feng Shang   04/17/2008
     return 0;
 }
 

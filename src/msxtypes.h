@@ -9,9 +9,9 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   09/29/08
+**  LAST UPDATE:   2/8/11
 **  Bug Fix:       Bug ID 08, Feng Shang, 01/07/08 
-		   Bug ID 09 (add roughness as hyfraulic variable) Feng Shang 01/29/2008
+**                 Bug ID 09 (add roughness as hydraulic variable) Feng Shang 01/29/2008
 ***********************************************************************/
 
 #include "mathexpr.h"
@@ -96,7 +96,7 @@ typedef  float REAL4;
 //-----------------------------------------------------------------------------
 //  Enumerated Types
 //-----------------------------------------------------------------------------
- enum ObjectTypes                      // Object types
+ enum ObjectType                       // Object types                         //1.1.00
                 {NODE,
                  LINK,
                  TANK,
@@ -189,7 +189,7 @@ typedef  float REAL4;
                   SHEAR,               //   link shear velocity
                   FRICTION,            //   friction factor
                   AREAVOL,             //   area/volume
-		  ROUGHNESS,	       //   roughness		/*Feng Shang 01/29/2008*/
+                  ROUGHNESS,           //   roughness                          /*Feng Shang 01/29/2008*/
                   MAX_HYD_VARS};
 
  enum TstatType                        // Time series statistics
@@ -207,12 +207,12 @@ typedef  float REAL4;
                   TIMESTEP_OPTION,
                   RTOL_OPTION,
                   ATOL_OPTION,
-				  COMPILER_OPTION};                                            //1.1.00
+                  COMPILER_OPTION};                                            //1.1.00
 
  enum CompilerType                     // C compiler type                      //1.1.00
                  {NO_COMPILER,
                   VC,                  // MS Visual C compiler
-		  GC};                 // Gnu C compiler
+                  GC};                 // Gnu C compiler
 
  enum FileModeType                     // File modes
                  {SCRATCH_FILE,
@@ -233,7 +233,7 @@ typedef  float REAL4;
                   s_OPTION,
                   s_REPORT};
 
- enum ErrorCodeType                    // Error codes (501-515)
+ enum ErrorCodeType                    // Error codes (501-524)
           {ERR_FIRST = 500,
            ERR_MEMORY,                 // 501
            ERR_NO_EPANET_FILE,         // 502
@@ -256,12 +256,9 @@ typedef  float REAL4;
            ERR_MSX_NOT_OPENED,         // 519
            ERR_MSX_OPENED,             // 520
            ERR_OPEN_RPT_FILE,          // 521                                  //(LR-11/20/07, to fix bug 08)
-           
-           ERR_CREATE_CHEM_SRC,        // 522                                  //1.1.00
-           ERR_INVALID_COMPILER,       // 523                                  //1.1.00
-           ERR_COMPILE_FAILED,         // 524                                  //1.1.00
-           ERR_COMPILED_LOAD,          // 525                                  //1.1.00
-
+           ERR_COMPILE_FAILED,         // 522                                  //1.1.00
+           ERR_COMPILED_LOAD,          // 523                                  //1.1.00
+		   ERR_ILLEGAL_MATH,           // 524                                  //1.1.00
            ERR_MAX};
 
 
@@ -439,7 +436,7 @@ typedef struct                         // MSX PROJECT VARIABLES
           Saveflag,                    // Save results flag
           Rptflag,                     // Report results flag
           Coupling,                    // Degree of coupling for solving DAE's
-	      Compiler,                    // chemistry function compiler code     //1.1.00 
+          Compiler,                    // chemistry function compiler code     //1.1.00 
           AreaUnits,                   // Surface area units
           RateUnits,                   // Reaction rate time units
           Solver,                      // Choice of ODE solver
@@ -469,7 +466,7 @@ typedef struct                         // MSX PROJECT VARIABLES
           DefRtol,                     // Default relative error tolerance
           DefAtol,                     // Default absolute error tolerance
           *K,                          // Vector of expression constants       //1.1.00
-	      *C0,			               // Species initial quality vector
+          *C0,                         // Species initial quality vector
           *C1;                         // Species concentration vector
 
    Pseg   *FirstSeg,                   // First WQ segment in each pipe/tank
@@ -498,12 +495,3 @@ typedef struct                         // MSX PROJECT VARIABLES
    int* SortedNodes;
 
 } MSXproject;
-#ifdef VARDEBUG
-char *getHeaderString();
-char *getVarFmtString();
-char *getFFmtString(int isNull);
-char *getVarString();
-char *getFString(int isNull);
-char *getCFmtString();
-char *getCString();
-#endif
