@@ -1,8 +1,14 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX 1.1
 
 cmake_minimum_required(VERSION 3.9)
-
 project(EPANETMSX LANGUAGES C)
+
+include_directories(
+  ../EPANET/include
+)
+link_directories(
+  ../EPANET/build/lib
+)
 
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -32,7 +38,11 @@ ENDIF (MSVC)
 file(GLOB MSX_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
 
 # the shared library
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(OpenMP_C_LIB_NAMES "libomp")
+set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
 find_package(OpenMP REQUIRED)
+
 IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   message("   ************************************")
   message("   Configuring with msx.def mapping")
@@ -43,7 +53,7 @@ IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 #Edited below
 ELSE(TRUE)
-  find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/include NO_DEFAULT_PATH)
+  find_library(EPANET_LIB epanet2 NAMES epanet2)
   add_library(epanetmsx SHARED ${MSX_SOURCES})
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")

@@ -16,7 +16,7 @@
 */
 
 #include <stdlib.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "mempool.h"
 
 /*

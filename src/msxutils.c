@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 
@@ -360,7 +360,7 @@ int factorize(double **a, int n, double *w, int *indx)
     }
     for (j = 1;j <= n;j++) /**for each column*/
     { 
-	/*This is the loop over columns of Crout’s method.*/
+	/*This is the loop over columns of Croutï¿½s method.*/
 	for (i = 1; i < j; i++) 
 	{ 
 	    /*Up from the diagonal*/
