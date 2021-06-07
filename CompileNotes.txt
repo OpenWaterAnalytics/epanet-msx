@@ -1,5 +1,9 @@
 Compiling with CMake
 
+Steps to do before Compiling
+1. Add epanet2.h, epanet2_2.h, epanet2_enums.h, and epanet2.lib from the EPANET repository to the include directory.
+
+Compiling
 1. Create a directory to store the build inside the root directory.
 2. Navigate into the directory.
 3. Run cmake ..

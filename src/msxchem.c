@@ -918,7 +918,7 @@ void evalPipeFormulas(double *c)
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
+	    MSXgetPipeFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = ChemC1[m];
@@ -961,7 +961,7 @@ void evalTankFormulas(double *c)
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
+	    MSXgetTankFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = ChemC1[m];
@@ -1161,7 +1161,7 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeRates(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
+	    MSXgetPipeRates(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = PipeRateSpecies[i];
@@ -1223,7 +1223,7 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankRates(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
+	    MSXgetTankRates(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = TankRateSpecies[i];
@@ -1274,7 +1274,7 @@ void getPipeEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeEquil(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
+	    MSXgetPipeEquil(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = PipeEquilSpecies[i];
@@ -1325,7 +1325,7 @@ void getTankEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankEquil(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
+	    MSXgetTankEquil(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = TankEquilSpecies[i];
