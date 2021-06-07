@@ -1,6 +1,6 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX 1.1
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.12)
 project(EPANETMSX LANGUAGES C)
 
 include_directories(
@@ -37,11 +37,13 @@ ENDIF (MSVC)
 # configure file groups
 file(GLOB MSX_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
 
-# the shared library
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-set(OpenMP_C_LIB_NAMES "libomp")
-set(OpenMP_libomp_LIBRARY ${OpenMP_C_LIB_NAMES})
-find_package(OpenMP REQUIRED)
+include(FindOpenMP)
+if(OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(OpenMP_C_LIB_NAMES "libomp")
+else(OPENMP_FOUND)
+  message("ERROR: OpenMP could not be found.")
+endif(OPENMP_FOUND)
 
 IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   message("   ************************************")
