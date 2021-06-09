@@ -6,9 +6,6 @@ project(EPANETMSX LANGUAGES C)
 include_directories(
   ../EPANET/include
 )
-link_directories(
-  ../EPANET/build/lib
-)
 
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -45,6 +42,8 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
+find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../EPANET/build/lib)
+
 IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   message("   ************************************")
   message("   Configuring with msx.def mapping")
@@ -54,11 +53,9 @@ IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   set_source_files_properties(${PROJECT_SOURCE_DIR}/include/msx.def PROPERTIES_HEADER_FILE_ONLY TRUE)
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ELSEIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
-  find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../EPANET/build/lib/* NO_DEFAULT_PATH)
   add_library(epanetmsx SHARED ${MSX_SOURCES})
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
-  find_library(EPANET_LIB epanet2 NAMES epanet2)
   add_library(epanetmsx SHARED ${MSX_SOURCES})
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
