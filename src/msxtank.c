@@ -10,6 +10,7 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   7/31/07
 ******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <math.h>

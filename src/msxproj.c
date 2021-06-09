@@ -9,13 +9,15 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/20/08
+**  LAST UPDATE:   2/8/11
 **  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
+**                 Memory leak fixed, T. Taxon - 9/7/10
 ******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "msxtypes.h"
@@ -57,7 +59,8 @@ static char * Errmsg[] =
      "Error 521 - could not open MSX report file.",                            //(LR-11/20/07)
 
      "Error 522 - could not compile chemistry functions.",                     //1.1.00
-     "Error 523 - could not load functions from compiled chemistry file."};    //1.1.00
+     "Error 523 - could not load functions from compiled chemistry file.",     //1.1.00
+	 "Error 524 - illegal math operation."};                                   //1.1.00
 
 //  Imported functions
 //--------------------
@@ -130,7 +133,7 @@ int  MSXproj_open(char *fname)
     CALL(errcode, MSXinp_readNetData());
     CALL(errcode, MSXinp_readMsxData());
 
-    if (strcmp(MSX.RptFile.name, ""))                                              //(FS-01/07/2008, to fix bug 08)
+    if (strcmp(MSX.RptFile.name, ""))                                          //(FS-01/07/2008, to fix bug 08)
 	CALL(errcode, openRptFile());                                              //(LR-11/20/07, to fix bug 08)
 
 // --- convert user's units to internal units
@@ -218,7 +221,7 @@ int   MSXproj_addObject(int type, char *id, int n)
 // --- use memory from the hash tables' common memory pool to store
 //     a copy of the object's ID string
 
-    len = (int)strlen(id) + 1;
+    len = strlen(id) + 1;
     newID = (char *) Alloc(len*sizeof(char));
     strcpy(newID, id);
 
@@ -529,6 +532,7 @@ void deleteObjects()
 {
     int i;
     SnumList *listItem;
+    Psource  source;                                                           //ttaxon - 9/7/10
 
 // --- free memory used by nodes, links, and tanks
 
@@ -536,14 +540,20 @@ void deleteObjects()
     {
         FREE(MSX.Node[i].c);
         FREE(MSX.Node[i].c0);
-		if(MSX.Node[i].sources) {
-			struct Ssource *p=MSX.Node[i].sources;
-			while(p != NULL) {
-				MSX.Node[i].sources=p->next;
-				FREE(p);
-				p=MSX.Node[i].sources;
-			}
-		}
+
+        // --- free memory used by water quality sources                       //ttaxon - 9/7/10
+
+	if(MSX.Node[i].sources)
+	{ 
+            source = MSX.Node[i].sources; 
+            while (source != NULL)
+	    { 
+                MSX.Node[i].sources = source->next; 
+                FREE(source); 
+                source = MSX.Node[i].sources; 
+            } 
+        }
+
     }
     if (MSX.Link) for (i=1; i<=MSX.Nobjects[LINK]; i++)
     {
@@ -559,6 +569,7 @@ void deleteObjects()
     }
 
 // --- free memory used by time patterns
+
     if (MSX.Pattern) for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
     {
         listItem = MSX.Pattern[i].first;

@@ -8,7 +8,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   2/8/11
 ******************************************************************************/
 
 //  Node in a tokenized math expression list

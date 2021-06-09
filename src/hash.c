@@ -14,7 +14,7 @@
 //      HTfree()   - frees a hash table
 //-----------------------------------------------------------------------------
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include "hash.h"
 

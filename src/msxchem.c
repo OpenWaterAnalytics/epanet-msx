@@ -8,13 +8,14 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   09/29/08
-**  BUG FIX    :   Bug ID 8,  Feng Shang, 01/29/2008
+**  LAST UPDATE:   2/8/11
+**  BUG FIXES  :   Bug ID 8,  Feng Shang, 01/29/2008
 *******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "msxtypes.h"
@@ -77,6 +78,7 @@ void   MSXchem_close(void);
 //-------------------
 int    MSXcompiler_open(void);                                                 //1.1.00
 void   MSXcompiler_close(void);                                                //1.1.00
+double MSXerr_validate(double x, int index, int element, int exprType);        //1.1.00
 
 //  Local functions
 //-----------------
@@ -95,6 +97,8 @@ static void   getPipeDcDt(double t, double y[], int n, double deriv[]);
 static void   getTankDcDt(double t, double y[], int n, double deriv[]);
 static void   getPipeEquil(double t, double y[], int n, double f[]);
 static void   getTankEquil(double t, double y[], int n, double f[]);
+static int    isValidNumber(double x);                                         //(L.Rossman - 11/03/10)
+
 
 //=============================================================================
 
@@ -907,13 +911,14 @@ void evalPipeFormulas(double *c)
 */
 {
     int m;
+    double x;
     for (m=1; m<=NumSpecies; m++) ChemC1[m] = c[m];
 
-// --- use compiled functions if available                                     //1.1.00
+// --- use compiled functions if available
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
+	    MSXgetPipeFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = ChemC1[m];
@@ -925,7 +930,8 @@ void evalPipeFormulas(double *c)
     {
         if ( MSX.Species[m].pipeExprType == FORMULA )
         {
-            c[m] = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+			x = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+			c[m] = MSXerr_validate(x, m, LINK, FORMULA);
         }
     }
 }
@@ -948,13 +954,14 @@ void evalTankFormulas(double *c)
 */
 {
     int m;
+    double x;
     for (m=1; m<=NumSpecies; m++) ChemC1[m] = c[m];
 
-// --- use compiled functions if available                                     //1.1.00
+// --- use compiled functions if available 
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, TheLink);
+	    MSXgetTankFormulas(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar);
         for (m=1; m<=NumSpecies; m++)
         {
             c[m] = ChemC1[m];
@@ -966,7 +973,8 @@ void evalTankFormulas(double *c)
     {
         if ( MSX.Species[m].tankExprType == FORMULA )
         {
-            c[m] = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+			x = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+			c[m] = MSXerr_validate(x, m, TANK, FORMULA);
         }
     }
 }
@@ -986,6 +994,8 @@ double getPipeVariableValue(int i)
 **    the current value of the indexed variable.
 */
 {
+	double x;
+
 // --- WQ species have index i between 1 & # of species
 //     and their current values are stored in vector ChemC1 
 
@@ -995,7 +1005,8 @@ double getPipeVariableValue(int i)
 
         if ( MSX.Species[i].pipeExprType == FORMULA )
         {
-            return mathexpr_eval(MSX.Species[i].pipeExpr, getPipeVariableValue);
+			x = mathexpr_eval(MSX.Species[i].pipeExpr, getPipeVariableValue);
+            return MSXerr_validate(x, i, LINK, FORMULA);                       //1.1.00
         }
 
     // --- otherwise return the current concentration
@@ -1008,7 +1019,8 @@ double getPipeVariableValue(int i)
     else if ( i <= LastIndex[TERM] )
     {
         i -= LastIndex[TERM-1];
-        return mathexpr_eval(MSX.Term[i].expr, getPipeVariableValue);
+		x = mathexpr_eval(MSX.Term[i].expr, getPipeVariableValue);
+        return MSXerr_validate(x, i, 0, TERM);                                 //1.1.00
     }
 
 // --- reaction parameter indexes come after that
@@ -1049,9 +1061,12 @@ double getTankVariableValue(int i)
 **
 **  Returns:
 **    the current value of the indexed variable.
+**
+**  Modified to check for NaN values (L.Rossman - 11/03/10).
 */
 {
     int j;
+	double x;
 
 // --- WQ species have index i between 1 & # of species
 //     and their current values are stored in vector ChemC1
@@ -1062,7 +1077,8 @@ double getTankVariableValue(int i)
 
         if ( MSX.Species[i].tankExprType == FORMULA )
         {
-            return mathexpr_eval(MSX.Species[i].tankExpr, getTankVariableValue);
+			x = mathexpr_eval(MSX.Species[i].tankExpr, getTankVariableValue);
+            return MSXerr_validate(x, i, TANK, FORMULA);                       //1.1.00
         }
 
     // --- otherwise return the current concentration
@@ -1075,7 +1091,8 @@ double getTankVariableValue(int i)
     else if ( i <= LastIndex[TERM] )
     {
         i -= LastIndex[TERM-1];
-        return mathexpr_eval(MSX.Term[i].expr, getTankVariableValue);
+		x = mathexpr_eval(MSX.Term[i].expr, getTankVariableValue);
+        return MSXerr_validate(x, i, 0, TERM);                                 //1.1.00
     }
 
 // --- next come reaction parameters associated with Tank nodes
@@ -1118,6 +1135,7 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
 */
 {
     int i, m;
+	double x;
 
 // --- assign species concentrations to their proper positions in the global
 //     concentration vector ChemC1
@@ -1143,11 +1161,11 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeRates(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
+	    MSXgetPipeRates(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = PipeRateSpecies[i];
-            deriv[i] = F[m];
+            deriv[i] = MSXerr_validate(F[m], m, LINK, RATE);                   //1.1.00
         }
 	    return;
     }
@@ -1157,7 +1175,8 @@ void getPipeDcDt(double t, double y[], int n, double deriv[])
     for (i=1; i<=n; i++)
     {
         m = PipeRateSpecies[i];
-        deriv[i] = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+		x = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+        deriv[i] = MSXerr_validate(x, m, LINK, RATE);                          //1.1.00
     }
 }
 
@@ -1178,6 +1197,7 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
 */
 {
     int i, m;
+	double x;
 
 // --- assign species concentrations to their proper positions in the global
 //     concentration vector ChemC1
@@ -1203,11 +1223,11 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankRates(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
+	    MSXgetTankRates(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = TankRateSpecies[i];
-            deriv[i] = F[m];
+            deriv[i] = MSXerr_validate(F[m], m, TANK, RATE);                   //1.1.00
         }
 	    return;
     }
@@ -1217,7 +1237,8 @@ void getTankDcDt(double t, double y[], int n, double deriv[])
     for (i=1; i<=n; i++)
     {
         m = TankRateSpecies[i];
-        deriv[i] = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+		x = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+        deriv[i] = MSXerr_validate(x, m, TANK, RATE);                          //1.1.00
     }
 }
 
@@ -1238,6 +1259,7 @@ void getPipeEquil(double t, double y[], int n, double f[])
 */
 {
     int i, m;
+	double x;
 
 // --- assign species concentrations to their proper positions in the global
 //     concentration vector ChemC1
@@ -1252,11 +1274,11 @@ void getPipeEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetPipeEquil(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F, TheLink, t);
+	    MSXgetPipeEquil(ChemC1, MSX.K, MSX.Link[TheLink].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = PipeEquilSpecies[i];
-            f[i] = F[m];
+		    f[i] = MSXerr_validate(F[m], m, LINK, EQUIL);                      //1.1.00
         }
     	return;
     }
@@ -1266,7 +1288,8 @@ void getPipeEquil(double t, double y[], int n, double f[])
     for (i=1; i<=n; i++)
     {
         m = PipeEquilSpecies[i];
-        f[i] = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+		x = mathexpr_eval(MSX.Species[m].pipeExpr, getPipeVariableValue);
+		f[i] = MSXerr_validate(x, m, LINK, EQUIL);                             //1.1.00
     }
 }
 
@@ -1287,6 +1310,7 @@ void getTankEquil(double t, double y[], int n, double f[])
 */
 {
     int i, m;
+    double x;
 
 // --- assign species concentrations to their proper positions in the global
 //     concentration vector ChemC1
@@ -1301,11 +1325,11 @@ void getTankEquil(double t, double y[], int n, double f[])
 
     if ( MSX.Compiler )
     {
-	    MSXgetTankEquil(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F, TheTank, t);
+	    MSXgetTankEquil(ChemC1, MSX.K, MSX.Tank[TheTank].param, HydVar, F);
         for (i=1; i<=n; i++)
         {
             m = TankEquilSpecies[i];
-            f[i] = F[m];
+		    f[i] = MSXerr_validate(F[m], m, TANK, EQUIL);                      //1.1.00
         }
 	    return;
     }
@@ -1315,164 +1339,7 @@ void getTankEquil(double t, double y[], int n, double f[])
     for (i=1; i<=n; i++)
     {
         m = TankEquilSpecies[i];
-        f[i] = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+		x = mathexpr_eval(MSX.Species[m].tankExpr, getTankVariableValue);
+		f[i] = MSXerr_validate(x, m, TANK, EQUIL);                             //1.1.00
     }
 }
-
-#ifdef VARDEBUG
-char *getHeaderString()
-{
-	static char hs[1024];
-	int i;
-	hs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			char s[20];
-			sprintf(s,"\\tc[%d]",i+1);
-			strcat(hs,s);
-		}
-	}
-/*
-	if(LastIndex[PARAMETER] > 0) {
-		for(i=0;i<LastIndex[PARAMETER];i++) {
-			char s[20];
-			sprintf(s,"\\tp[%d]",i+1);
-			strcat(hs,s);
-		}
-	}
-	if(LastIndex[CONSTANT] > 0) {
-		for(i=0;i<LastIndex[CONSTANT];i++) {
-			char s[20];
-			sprintf(s,"\\tk[%d]",i+1);
-			strcat(hs,s);
-		}
-	}
-	for(i=0;i<7;i++) {
-		char s[20];
-		sprintf(s,"\\th[%d]",i+1);
-		strcat(hs,s);
-	}
-*/
-	return hs;
-}
-static char vfs[1024];
-char *getVarFmtString()
-{
-	int i;
-	vfs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			strcat(vfs,"\\t%g");
-		}
-	}
-/*
-	if(LastIndex[PARAMETER] > 0) {
-		for(i=0;i<LastIndex[PARAMETER];i++) {
-			strcat(vfs,"\\t%g");
-		}
-	}
-	if(LastIndex[CONSTANT] > 0) {
-		for(i=0;i<LastIndex[CONSTANT];i++) {
-			strcat(vfs,"\\t%g");
-		}
-	}
-	for(i=0;i<7;i++) {
-		strcat(vfs,"\\t%g");
-	}
-*/
-
-	return vfs;
-}
-static char ffs[1024];
-char *getFFmtString(int isNull)
-{
-	int i;
-	ffs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			if(isNull)
-				strcat(ffs,"\\t");
-			else 
-				strcat(ffs,"\\t%g");
-		}
-	}
-	return ffs;
-}
-static char cfs[1024];
-char *getCFmtString()
-{
-	int i;
-	cfs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			strcat(cfs,"\\t%g");
-		}
-	}
-	return cfs;
-}
-static char cs[1024];
-char *getCString()
-{
-	int i;
-	cs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			char s[20];
-			sprintf(s,",c[%d]",i+1);
-			strcat(cs,s);
-		}
-	}
-	return cs;
-}
-static char vs[1024];
-char *getVarString()
-{
-	int i;
-	vfs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			char s[20];
-			sprintf(s,",c[%d]",i+1);
-			strcat(vs,s);
-		}
-	}
-/*
-	if(LastIndex[PARAMETER] > 0) {
-		for(i=0;i<LastIndex[PARAMETER];i++) {
-			char s[20];
-			sprintf(s,",p[%d]",i+1);
-			strcat(vs,s);
-		}
-	}
-	if(LastIndex[CONSTANT] > 0) {
-		for(i=0;i<LastIndex[CONSTANT];i++) {
-			char s[20];
-			sprintf(s,",k[%d]",i+1);
-			strcat(vs,s);
-		}
-	}
-	for(i=0;i<7;i++) {
-		char s[20];
-		sprintf(s,",h[%d]",i+1);
-		strcat(vs,s);
-	}
-*/
-	return vs;
-}
-static char fs[1024];
-char *getFString(int isNull)
-{
-	int i;
-	fs[0]='\0';
-	if(LastIndex[SPECIES] > 0) {
-		for(i=0;i<LastIndex[SPECIES];i++) {
-			if(!isNull) {
-				char s[20];
-				sprintf(s,",f[%d]",i+1);
-				strcat(fs,s);
-			}
-		}
-	}
-	return fs;
-}
-#endif

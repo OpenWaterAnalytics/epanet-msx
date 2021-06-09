@@ -9,13 +9,14 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00
-**  LAST UPDATE:   10/20/08
+**  LAST UPDATE:   2/8/11
 *******************************************************************************/
+#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 
@@ -51,15 +52,24 @@ char * MSXutils_getTempName(char *s)                                           /
     char *ptr;
     char fname[L_tmpnam];
     unsigned int i;
+
+	// --- use tmpnam() function to create a temporary file name
     tmpnam(fname);
+
+	// --- replace any '.' characters (they cause problems for some compilers)
     for (i=0; i<strlen(fname); i++)
     {
-	if ( fname[i] == '.' ) fname[i] = '_';
+	    if ( fname[i] == '.' ) fname[i] = '_';
     }
+
+	// --- set ptr to non-path portion of file name
     ptr = strrchr(fname, '\\');
     if ( ptr ) ++ptr;
     else ptr = fname;
-    strcpy(s, ptr);
+
+	// --- use '.\' as path name to keep file in current directory
+	strcpy(s, ".\\");
+    strcat(s, ptr);
 #else
     // --- use system function mkstemp() to create a temporary file name
     strcpy(s, "msxXXXXXX");
@@ -350,7 +360,7 @@ int factorize(double **a, int n, double *w, int *indx)
     }
     for (j = 1;j <= n;j++) /**for each column*/
     { 
-	/*This is the loop over columns of Crout’s method.*/
+	/*This is the loop over columns of Croutï¿½s method.*/
 	for (i = 1; i < j; i++) 
 	{ 
 	    /*Up from the diagonal*/
