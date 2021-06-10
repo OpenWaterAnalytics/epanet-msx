@@ -8,7 +8,7 @@ Tom Taxon <tntaxon@anl.gov>
 Sam Hatchett <samhatchett@gmail.com>
 Kyle Arrowood <kyle.arrowood@xylem.com>
 
-*** some works are in the public domain, all others licensed under terms: see LICENSE.txt
+*** Contributions are copyright their respective authors. Some contributor works are in the public domain in countries where this is recognized. See LICENSE.txt
 
 Some commits are co-authored:
 
