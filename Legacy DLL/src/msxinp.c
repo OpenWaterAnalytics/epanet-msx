@@ -17,13 +17,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdlib.h>
 #include <math.h>
 
 #include "msxtypes.h"
 #include "msxutils.h"
 #include "msxdict.h"
 #include "epanet2.h"
+
+#include "msxsetters.h"
+#include "msxgetters.h"
 
 //  Constants
 //-----------
@@ -132,11 +134,11 @@ int MSXinp_countMsxObjects()
 
 // --- write name of input file to EPANET report file
     
-    strcpy(MSX.Msg, "Processing MSX input file ");
+    // strcpy(MSX.Msg, "Processing MSX input file ");
     strcpy(line, MSX.MsxFile.name);
-    strcat(MSX.Msg, line);
-    ENwriteline(MSX.Msg);
-    ENwriteline("");
+    // strcat(MSX.Msg, line);
+    // ENwriteline(MSX.Msg);
+    // ENwriteline("");
 
 // --- make pass through EPANET-MSX data file counting number of each object
 
@@ -193,9 +195,13 @@ int  MSXinp_countNetObjects()
 
 // --- retrieve number of network elements
 
-    CALL(errcode, ENgetcount(EN_NODECOUNT, &MSX.Nobjects[NODE]));
-    CALL(errcode, ENgetcount(EN_TANKCOUNT, &MSX.Nobjects[TANK]));
-    CALL(errcode, ENgetcount(EN_LINKCOUNT, &MSX.Nobjects[LINK]));
+    int Nobjects;
+    CALL(errcode, ENgetcount(EN_NODECOUNT, &Nobjects));
+    CALL(errcode, setNobjects(NODE, Nobjects));      //Set Nobjects in the MSXpoject struct
+    CALL(errcode, ENgetcount(EN_TANKCOUNT, &Nobjects));
+    CALL(errcode, setNobjects(TANK, Nobjects));      //Set Nobjects in the MSXpoject struct
+    CALL(errcode, ENgetcount(EN_LINKCOUNT, &Nobjects));
+    CALL(errcode, setNobjects(LINK, Nobjects));      //Set Nobjects in the MSXpoject struct
     return errcode;
 }
 
@@ -221,20 +227,43 @@ int MSXinp_readNetData()
 	float roughness = 0.0;   /*Feng Shang, Bug ID 8,  01/29/2008*/
 // --- get flow units & time parameters
 
-    CALL(errcode, ENgetflowunits(&MSX.Flowflag));
-    if ( MSX.Flowflag >= EN_LPS ) MSX.Unitsflag = SI;
-    else                          MSX.Unitsflag = US;
-    CALL(errcode, ENgettimeparam(EN_QUALSTEP, &MSX.Qstep));
-    CALL(errcode, ENgettimeparam(EN_REPORTSTEP, &MSX.Rstep));
-    CALL(errcode, ENgettimeparam(EN_REPORTSTART, &MSX.Rstart));
-    CALL(errcode, ENgettimeparam(EN_PATTERNSTEP, &MSX.Pstep));
-    CALL(errcode, ENgettimeparam(EN_PATTERNSTART, &MSX.Pstart));
-    CALL(errcode, ENgettimeparam(EN_STATISTIC, &MSX.Statflag));
+    // CALL(errcode, ENgetflowunits(&MSX.Flowflag));
+    int Flowflag;
+    int Unitsflag;
+    CALL(errcode, ENgetflowunits(&Flowflag));
+    if ( Flowflag >= EN_LPS ) Unitsflag = SI;
+    else                          Unitsflag = US;
+    CALL(errcode, setFlowUnits(Flowflag, Unitsflag));     // Sets the Flow and Units in MSX struct
+    int Qstep;
+    CALL(errcode, ENgettimeparam(EN_QUALSTEP, &Qstep));
+    CALL(errcode, setQstep(Qstep));       // Sets the Qstep in MSX data struct
+    int Rstep;
+    CALL(errcode, ENgettimeparam(EN_REPORTSTEP, &Rstep));
+    CALL(errcode, setRstep(Rstep));       // Sets the Rstep in MSX data struct
+    int Rstart;
+    CALL(errcode, ENgettimeparam(EN_REPORTSTART, &Rstart));
+    CALL(errcode, setRstart(Rstart));       // Sets the Rstart in MSX data struct
+    int Pstep;
+    CALL(errcode, ENgettimeparam(EN_PATTERNSTEP, &Pstep));
+    CALL(errcode, setPstep(Pstep));       // Sets the Pstep in MSX data struct
+    int Pstart;
+    CALL(errcode, ENgettimeparam(EN_PATTERNSTART, &Pstart));
+    CALL(errcode, setPstart(Pstart));       // Sets the Pstart in MSX data struct
+    int Statflag;
+    CALL(errcode, ENgettimeparam(EN_STATISTIC, &Statflag));
+    CALL(errcode, setStatflag(Statflag));       // Sets the Statflag in MSX data struct
+
 
 // --- read tank/reservoir data
 
-    n = MSX.Nobjects[NODE] - MSX.Nobjects[TANK];
-    for (i=1; i<=MSX.Nobjects[NODE]; i++)
+    // Get number of node and tank objects
+    int numNodeObjects;
+    CALL(errcode, getNobjects(NODE, &numNodeObjects));
+    int numTankObjects;
+    CALL(errcode, getNobjects(TANK, &numTankObjects));
+
+    n = numNodeObjects - numTankObjects;
+    for (i=1; i<=numNodeObjects; i++)
     {
         k = i - n;
         if ( k > 0 )
@@ -245,13 +274,13 @@ int MSXinp_readNetData()
             CALL(errcode, ENgetnodevalue(i, EN_MIXZONEVOL, &vmix));
             if ( !errcode )
             {
-                MSX.Node[i].tank = k;
-                MSX.Tank[k].node = i;
-                if ( t == EN_RESERVOIR ) MSX.Tank[k].a = 0.0;
-                else                     MSX.Tank[k].a = 1.0;
-                MSX.Tank[k].v0       = v0;
-                MSX.Tank[k].mixModel = (int)xmix;
-                MSX.Tank[k].vMix     = vmix;
+                CALL(errcode, setNodeTank(i, k));
+                CALL(errcode, setTankNode(k, i));
+                if ( t == EN_RESERVOIR ) CALL(errcode, setTankArea(k, 0.0));
+                else                     CALL(errcode, setTankArea(k, 1.0));
+                CALL(errcode, setTankInitialVolume(k, v0));
+                CALL(errcode, setTankMixModel(k, (int)xmix));
+                CALL(errcode, setTankMixingSize(k, vmix));
             }
         }
     }
@@ -266,15 +295,17 @@ int MSXinp_readNetData()
         CALL(errcode, ENgetlinkvalue(i, EN_ROUGHNESS, &roughness));  /*Feng Shang, Bug ID 8,  01/29/2008*/
         if ( !errcode )
         {
-            MSX.Link[i].n1 = n1;
-            MSX.Link[i].n2 = n2;
-            MSX.Link[i].diam = diam;
-            MSX.Link[i].len = len;
-            MSX.Link[i].roughness = roughness;  /*Feng Shang, Bug ID 8,  01/29/2008*/
+            CALL(errcode, setLinkStartNode(i, n1));
+            CALL(errcode, setLinkEndNode(i, n2));
+            CALL(errcode, setLinkDiameter(i, diam));
+            CALL(errcode, setLinkLength(i, len));
+            CALL(errcode, setLinkRoughness(i, roughness));
         }
     }
     return errcode;
 }
+
+//TODO just finished this function above
 
 //=============================================================================
 

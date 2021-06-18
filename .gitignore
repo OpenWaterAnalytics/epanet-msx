@@ -179,3 +179,7 @@ $RECYCLE.BIN/
 
 
 *.xcuserstate
+
+# Visual Studio Code folder
+
+.vscode
