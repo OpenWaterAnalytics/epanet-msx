@@ -134,11 +134,11 @@ int MSXinp_countMsxObjects()
 
 // --- write name of input file to EPANET report file
     
-    // strcpy(MSX.Msg, "Processing MSX input file ");
+    strcpy(MSX.Msg, "Processing MSX input file ");
     strcpy(line, MSX.MsxFile.name);
-    // strcat(MSX.Msg, line);
-    // ENwriteline(MSX.Msg);
-    // ENwriteline("");
+    strcat(MSX.Msg, line);
+    ENwriteline(MSX.Msg);
+    ENwriteline("");
 
 // --- make pass through EPANET-MSX data file counting number of each object
 
@@ -286,8 +286,9 @@ int MSXinp_readNetData()
     }
 
 // --- read link data
-
-    for (i=1; i<=MSX.Nobjects[LINK]; i++)
+    int numLinks;
+    getNobjects(LINK, &numLinks);
+    for (i=1; i<=numLinks; i++)
     {
         CALL(errcode, ENgetlinknodes(i, &n1, &n2));
         CALL(errcode, ENgetlinkvalue(i, EN_DIAMETER, &diam));
@@ -305,7 +306,6 @@ int MSXinp_readNetData()
     return errcode;
 }
 
-//TODO just finished this function above
 
 //=============================================================================
 
@@ -328,13 +328,18 @@ int  MSXinp_readMsxData()
     int   inperr = 0;                  // input error code
     long  lineCount = 0;               // line count
 
+    int errcode = 0;
+
 // --- create the TermArray for checking circular references in Terms          //1.1.00
 
-	TermArray = createMatrix(MSX.Nobjects[TERM]+1, MSX.Nobjects[TERM]+1);      //1.1.00
+    int n;
+    CALL(errcode, getNobjects(TERM, &n));
+	TermArray = createMatrix(n+1, n+1);
 	if ( TermArray == NULL ) return ERR_MEMORY;                                //1.1.00
 
 // --- read each line from MSX input file
 
+    //TODO do something about the file right here
     rewind(MSX.MsxFile.file);
     while ( fgets(line, MAXLINE, MSX.MsxFile.file) != NULL )
     {
@@ -380,7 +385,7 @@ int  MSXinp_readMsxData()
     if ( checkCyclicTerms() ) errsum++;                                        //1.1.00
     freeMatrix(TermArray);                                                     //1.1.00
     if (errsum > 0) return ERR_MSX_INPUT;                                      //1.1.00
-    return 0;
+    return errcode;
 }
 
 //=============================================================================
@@ -397,10 +402,18 @@ void   MSXinp_getSpeciesUnits(int m, char *units)
 **    units = character string with species concentration units
 */
 {
-    strcpy(units, MSX.Species[m].units);
+    char * u;
+    getSpeciesUnits(m, &u);
+    strcpy(units, u);
     strcat(units, "/");
-    if ( MSX.Species[m].type == BULK ) strcat(units, "L");
-    else strcat(units, AreaUnitsWords[MSX.AreaUnits]);
+    int type;
+    getSpeciesType(m, &type);
+    if ( type == BULK ) strcat(units, "L");
+    else {
+        int AreaUnits;
+        getAreaUnits(&AreaUnits);
+        strcat(units, AreaUnitsWords[AreaUnits]);
+    }
 }
 
 //=============================================================================
@@ -481,9 +494,13 @@ int addSpecies(char *line)
     if ( Ntokens < 2 ) return ERR_ITEMS;
     errcode = checkID(Tok[1]);
     if ( errcode ) return errcode;
-    if ( MSXproj_addObject(SPECIES, Tok[1], MSX.Nobjects[SPECIES]+1) < 0 )
+    int numSpecies;
+    CALL(errcode, getNobjects(SPECIES, &numSpecies));
+    if ( MSXproj_addObject(SPECIES, Tok[1], numSpecies+1) < 0 )
         errcode = 101;
-    else MSX.Nobjects[SPECIES]++;
+    else {
+        CALL(errcode, setNobjects(SPECIES, numSpecies+1));
+    }
     return errcode;
 }
 
@@ -516,9 +533,13 @@ int addCoeff(char *line)
 
     errcode = checkID(Tok[1]);
     if ( errcode ) return errcode;
-    if ( MSXproj_addObject(k, Tok[1], MSX.Nobjects[k]+1) < 0 )
+    int Nobjects;
+    CALL(errcode, getNobjects(k, &Nobjects));
+    if ( MSXproj_addObject(k, Tok[1], Nobjects+1) < 0 )
         errcode = 101;
-    else MSX.Nobjects[k]++;
+    else {
+        CALL(errcode, setNobjects(k, Nobjects+1));
+    }
     return errcode;
 }
 
@@ -539,9 +560,13 @@ int addTerm(char *id)
     int errcode = checkID(id);
     if ( !errcode )
     {
-        if ( MSXproj_addObject(TERM, id, MSX.Nobjects[TERM]+1) < 0 )
+        int numTerms;
+        CALL(errcode, getNobjects(TERM, &numTerms));
+        if ( MSXproj_addObject(TERM, id, numTerms+1) < 0 )
             errcode = 101;
-        else MSX.Nobjects[TERM]++;
+        else {
+            CALL(errcode, setNobjects(TERM, numTerms+1));
+        }
     }
     return errcode;
 }
@@ -566,9 +591,13 @@ int addPattern(char *id)
 
     if ( MSXproj_findObject(PATTERN, id) <= 0 )
     {
-        if ( MSXproj_addObject(PATTERN, id, MSX.Nobjects[PATTERN]+1) < 0 )
+        int numPatterns;
+        CALL(errcode, getNobjects(PATTERN, &numPatterns));
+        if ( MSXproj_addObject(PATTERN, id, numPatterns+1) < 0 )
             errcode = 101;
-        else MSX.Nobjects[PATTERN]++;
+        else {
+            CALL(errcode, setNobjects(PATTERN, numPatterns+1));
+        }
     }
     return errcode;
 }
@@ -623,6 +652,7 @@ int parseLine(int sect, char *line)
     switch(sect)
     {
       case s_TITLE:
+        //TODO Does the project even need a title?
         strcpy(MSX.Title, line);
         break;
 
@@ -685,51 +715,57 @@ int parseOption()
     if ( k < 0 ) return ERR_KEYWORD;
 
 // --- parse the value for the given option
-
+    int result; // Only used in the tolerance cases
     switch ( k )
     {
       case AREA_UNITS_OPTION:
           k = MSXutils_findmatch(Tok[1], AreaUnitsWords);
           if ( k < 0 ) return ERR_KEYWORD;
-          MSX.AreaUnits = k;
+          setAreaUnits(k);
           break;
 
       case RATE_UNITS_OPTION:
           k = MSXutils_findmatch(Tok[1], TimeUnitsWords);
           if ( k < 0 ) return ERR_KEYWORD;
-          MSX.RateUnits = k;
+          setRateUnits(k);
           break;
 
       case SOLVER_OPTION:
           k = MSXutils_findmatch(Tok[1], SolverTypeWords);
           if ( k < 0 ) return ERR_KEYWORD;
-          MSX.Solver = k;
+          setSolver(k);
           break;
 
       case COUPLING_OPTION:
           k = MSXutils_findmatch(Tok[1], CouplingWords);
           if ( k < 0 ) return ERR_KEYWORD;
-          MSX.Coupling = k;
+          setCoupling(k);
 		  break;
 
       case TIMESTEP_OPTION:
           k = atoi(Tok[1]);
           if ( k <= 0 ) return ERR_NUMBER;
-          MSX.Qstep = k;
+          setQstep(k);
           break;
 
       case RTOL_OPTION:
-          if ( !MSXutils_getDouble(Tok[1], &MSX.DefRtol) ) return ERR_NUMBER;
+          double DefRtol;
+          result = MSXutils_getDouble(Tok[1], &DefRtol);
+          setDefaultRelativeErrorTolerance(DefRtol);
+          if ( !result ) return ERR_NUMBER;
           break;
 
       case ATOL_OPTION:
-          if ( !MSXutils_getDouble(Tok[1], &MSX.DefAtol) ) return ERR_NUMBER;
+          double DefAtol;
+          result = MSXutils_getDouble(Tok[1], &DefAtol);
+          setDefaultAbsoluteErrorTolerance(DefAtol);
+          if ( !result ) return ERR_NUMBER;
           break;
 
       case COMPILER_OPTION:                                                    //1.1.00
           k = MSXutils_findmatch(Tok[1], CompilerWords);
           if ( k < 0 ) return ERR_KEYWORD;
-    	  MSX.Compiler = k;
+    	  setCompiler(k);
 	  break;
 
     }
@@ -759,31 +795,37 @@ int parseSpecies()
     if ( i <= 0 ) return ERR_NAME;
 
 // --- get pointer to Species name
-
-    MSX.Species[i].id = MSXproj_findID(SPECIES, Tok[1]);
+    setSpeciesId(i, MSXproj_findID(SPECIES, Tok[1]));
 
 // --- get Species type
 
-    if      ( MSXutils_match(Tok[0], "BULK") ) MSX.Species[i].type = BULK;
-    else if ( MSXutils_match(Tok[0], "WALL") ) MSX.Species[i].type = WALL;
+    if      ( MSXutils_match(Tok[0], "BULK") ) setSpeciesType(i, BULK);
+    else if ( MSXutils_match(Tok[0], "WALL") ) setSpeciesType(i, WALL);
     else return ERR_KEYWORD;
 
 // --- get Species units
 
-    strncpy(MSX.Species[i].units, Tok[2], MAXUNITS);
+    setSpeciesUnits(i, Tok[2]);
 
 // --- get Species error tolerance
 
-    MSX.Species[i].aTol = 0.0;
-    MSX.Species[i].rTol = 0.0;
+    setSpeciesAbsoluteTolerance(i, 0.0);
+    setSpeciesRelativeTolerance(i, 0.0);
+
     if ( Ntokens >= 4)
     {
-        if ( !MSXutils_getDouble(Tok[3], &MSX.Species[i].aTol) )
+        double aTol;
+        int result = MSXutils_getDouble(Tok[3], &aTol);
+        setSpeciesAbsoluteTolerance(i, aTol);
+        if ( !result )
             return ERR_NUMBER;
     }
     if ( Ntokens >= 5)
     {
-        if ( !MSXutils_getDouble(Tok[4], &MSX.Species[i].rTol) )
+        double rTol;
+        int result = MSXutils_getDouble(Tok[4], &rTol);
+        setSpeciesRelativeTolerance(i, rTol);
+        if ( !result )
             return ERR_NUMBER;
     }
     return 0;
@@ -818,13 +860,17 @@ int parseCoeff()
 
     // --- get Parameter's value
 
-        MSX.Param[i].id = MSXproj_findID(PARAMETER, Tok[1]); 
+        setParameterId(i, MSXproj_findID(PARAMETER, Tok[1]));
         if ( Ntokens >= 3 )
         {
             if ( !MSXutils_getDouble(Tok[2], &x) ) return ERR_NUMBER;
-			MSX.Param[i].value = x;
-            for (j=1; j<=MSX.Nobjects[LINK]; j++) MSX.Link[j].param[i] = x;
-            for (j=1; j<=MSX.Nobjects[TANK]; j++) MSX.Tank[j].param[i] = x;
+            setParameterValue(i, x);
+            int numLinks;
+            getNobjects(LINK, &numLinks);
+            for (j=1; j<=numLinks; j++) setLinkParameter(j, i, x); //MSX.Link[j].param[i] = x;
+            int numTanks;
+            getNobjects(TANK, &numTanks);
+            for (j=1; j<=numTanks; j++) setTankParameter(j, i, x); //MSX.Tank[j].param[i] = x;
         }
         return 0;
     }
@@ -840,11 +886,14 @@ int parseCoeff()
 
     // --- get Constant's value
 
-        MSX.Const[i].id = MSXproj_findID(CONSTANT, Tok[1]); 
-        MSX.Const[i].value = 0.0;
+        setConstantId(i, MSXproj_findID(CONSTANT, Tok[1]));
+        double value = 0.0;
+        setConstantValue(i, value);
         if ( Ntokens >= 3 )
         {
-            if ( !MSXutils_getDouble(Tok[2], &MSX.Const[i].value) )
+            int result = MSXutils_getDouble(Tok[2], &value);
+            setConstantValue(i, value);
+            if ( !result )
                 return ERR_NUMBER;
         }
         return 0;
@@ -875,7 +924,7 @@ int parseTerm()
 
     if ( Ntokens < 2 ) return 0;
     i = MSXproj_findObject(TERM, Tok[0]);
-    MSX.Term[i].id = MSXproj_findID(TERM, Tok[0]);                             //1.1.00
+    setTermId(i, MSXproj_findID(TERM, Tok[0]));
 
 // --- reconstruct the expression string from its tokens
 
@@ -893,6 +942,7 @@ int parseTerm()
 
 // --- assign the expression to a Term object
 
+    // setTermExpression(i, expr); //TODO
     MSX.Term[i].expr = expr;
     return 0;
 }
@@ -930,10 +980,16 @@ int parseExpression(int classType)
 
     if ( classType == LINK )
     {
+        // int pipeExprType; //TODO
+        // getSpeciesPipeExpressionType(i, &pipeExprType);
+        // if ( pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
         if ( MSX.Species[i].pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
     if ( classType == TANK )
     {
+        // int tankExprType; //TODO
+        // getSpeciesTankExpressionType(i, &tankExprType);
+        // if ( tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
         if ( MSX.Species[i].tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
 
@@ -951,10 +1007,14 @@ int parseExpression(int classType)
     switch (classType)
     {
     case LINK:
+        // setSpeciesPipeExpression(i, expr); //TODO
+        // setSpeciesPipeExpressionType(i, k);
         MSX.Species[i].pipeExpr = expr;
         MSX.Species[i].pipeExprType = k;
         break;
     case TANK:
+        // setSpeciesTankExpression(i, expr); //TODO
+        // setSpeciesTankExpressionType(i, k);
         MSX.Species[i].tankExpr = expr;
         MSX.Species[i].tankExprType = k;
         break;
@@ -1006,12 +1066,18 @@ int parseQuality()
 
     if ( i == 1)
     {
-		MSX.C0[m] = x;
-        if ( MSX.Species[m].type == BULK )
+        setInitialQualityVector(i, x);
+        int type;
+        getSpeciesType(m, &type);
+        if ( type == BULK )
         {
-            for (j=1; j<=MSX.Nobjects[NODE]; j++) MSX.Node[j].c0[m] = x;
+            int numNodes;
+            getNobjects(NODE, &numNodes);
+            for (j=1; j<=numNodes; j++) setNodeInitialSpeciesConcentration(j, m, x);
         }
-        for (j=1; j<=MSX.Nobjects[LINK]; j++) MSX.Link[j].c0[m] = x;
+        int numLinks;
+        getNobjects(LINK, &numLinks);
+        for (j=1; j<=numLinks; j++) setLinkInitialSpeciesConcentration(j, m, x);
     }
 
 // --- for a specific node, get its index & set its initial quality
@@ -1020,7 +1086,9 @@ int parseQuality()
     {
         err = ENgetnodeindex(Tok[1], &j);
         if ( err ) return ERR_NAME;
-        if ( MSX.Species[m].type == BULK ) MSX.Node[j].c0[m] = x;
+        int type;
+        getSpeciesType(m, &type);
+        if ( type == BULK ) setNodeInitialSpeciesConcentration(j, m, x);
     }
 
 // --- for a specific link, get its index & set its initial quality
@@ -1029,7 +1097,7 @@ int parseQuality()
     {
         err = ENgetlinkindex(Tok[1], &j);
         if ( err ) return ERR_NAME;
-        MSX.Link[j].c0[m] = x;
+        setLinkInitialSpeciesConcentration(j, m, x);
     }
     return 0;
 }
@@ -1066,7 +1134,7 @@ int parseParameter()
     {
         err = ENgetlinkindex(Tok[1], &j);
         if ( err ) return ERR_NAME;
-        MSX.Link[j].param[i] = x;
+        setLinkParameter(j, i, x);
     }
 
 // --- for tank parameter, get tank index and update parameter's value
@@ -1075,8 +1143,11 @@ int parseParameter()
     {
         err = ENgetnodeindex(Tok[1], &j);
         if ( err ) return ERR_NAME;
-        j = MSX.Node[j].tank;
-        if ( j > 0 ) MSX.Tank[j].param[i] = x;
+        int nodeTank;
+        getNodeTank(j, &nodeTank);
+        j = nodeTank;
+
+        if ( j > 0 ) setTankParameter(j, i, x);
     }
     else return ERR_KEYWORD;
     return 0;
@@ -1117,8 +1188,9 @@ int parseSource()
     if ( m <= 0 ) return ERR_NAME;
 
 // --- check that species is a BULK species
-
-    if ( MSX.Species[m].type != BULK ) return 0;
+    int type;
+    getSpeciesType(m, &type);
+    if ( type != BULK ) return 0;
 
 // --- get base strength
 
@@ -1135,6 +1207,7 @@ int parseSource()
 
 // --- check if a source for this species already exists
 
+    // getNodeSources(j, &source); //TODO
     source = MSX.Node[j].sources;
     while ( source )
     {
@@ -1148,6 +1221,8 @@ int parseSource()
     {
         source = (struct Ssource *) malloc(sizeof(struct Ssource));
         if ( source == NULL ) return 101;
+        // getNodeSources(j, &source->next); //TODO
+        // setNodeSources(j, source);
         source->next = MSX.Node[j].sources;
         MSX.Node[j].sources = source;
     }
@@ -1184,7 +1259,7 @@ int parsePattern()
     if ( Ntokens < 2 ) return ERR_ITEMS;
     i = MSXproj_findObject(PATTERN, Tok[0]);
     if ( i <= 0 ) return ERR_NAME;
-	MSX.Pattern[i].id = MSXproj_findID(PATTERN, Tok[0]);
+    setPatternId(i, MSXproj_findID(PATTERN, Tok[0]));
 
 // --- begin reading pattern multipliers
 
@@ -1196,17 +1271,26 @@ int parsePattern()
         if ( listItem == NULL ) return 101;
         listItem->value = x;
         listItem->next = NULL;
+        // SnumList *first; //TODO
+        // getPatternFirstMultiplier(i, &first);
+        // if ( first == NULL )
         if ( MSX.Pattern[i].first == NULL )
         {
+            // setPatternCurrentMultiplier(i, listItem); //TODO
+            // setPatternFirstMultiplier(i, listItem);
             MSX.Pattern[i].current = listItem;
             MSX.Pattern[i].first = listItem;
         }
         else
         {
+            // setPatternNextMultiplier(i, listItem); //TODO
+            // setPatternCurrentMultiplier(i, listItem);
             MSX.Pattern[i].current->next = listItem;
             MSX.Pattern[i].current = listItem;
         }
-        MSX.Pattern[i].length++;
+        int length;
+        getPatternLength(i, &length);
+        setPatternLength(i, length+1);
         k++;
     }
     return 0;
@@ -1229,69 +1313,77 @@ int parseReport()
     // --- keyword is NODE; parse ID names of reported nodes
     
         case 0:
-        if ( MSXutils_strcomp(Tok[1], ALL) )
-        {
-            for (j=1; j<=MSX.Nobjects[NODE]; j++) MSX.Node[j].rpt = 1;
-        }
-        else if ( MSXutils_strcomp(Tok[1], NONE) )
-        {
-            for (j=1; j<=MSX.Nobjects[NODE]; j++) MSX.Node[j].rpt = 0;
-        }
-        else for (i=1; i<Ntokens; i++)
-        {
-            err = ENgetnodeindex(Tok[i], &j);
-            if ( err ) return ERR_NAME;
-            MSX.Node[j].rpt = 1;
-        }
-        break;
+            int numNodes;
+            getNobjects(NODE, &numNodes);
+            if ( MSXutils_strcomp(Tok[1], ALL) )
+            {
+                
+                for (j=1; j<=numNodes; j++) setNodeReport(j, 1);
+            }
+            else if ( MSXutils_strcomp(Tok[1], NONE) )
+            {
+                for (j=1; j<=numNodes; j++) setNodeReport(j, 0);
+            }
+            else for (i=1; i<Ntokens; i++)
+            {
+                err = ENgetnodeindex(Tok[i], &j);
+                if ( err ) return ERR_NAME;
+                setNodeReport(j, 1);
+            }
+            break;
 
     // --- keyword is LINK: parse ID names of reported links
         case 1:
-        if ( MSXutils_strcomp(Tok[1], ALL) )
-        {
-            for (j=1; j<=MSX.Nobjects[LINK]; j++) MSX.Link[j].rpt = 1;
-        }
-        else if ( MSXutils_strcomp(Tok[1], NONE) )
-        {
-            for (j=1; j<=MSX.Nobjects[LINK]; j++) MSX.Link[j].rpt = 0;
-        }
-        else for (i=1; i<Ntokens; i++)
-        {
-            err = ENgetlinkindex(Tok[i], &j);
-            if ( err ) return ERR_NAME;
-            MSX.Link[j].rpt = 1;
-        }
-        break;
+            int numLinks;
+            getNobjects(LINK, &numLinks);
+            if ( MSXutils_strcomp(Tok[1], ALL) )
+            {
+                for (j=1; j<=numLinks; j++) setLinkReport(j, 1);
+            }
+            else if ( MSXutils_strcomp(Tok[1], NONE) )
+            {
+                for (j=1; j<=numLinks; j++) setLinkReport(j, 0);
+            }
+            else for (i=1; i<Ntokens; i++)
+            {
+                err = ENgetlinkindex(Tok[i], &j);
+                if ( err ) return ERR_NAME;
+                setLinkReport(j, 1);
+            }
+            break;
 
     // --- keyword is SPECIES; get YES/NO & precision
 
         case 2:
-        j = MSXproj_findObject(SPECIES, Tok[1]);
-        if ( j <= 0 ) return ERR_NAME;
-        if ( Ntokens >= 3 )
-        {
-            if ( MSXutils_strcomp(Tok[2], YES) ) MSX.Species[j].rpt = 1;
-            else if ( MSXutils_strcomp(Tok[2], NO)  ) MSX.Species[j].rpt = 0;
-            else return ERR_KEYWORD;
-        }
-        if ( Ntokens >= 4 )
-        {
-            if ( !MSXutils_getInt(Tok[3], &MSX.Species[j].precision) )
-                return ERR_NUMBER;
-        }
-        break;
+            j = MSXproj_findObject(SPECIES, Tok[1]);
+            if ( j <= 0 ) return ERR_NAME;
+            if ( Ntokens >= 3 )
+            {
+                if ( MSXutils_strcomp(Tok[2], YES) ) setSpeciesReport(j, 1);
+                else if ( MSXutils_strcomp(Tok[2], NO)  ) setSpeciesReport(j, 0);
+                else return ERR_KEYWORD;
+            }
+            if ( Ntokens >= 4 )
+            {
+                int precision;
+                int result = MSXutils_getInt(Tok[3], &precision);
+                setSpeciesPrecision(j, precision);
+                if ( !result )
+                    return ERR_NUMBER;
+            }
+            break;
 
     // --- keyword is FILE: get name of report file
 
         case 3:
-        strcpy(MSX.RptFile.name, Tok[1]);
-        break;
+            strcpy(MSX.RptFile.name, Tok[1]); //TODO
+            break;
 
     // --- keyword is PAGESIZE;
 
         case 4:
-        if ( !MSXutils_getInt(Tok[1], &MSX.PageSize) ) return ERR_NUMBER;
-        break;
+            if ( !MSXutils_getInt(Tok[1], &MSX.PageSize) ) return ERR_NUMBER; //TODO
+            break;
     }
     return 0;
 }
@@ -1318,15 +1410,41 @@ int getVariableCode(char *id)
     int j = MSXproj_findObject(SPECIES, id);
     if ( j >= 1 ) return j;
     j = MSXproj_findObject(TERM, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + j;
+    if ( j >= 1 ) {
+        int numSpecies;
+        getNobjects(SPECIES, &numSpecies);
+        return numSpecies + j;
+    }
     j = MSXproj_findObject(PARAMETER, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + j;
+    if ( j >= 1 ){
+        int numSpecies;
+        int numTerms;
+        getNobjects(SPECIES, &numSpecies);
+        getNobjects(TERM, &numTerms);
+        return numSpecies + numTerms + j;
+    }
     j = MSXproj_findObject(CONSTANT, id);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + 
-                         MSX.Nobjects[PARAMETER] + j;
+    if ( j >= 1 ){
+        int numSpecies;
+        int numTerms;
+        int numParams;
+        getNobjects(SPECIES, &numSpecies);
+        getNobjects(TERM, &numTerms);
+        getNobjects(PARAMETER, &numParams);
+        return numSpecies + numTerms + numParams + j;
+    }
     j = MSXutils_findmatch(id, HydVarWords);
-    if ( j >= 1 ) return MSX.Nobjects[SPECIES] + MSX.Nobjects[TERM] + 
-                         MSX.Nobjects[PARAMETER] + MSX.Nobjects[CONSTANT] + j;
+    if ( j >= 1 ) {
+        int numSpecies;
+        int numTerms;
+        int numParams;
+        int numConstants;
+        getNobjects(SPECIES, &numSpecies);
+        getNobjects(TERM, &numTerms);
+        getNobjects(PARAMETER, &numParams);
+        getNobjects(CONSTANT, &numConstants);
+        return numSpecies + numTerms + numParams + numConstants + j;
+    }
     return -1;
 }
 
@@ -1425,14 +1543,16 @@ int checkCyclicTerms()                                                         /
     int i, j, n;
     char msg[MAXMSG+1];
 
-    n = MSX.Nobjects[TERM];
+    getNobjects(TERM, &n);
     for (i=1; i<n; i++)
     {
         for (j=1; j<=n; j++) TermArray[0][j] = 0.0;
         if ( traceTermPath(i, i, n) )
         {
+            char * id;
+            getTermId(i, &id);
             sprintf(msg, "Error 410 - term %s contains a cyclic reference.",
-                         MSX.Term[i].id);
+                         id);
             ENwriteline(msg);
             return 1;
         }
