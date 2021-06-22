@@ -19,7 +19,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "msxtypes.h"
+// #include "msxtypes.h"
 #include "msxutils.h"
 #include "msxdict.h"
 #include "epanet2.h"
@@ -867,10 +867,10 @@ int parseCoeff()
             setParameterValue(i, x);
             int numLinks;
             getNobjects(LINK, &numLinks);
-            for (j=1; j<=numLinks; j++) setLinkParameter(j, i, x); //MSX.Link[j].param[i] = x;
+            for (j=1; j<=numLinks; j++) setLinkParameter(j, i, x);
             int numTanks;
             getNobjects(TANK, &numTanks);
-            for (j=1; j<=numTanks; j++) setTankParameter(j, i, x); //MSX.Tank[j].param[i] = x;
+            for (j=1; j<=numTanks; j++) setTankParameter(j, i, x);
         }
         return 0;
     }
@@ -942,8 +942,7 @@ int parseTerm()
 
 // --- assign the expression to a Term object
 
-    // setTermExpression(i, expr); //TODO
-    MSX.Term[i].expr = expr;
+    setTermExpression(i, expr);
     return 0;
 }
 
@@ -980,17 +979,15 @@ int parseExpression(int classType)
 
     if ( classType == LINK )
     {
-        // int pipeExprType; //TODO
-        // getSpeciesPipeExpressionType(i, &pipeExprType);
-        // if ( pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
-        if ( MSX.Species[i].pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
+        int pipeExprType;
+        getSpeciesPipeExpressionType(i, &pipeExprType);
+        if ( pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
     if ( classType == TANK )
     {
-        // int tankExprType; //TODO
-        // getSpeciesTankExpressionType(i, &tankExprType);
-        // if ( tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
-        if ( MSX.Species[i].tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
+        int tankExprType;
+        getSpeciesTankExpressionType(i, &tankExprType);
+        if ( tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
     }
 
 // --- reconstruct the expression string from its tokens
@@ -1007,16 +1004,12 @@ int parseExpression(int classType)
     switch (classType)
     {
     case LINK:
-        // setSpeciesPipeExpression(i, expr); //TODO
-        // setSpeciesPipeExpressionType(i, k);
-        MSX.Species[i].pipeExpr = expr;
-        MSX.Species[i].pipeExprType = k;
+        setSpeciesPipeExpression(i, expr);
+        setSpeciesPipeExpressionType(i, k);
         break;
     case TANK:
-        // setSpeciesTankExpression(i, expr); //TODO
-        // setSpeciesTankExpressionType(i, k);
-        MSX.Species[i].tankExpr = expr;
-        MSX.Species[i].tankExprType = k;
+        setSpeciesTankExpression(i, expr);
+        setSpeciesTankExpressionType(i, k);
         break;
     }
     return 0;    
@@ -1207,8 +1200,7 @@ int parseSource()
 
 // --- check if a source for this species already exists
 
-    // getNodeSources(j, &source); //TODO
-    source = MSX.Node[j].sources;
+    getNodeSources(j, &source);
     while ( source )
     {
         if ( source->species == m ) break;
@@ -1221,10 +1213,8 @@ int parseSource()
     {
         source = (struct Ssource *) malloc(sizeof(struct Ssource));
         if ( source == NULL ) return 101;
-        // getNodeSources(j, &source->next); //TODO
-        // setNodeSources(j, source);
-        source->next = MSX.Node[j].sources;
-        MSX.Node[j].sources = source;
+        getNodeSources(j, &source->next);
+        setNodeSources(j, source);
     }
 
 // --- save source's properties
@@ -1271,22 +1261,17 @@ int parsePattern()
         if ( listItem == NULL ) return 101;
         listItem->value = x;
         listItem->next = NULL;
-        // SnumList *first; //TODO
-        // getPatternFirstMultiplier(i, &first);
-        // if ( first == NULL )
-        if ( MSX.Pattern[i].first == NULL )
+        SnumList *first; //TODO
+        getPatternFirstMultiplier(i, &first);
+        if ( first == NULL )
         {
-            // setPatternCurrentMultiplier(i, listItem); //TODO
-            // setPatternFirstMultiplier(i, listItem);
-            MSX.Pattern[i].current = listItem;
-            MSX.Pattern[i].first = listItem;
+            setPatternCurrentMultiplier(i, listItem);
+            setPatternFirstMultiplier(i, listItem);
         }
         else
         {
-            // setPatternNextMultiplier(i, listItem); //TODO
-            // setPatternCurrentMultiplier(i, listItem);
-            MSX.Pattern[i].current->next = listItem;
-            MSX.Pattern[i].current = listItem;
+            setPatternNextMultiplier(i, listItem);
+            setPatternCurrentMultiplier(i, listItem);
         }
         int length;
         getPatternLength(i, &length);

@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include "msxsetters.h"
-#include "msxtypes.h"
-// #include "mathexpr.h"
 
 //  External variables
 //--------------------
@@ -127,12 +125,12 @@ int setNodeInitialSpeciesConcentration(int nodeIndex, int speciesIndex, double c
     return 0;   //Success
 }
 
-// int setNodeSources(int nodeIndex, Psource sources)
-// {
-//     if (nodeIndex > MSX.Nobjects[NODE]) return 516; //reference made to an illegal object index
-//     MSX.Node[nodeIndex].sources = sources;
-//     return 0;   //Success
-// }
+int setNodeSources(int nodeIndex, Psource sources)
+{
+    if (nodeIndex > MSX.Nobjects[NODE]) return 516; //reference made to an illegal object index
+    MSX.Node[nodeIndex].sources = sources;
+    return 0;   //Success
+}
 
 int setNodeReport(int nodeIndex, char report)
 {
@@ -290,12 +288,12 @@ int setSpeciesPipeExpressionType(int speciesIndex, int type)
     return 0;   //Success
 }
 
-// int setSpeciesPipeExpression(int speciesIndex, MathExpr *expr)
-// {
-//     if (speciesIndex > MSX.Nobjects[SPECIES]) return 516; //reference made to an illegal object index
-//     MSX.Species[speciesIndex].pipeExpr = expr;
-//     return 0;   //Success
-// }
+int setSpeciesPipeExpression(int speciesIndex, MathExpr *expr)
+{
+    if (speciesIndex > MSX.Nobjects[SPECIES]) return 516; //reference made to an illegal object index
+    MSX.Species[speciesIndex].pipeExpr = expr;
+    return 0;   //Success
+}
 
 int setSpeciesTankExpressionType(int speciesIndex, int type)
 {
@@ -304,12 +302,12 @@ int setSpeciesTankExpressionType(int speciesIndex, int type)
     return 0;   //Success
 }
 
-// int setSpeciesTankExpression(int speciesIndex, MathExpr *expr)
-// {
-//     if (speciesIndex > MSX.Nobjects[SPECIES]) return 516; //reference made to an illegal object index
-//     MSX.Species[speciesIndex].tankExpr = expr;
-//     return 0;   //Success
-// }
+int setSpeciesTankExpression(int speciesIndex, MathExpr *expr)
+{
+    if (speciesIndex > MSX.Nobjects[SPECIES]) return 516; //reference made to an illegal object index
+    MSX.Species[speciesIndex].tankExpr = expr;
+    return 0;   //Success
+}
 
 int setSpeciesReport(int speciesIndex, char report)
 {
@@ -366,12 +364,12 @@ int setTermId(int termIndex, char *id)
     return 0;   //Success
 }
 
-// int setTermExpression(int termIndex, MathExpr *expr)
-// {
-//     if (termIndex > MSX.Nobjects[TERM]) return 516;   //reference made to an illegal object index
-//     MSX.Term[termIndex].expr = expr;
-//     return 0;   //Success
-// }
+int setTermExpression(int termIndex, MathExpr *expr)
+{
+    if (termIndex > MSX.Nobjects[TERM]) return 516;   //reference made to an illegal object index
+    MSX.Term[termIndex].expr = expr;
+    return 0;   //Success
+}
 
 // Pattern setters
 
@@ -389,23 +387,23 @@ int setPatternLength(int patternIndex, int length)
     return 0;   //Success
 }
 
-// int setPatternFirstMultiplier(int patternIndex, SnumList *first)
-// {
-//     if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
-//     MSX.Pattern[patternIndex].first = first;
-//     return 0;   //Success
-// }
+int setPatternFirstMultiplier(int patternIndex, SnumList *first)
+{
+    if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
+    MSX.Pattern[patternIndex].first = first;
+    return 0;   //Success
+}
 
-// int setPatternCurrentMultiplier(int patternIndex, SnumList *current)
-// {
-//     if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
-//     MSX.Pattern[patternIndex].current = current;
-//     return 0;   //Success
-// }
+int setPatternCurrentMultiplier(int patternIndex, SnumList *current)
+{
+    if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
+    MSX.Pattern[patternIndex].current = current;
+    return 0;   //Success
+}
 
-// int setPatternNextMultiplier(int patternIndex, SnumList *next)
-// {
-//     if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
-//     MSX.Pattern[patternIndex].current->next = next;
-//     return 0;   //Success
-// }
+int setPatternNextMultiplier(int patternIndex, SnumList *next)
+{
+    if (patternIndex > MSX.Nobjects[PATTERN]) return 516;   //reference made to an illegal object index
+    MSX.Pattern[patternIndex].current->next = next;
+    return 0;   //Success
+}

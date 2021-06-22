@@ -1,5 +1,7 @@
 
-
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
 
 int setNobjects(int type, int Nobjects);
 
@@ -39,7 +41,7 @@ int setNodeTank(int nodeIndex, int tank);
 
 int setNodeInitialSpeciesConcentration(int nodeIndex, int speciesIndex, double concentration);
 
-// int setNodeSources(int nodeIndex, Psource sources);
+int setNodeSources(int nodeIndex, Psource sources);
 
 int setNodeReport(int nodeIndex, char report);
 
@@ -89,11 +91,11 @@ int setSpeciesRelativeTolerance(int speciesIndex, double rTol);
 
 int setSpeciesPipeExpressionType(int speciesIndex, int type);
 
-// int setSpeciesPipeExpression(int speciesIndex, MathExpr *expr);
+int setSpeciesPipeExpression(int speciesIndex, MathExpr *expr);
 
 int setSpeciesTankExpressionType(int speciesIndex, int type);
 
-// int setSpeciesTankExpression(int speciesIndex, MathExpr *expr);
+int setSpeciesTankExpression(int speciesIndex, MathExpr *expr);
 
 int setSpeciesReport(int speciesIndex, char report);
 
@@ -115,7 +117,7 @@ int setConstantValue(int constantIndex, double value);
 
 int setTermId(int termIndex, char *id);
 
-// int setTermExpression(int termIndex, MathExpr *expr);
+int setTermExpression(int termIndex, MathExpr *expr);
 
 // Pattern setters
 
@@ -123,9 +125,9 @@ int setPatternId(int patternIndex, char *id);
 
 int setPatternLength(int patternIndex, int length);
 
-// int setPatternFirstMultiplier(int patternIndex, SnumList *first);
+int setPatternFirstMultiplier(int patternIndex, SnumList *first);
 
-// int setPatternCurrentMultiplier(int patternIndex, SnumList *current);
+int setPatternCurrentMultiplier(int patternIndex, SnumList *current);
 
-// int setPatternNextMultiplier(int patternIndex, SnumList *next);
+int setPatternNextMultiplier(int patternIndex, SnumList *next);
 
