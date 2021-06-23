@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
-#include "epanet2_2.h"
+
 #include "epanet2.h"                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
@@ -59,9 +59,6 @@ int main(int argc, char *argv[])
     int    err, done = 1;
     long   t, tleft;
     long   oldHour, newHour;
-	char *inpFile, *repFile, *outFile;
-    EN_Project ph;
- 
 
 // --- check command line arguments
 
@@ -71,25 +68,26 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    MSXproject *MSX = malloc(sizeof(MSXproject)); //MSX Project data
+    MSX->ProjectOpened = 0;
+
 // --- open EPANET file
 
     printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
     printf("\n  o Processing EPANET input file");
-    EN_createproject(&ph);
-    err = ENopen(inpFile, repFile, outFile);
+    err = ENopen(argv[1], argv[3], "");
     do
     {
         if (err)
         {
             printf("\n\n... Cannot read EPANET file; error code = %d\n", err);
-            EN_close(ph);
+            ENclose();
             return 0;
         }
 
     // --- open the MSX input file
-
         printf("\n  o Processing MSX input file   ");
-        err = MSXopen(argv[2]);
+        err = MSXopen(MSX, argv[2]);
         if (err)
         {
             printf("\n\n... Cannot read EPANET-MSX file; error code = %d\n", err);
@@ -99,7 +97,7 @@ int main(int argc, char *argv[])
     //--- solve hydraulics
 
         printf("\n  o Computing network hydraulics");
-        err = MSXsolveH();
+        err = MSXsolveH(MSX);
         if (err)
         {
             printf("\n\n... Cannot obtain network hydraulics; error code = %d\n", err);
@@ -109,7 +107,7 @@ int main(int argc, char *argv[])
     //--- Initialize the multi-species analysis
 
         printf("\n  o Initializing network water quality");
-        err = MSXinit(1);
+        err = MSXinit(MSX, 1);
         if (err)
         {
             printf("\n\n... Cannot initialize EPANET-MSX; error code = %d\n", err);
@@ -129,7 +127,7 @@ int main(int argc, char *argv[])
                 printf("\r  o Computing water quality at hour %-4d", newHour);
                 oldHour = newHour;
             }
-            err = MSXstep(&t, &tleft);
+            err = MSXstep(MSX, &t, &tleft);
             newHour = t / 3600;
 
         } while (!err && tleft > 0);
@@ -144,7 +142,7 @@ int main(int argc, char *argv[])
     // --- report results
 
         printf("\n  o Reporting water quality results");
-        err = MSXreport();
+        err = MSXreport(MSX);
         if (err)
         {
             printf("\n\n... EPANET-MSX report writer error; error code = %d\n", err);
@@ -155,7 +153,7 @@ int main(int argc, char *argv[])
 
         if ( argc >= 5 )
         {
-            err = MSXsaveoutfile(argv[4]);
+            err = MSXsaveoutfile(MSX, argv[4]);
             if ( err > 0 )
             {
                 printf("\n\n... Cannot save EPANET-MSX results file; error code = %d\n", err);
@@ -167,7 +165,7 @@ int main(int argc, char *argv[])
 
 //--- Close both the multi-species & EPANET systems
 
-    MSXclose();
+    MSXclose(MSX);
     ENclose();
     if ( !err ) printf("\n\n... EPANET-MSX completed successfully.");
     printf("\n");

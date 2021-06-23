@@ -105,9 +105,9 @@ void rk5_close()
 
 //=============================================================================
 
-int rk5_integrate(double y[], int n, double t, double tnext,
+int rk5_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                   double* htry, double atol[], double rtol[],
-                  void (*func)(double, double*, int, double*))
+                  void (*func)(MSXproject*, double, double*, int, double*))
 /*
 **  Purpose:
 **    Integrates system of equations dY/dt = F(t,Y) over a
@@ -171,7 +171,7 @@ int rk5_integrate(double y[], int n, double t, double tnext,
 
 // --- initial function evaluation
 
-    func(t, y, n, MSXRungeKuttaSolver.K1);
+    func(MSX, t, y, n, MSXRungeKuttaSolver.K1);
     nfcn++;
 
 // --- initial step size
@@ -203,33 +203,33 @@ int rk5_integrate(double y[], int n, double t, double tnext,
         tnew = t + c2*h;
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i] = y[i] + h*a21* MSXRungeKuttaSolver.K1[i];
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K2);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K2);
 
         tnew = t + c3*h;
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i] = y[i] + h*(a31* MSXRungeKuttaSolver.K1[i] + a32* MSXRungeKuttaSolver.K2[i]);
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K3);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K3);
 
         tnew = t + c4*h;
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i]=y[i] + h*(a41* MSXRungeKuttaSolver.K1[i] + a42* MSXRungeKuttaSolver.K2[i] + a43* MSXRungeKuttaSolver.K3[i]);
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K4);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K4);
 
         tnew = t + c5*h;
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i] = y[i] + h*(a51* MSXRungeKuttaSolver.K1[i] + a52* MSXRungeKuttaSolver.K2[i] + a53* MSXRungeKuttaSolver.K3[i]+a54* MSXRungeKuttaSolver.K4[i]);
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K5);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K5);
 
         tnew = t + h;
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i] = y[i] + h*(a61* MSXRungeKuttaSolver.K1[i] + a62* MSXRungeKuttaSolver.K2[i] +
 	                  a63* MSXRungeKuttaSolver.K3[i] + a64* MSXRungeKuttaSolver.K4[i] + a65* MSXRungeKuttaSolver.K5[i]);
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K6);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K6);
 
         for (i=1; i<=n; i++)
             MSXRungeKuttaSolver.Ynew[i] = y[i] + h*(a71* MSXRungeKuttaSolver.K1[i] + a73* MSXRungeKuttaSolver.K3[i] +
 	                  a74* MSXRungeKuttaSolver.K4[i] + a75* MSXRungeKuttaSolver.K5[i] + a76* MSXRungeKuttaSolver.K6[i]);
-        func(tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K2);
+        func(MSX, tnew, MSXRungeKuttaSolver.Ynew, n, MSXRungeKuttaSolver.K2);
         nfcn += 6;
 
     // --- step size adjustment

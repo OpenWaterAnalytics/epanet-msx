@@ -29,7 +29,7 @@
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;                // MSX project data
+// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------
@@ -61,32 +61,32 @@ static char IDname[MAXLINE+1];
 
 //  Imported functions
 //--------------------
-void  MSXinp_getSpeciesUnits(int m, char *units);
-float MSXout_getNodeQual(int k, int j, int m);
-float MSXout_getLinkQual(int k, int j, int m);
+void  MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units);
+float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
+float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
 
 //  Exported functions
 //--------------------
-int   MSXrpt_write(void);
-void  MSXrpt_writeLine(char *line);                                            //1.1.00
+int   MSXrpt_write(MSXproject *MSX);
+void  MSXrpt_writeLine(MSXproject *MSX, char *line);                                            //1.1.00
 
 //  Local functions
 //-----------------
-static void  createSeriesTables(void);
-static void  createStatsTables(void);
-static void  createTableHdr(int objType, int tableType);
-static void  writeTableHdr(void);
-static void  writeNodeTable(int j, int tableType);
-static void  writeLinkTable(int j, int tableType);
-static void  getHrsMins(int k, int *hrs, int *mins);
-static void  newPage(void);
-static void  writeLine(char *line);
+static void  createSeriesTables(MSXproject *MSX);
+static void  createStatsTables(MSXproject *MSX);
+static void  createTableHdr(MSXproject *MSX, int objType, int tableType);
+static void  writeTableHdr(MSXproject *MSX);
+static void  writeNodeTable(MSXproject *MSX, int j, int tableType);
+static void  writeLinkTable(MSXproject *MSX, int j, int tableType);
+static void  getHrsMins(MSXproject *MSX, int k, int *hrs, int *mins);
+static void  newPage(MSXproject *MSX);
+static void  writeLine(MSXproject *MSX, char *line);
 
-static void writemassbalance();
+static void writemassbalance(MSXproject *MSX);
 
 //=============================================================================
 
-int  MSXrpt_write()
+int  MSXrpt_write(MSXproject *MSX)
 {
     INT4  magic = 0;
     int  j;
@@ -94,69 +94,69 @@ int  MSXrpt_write()
 
 // --- check that results are available
 
-    if ( MSX.Nperiods < 1 )    return 0;
-    if ( MSX.OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
-    fseek(MSX.OutFile.file, -recordsize, SEEK_END);
-    fread(&magic, sizeof(INT4), 1, MSX.OutFile.file);
+    if ( MSX->Nperiods < 1 )    return 0;
+    if ( MSX->OutFile.file == NULL ) return ERR_OPEN_OUT_FILE;
+    fseek(MSX->OutFile.file, -recordsize, SEEK_END);
+    fread(&magic, sizeof(INT4), 1, MSX->OutFile.file);
     if ( magic != MAGICNUMBER ) return ERR_IO_OUT_FILE;
 
 // --- write program logo & project title
 
     PageNum = 1;
     LineNum = 1;
-    newPage();
-    for (j=0; j<=5; j++) writeLine(Logo[j]);
-    writeLine("");
-    writeLine(MSX.Title);
+    newPage(MSX);
+    for (j=0; j<=5; j++) writeLine(MSX, Logo[j]);
+    writeLine(MSX, "");
+    writeLine(MSX, MSX->Title);
 
 // --- generate the appropriate type of table
 
-    if ( MSX.Statflag == SERIES ) createSeriesTables();
-    else createStatsTables();
+    if ( MSX->Statflag == SERIES ) createSeriesTables(MSX);
+    else createStatsTables(MSX);
 
-    writemassbalance();
+    writemassbalance(MSX);
 
-    writeLine("");
+    writeLine(MSX, "");
     return 0;
 }
 
 //=============================================================================
 
-void  MSXrpt_writeLine(char *line)                                             //1.1.00
+void  MSXrpt_writeLine(MSXproject *MSX, char *line)                                             //1.1.00
 {                                                                              //1.1.00
-    writeLine(line);                                                           //1.1.00
+    writeLine(MSX, line);                                                           //1.1.00
 }                                                                              //1.1.00
 
 //=============================================================================
 
-void createSeriesTables()
+void createSeriesTables(MSXproject *MSX)
 {
     int  j;
 
 // --- report on all requested nodes
 
-    for (j=1; j<=MSX.Nobjects[NODE]; j++)
+    for (j=1; j<=MSX->Nobjects[NODE]; j++)
     {
-        if ( !MSX.Node[j].rpt ) continue;
+        if ( !(MSX->Node[j].rpt) ) continue;
         ENgetnodeid(j, IDname);
-        createTableHdr(NODE, SERIES_TABLE);
-        writeNodeTable(j, SERIES_TABLE);
+        createTableHdr(MSX, NODE, SERIES_TABLE);
+        writeNodeTable(MSX, j, SERIES_TABLE);
     }
 
 // --- report on all requested links
 
-    for (j=1; j<=MSX.Nobjects[LINK]; j++)
+    for (j=1; j<=MSX->Nobjects[LINK]; j++)
     {
-        if ( !MSX.Link[j].rpt ) continue;
+        if ( !MSX->Link[j].rpt ) continue;
         ENgetlinkid(j, IDname);
-        createTableHdr(LINK, SERIES_TABLE);
-        writeLinkTable(j, SERIES_TABLE);
+        createTableHdr(MSX, LINK, SERIES_TABLE);
+        writeLinkTable(MSX, j, SERIES_TABLE);
     }
 }
 
 //=============================================================================
 
-void createStatsTables()
+void createStatsTables(MSXproject *MSX)
 {
     int  j;
     int  count;
@@ -164,39 +164,39 @@ void createStatsTables()
 // --- check if any nodes to be reported
 
     count = 0;
-    for (j = 1; j <= MSX.Nobjects[NODE]; j++) count += MSX.Node[j].rpt;
+    for (j = 1; j <= MSX->Nobjects[NODE]; j++) count += MSX->Node[j].rpt;
 
 // --- report on all requested nodes
 
     if ( count > 0 )
     {
-        createTableHdr(NODE, STATS_TABLE);
-        for (j = 1; j <= MSX.Nobjects[NODE]; j++)
+        createTableHdr(MSX, NODE, STATS_TABLE);
+        for (j = 1; j <= MSX->Nobjects[NODE]; j++)
         {
-            if ( MSX.Node[j].rpt ) writeNodeTable(j, STATS_TABLE);
+            if ( MSX->Node[j].rpt ) writeNodeTable(MSX, j, STATS_TABLE);
         }
     }
 
 // --- check if any links to be reported
 
     count = 0;
-    for (j = 1; j <= MSX.Nobjects[LINK]; j++) count += MSX.Link[j].rpt;
+    for (j = 1; j <= MSX->Nobjects[LINK]; j++) count += MSX->Link[j].rpt;
 
 // --- report on all requested links
 
     if ( count > 0 )
     {
-        createTableHdr(LINK, STATS_TABLE);
-        for (j = 1; j <= MSX.Nobjects[LINK]; j++)
+        createTableHdr(MSX, LINK, STATS_TABLE);
+        for (j = 1; j <= MSX->Nobjects[LINK]; j++)
         {
-            if ( MSX.Link[j].rpt ) writeLinkTable(j, STATS_TABLE);
+            if ( MSX->Link[j].rpt ) writeLinkTable(MSX, j, STATS_TABLE);
         }
     }
 }
 
 //=============================================================================
 
-void createTableHdr(int objType, int tableType)
+void createTableHdr(MSXproject *MSX, int objType, int tableType)
 {
     int   m;
     char  s1[MAXLINE+1];
@@ -220,47 +220,47 @@ void createTableHdr(int objType, int tableType)
         else                   strcpy(TableHdr.Line3, "for Link        ");
         strcpy(TableHdr.Line4, "----------------");
     }
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        if ( !MSX.Species[m].rpt ) continue;
-        if ( objType == NODE && MSX.Species[m].type == WALL ) continue;
-        sprintf(s1, "  %10s", MSX.Species[m].id);
+        if ( !MSX->Species[m].rpt ) continue;
+        if ( objType == NODE && MSX->Species[m].type == WALL ) continue;
+        sprintf(s1, "  %10s", MSX->Species[m].id);
         strcat(TableHdr.Line2, s1);
         strcat(TableHdr.Line4, "  ----------");
-        MSXinp_getSpeciesUnits(m, s1);
+        MSXinp_getSpeciesUnits(MSX, m, s1);
         sprintf(s2, "  %10s", s1);
         strcat(TableHdr.Line3, s2);
     }
-    if ( MSX.PageSize > 0 && MSX.PageSize - LineNum < 8 ) newPage();
-    else writeTableHdr();
+    if ( MSX->PageSize > 0 && MSX->PageSize - LineNum < 8 ) newPage(MSX);
+    else writeTableHdr(MSX);
 }
 
 //=============================================================================
 
-void  writeTableHdr()
+void  writeTableHdr(MSXproject *MSX)
 {
-    if ( MSX.PageSize > 0 && MSX.PageSize - LineNum < 6 ) newPage();
-    writeLine("");
-    writeLine(TableHdr.Line1);
-    writeLine("");
-    writeLine(TableHdr.Line2);
-    writeLine(TableHdr.Line3);
-    writeLine(TableHdr.Line4);
+    if ( MSX->PageSize > 0 && MSX->PageSize - LineNum < 6 ) newPage(MSX);
+    writeLine(MSX, "");
+    writeLine(MSX, TableHdr.Line1);
+    writeLine(MSX, "");
+    writeLine(MSX, TableHdr.Line2);
+    writeLine(MSX, TableHdr.Line3);
+    writeLine(MSX, TableHdr.Line4);
 }
 
 //=============================================================================
 
-void  writeNodeTable(int j, int tableType)
+void  writeNodeTable(MSXproject *MSX, int j, int tableType)
 {
     int   k, m, hrs, mins;
     char  s[MAXLINE+1];
     float c;
 
-    for (k=0; k<MSX.Nperiods; k++)
+    for (k=0; k<MSX->Nperiods; k++)
     {
         if ( tableType == SERIES_TABLE )
         {
-            getHrsMins(k, &hrs, &mins);
+            getHrsMins(MSX, k, &hrs, &mins);
             sprintf(Line, "%4d:%02d", hrs, mins);
         }
         if ( tableType == STATS_TABLE )
@@ -268,31 +268,31 @@ void  writeNodeTable(int j, int tableType)
             ENgetnodeid(j, IDname);
             sprintf(Line, "%-16s", IDname);
         }
-        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+        for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
         {
-            if ( !MSX.Species[m].rpt ) continue;
-            if ( MSX.Species[m].type == WALL ) continue;
-            c = MSXout_getNodeQual(k, j, m);
-            sprintf(s, "  %10.*f", MSX.Species[m].precision, c);
+            if ( !MSX->Species[m].rpt ) continue;
+            if ( MSX->Species[m].type == WALL ) continue;
+            c = MSXout_getNodeQual(MSX, k, j, m);
+            sprintf(s, "  %10.*f", MSX->Species[m].precision, c);
             strcat(Line, s);
         }
-        writeLine(Line);
+        writeLine(MSX, Line);
     }
 }
 
 //=============================================================================
 
-void  writeLinkTable(int j, int tableType)
+void  writeLinkTable(MSXproject *MSX, int j, int tableType)
 {
     int   k, m, hrs, mins;
     char  s[MAXLINE+1];
     float c;
 
-    for (k=0; k<MSX.Nperiods; k++)
+    for (k=0; k<MSX->Nperiods; k++)
     {
         if ( tableType == SERIES_TABLE )
         {
-            getHrsMins(k, &hrs, &mins);
+            getHrsMins(MSX, k, &hrs, &mins);
             sprintf(Line, "%4d:%02d", hrs, mins);
         }
         if ( tableType == STATS_TABLE )
@@ -300,24 +300,24 @@ void  writeLinkTable(int j, int tableType)
             ENgetlinkid(j, IDname);
             sprintf(Line, "%-16s", IDname);
         }
-        for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+        for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
         {
-            if ( !MSX.Species[m].rpt ) continue;
-            c = MSXout_getLinkQual(k, j, m);
-            sprintf(s, "  %10.*f", MSX.Species[m].precision, c);
+            if ( !MSX->Species[m].rpt ) continue;
+            c = MSXout_getLinkQual(MSX, k, j, m);
+            sprintf(s, "  %10.*f", MSX->Species[m].precision, c);
             strcat(Line, s);
         }
-        writeLine(Line);
+        writeLine(MSX, Line);
     }
 }
 
 //=============================================================================
 
-void getHrsMins(int k, int *hrs, int *mins)
+void getHrsMins(MSXproject *MSX, int k, int *hrs, int *mins)
 {
     long m, h;
 
-    m = (MSX.Rstart + k*MSX.Rstep) / 60;
+    m = (MSX->Rstart + k*MSX->Rstep) / 60;
     h = m / 60;
     m = m - 60*h;
     *hrs = h;
@@ -326,32 +326,32 @@ void getHrsMins(int k, int *hrs, int *mins)
 
 //=============================================================================
 
-void  newPage()
+void  newPage(MSXproject *MSX)
 {
     char  s[MAXLINE+1];
     LineNum = 1;
     sprintf(s,
             "\nPage %-3d                                             EPANET-MSX 1.1",   //1.1.00
             PageNum);
-    writeLine(s);
-    writeLine("");
-    if ( PageNum > 1 ) writeTableHdr();
+    writeLine(MSX, s);
+    writeLine(MSX, "");
+    if ( PageNum > 1 ) writeTableHdr(MSX);
     PageNum++;
 }
 
 //=============================================================================
 
-void  writeLine(char *line)
+void  writeLine(MSXproject *MSX, char *line)
 {
-    if ( LineNum == MSX.PageSize ) newPage();
-    if ( MSX.RptFile.file ) fprintf(MSX.RptFile.file, "  %s\n", line);   //(modified, FS-01/07/2008)
+    if ( LineNum == MSX->PageSize ) newPage(MSX);
+    if ( MSX->RptFile.file ) fprintf(MSX->RptFile.file, "  %s\n", line);   //(modified, FS-01/07/2008)
     else ENwriteline(line);
     LineNum++;
 }
 
 
 
-void writemassbalance()
+void writemassbalance(MSXproject *MSX)
 /*
 **-------------------------------------------------------------
 **   Input:   none
@@ -366,31 +366,31 @@ void writemassbalance()
     char s1[MAXMSG + 1];
     int  kunits = 0;
 
-    for (int m = 1; m <= MSX.Nobjects[SPECIES]; m++)
+    for (int m = 1; m <= MSX->Nobjects[SPECIES]; m++)
     {
-        if (MSX.Species[m].pipeExprType != RATE)
+        if (MSX->Species[m].pipeExprType != RATE)
             continue;
         
         snprintf(s1, MAXMSG, "\n");
 
-        snprintf(s1, MAXMSG, "Water Quality Mass Balance: %s (%s)", MSX.Species[m].id, MSX.Species[m].units);
-        writeLine(s1);
+        snprintf(s1, MAXMSG, "Water Quality Mass Balance: %s (%s)", MSX->Species[m].id, MSX->Species[m].units);
+        writeLine(MSX, s1);
         snprintf(s1, MAXMSG, "================================");
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Initial Mass:      %12.5e", MSX.MassBalance.initial[m]);
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Mass Inflow:       %12.5e", MSX.MassBalance.inflow[m]);
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Mass Outflow:      %12.5e", MSX.MassBalance.outflow[m]);
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Mass Reacted:      %12.5e", MSX.MassBalance.reacted[m]);
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Final Mass:        %12.5e", MSX.MassBalance.final[m]);
-        writeLine(s1);
-        snprintf(s1, MAXMSG, "Mass Ratio:         %-.5f", MSX.MassBalance.ratio[m]);
-        writeLine(s1);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Initial Mass:      %12.5e", MSX->MassBalance.initial[m]);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Mass Inflow:       %12.5e", MSX->MassBalance.inflow[m]);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Mass Outflow:      %12.5e", MSX->MassBalance.outflow[m]);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Mass Reacted:      %12.5e", MSX->MassBalance.reacted[m]);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Final Mass:        %12.5e", MSX->MassBalance.final[m]);
+        writeLine(MSX, s1);
+        snprintf(s1, MAXMSG, "Mass Ratio:         %-.5f", MSX->MassBalance.ratio[m]);
+        writeLine(MSX, s1);
         snprintf(s1, MAXMSG, "================================\n");
-        writeLine(s1);
+        writeLine(MSX, s1);
     }
 }
 

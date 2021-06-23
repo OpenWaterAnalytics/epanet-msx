@@ -12,6 +12,10 @@
 **  LAST UPDATE:   2/8/11
 *******************************************************************************/
 
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
+
 // Gets the name of a temporary file                                           //1.1.00
 char * MSXutils_getTempName(char *s);
 
@@ -49,5 +53,5 @@ int factorize(double **a, int n, double *w, int *indx);
 void solve(double **a, int n, int *indx, double b[]);
 
 // Computes the Jacobian matrix of a set of functions
-void jacobian(double *x, int n, double *f, double *w, double **a,
-              void (*func)(double, double*, int, double*));
+void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **a,
+              void (*func)(MSXproject*, double, double*, int, double*));

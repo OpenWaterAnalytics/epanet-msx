@@ -101,20 +101,20 @@ static int        isDigit(char);
 static int        isLetter(char);
 static void       getToken(void);
 static int        getMathFunc(void);
-static int        getVariable(void);
+static int        getVariable(MSXproject *MSX);
 static int        getOperand(void);
-static int        getLex(void);
+static int        getLex(MSXproject *MSX);
 static double     getNumber(void);
 static ExprTree * newNode(void);
-static ExprTree * getSingleOp(int *);
-static ExprTree * getOp(int *);
-static ExprTree * getTree(void);
+static ExprTree * getSingleOp(MSXproject *MSX, int *);
+static ExprTree * getOp(MSXproject *MSX, int *);
+static ExprTree * getTree(MSXproject *MSX);
 static void       traverseTree(ExprTree *, MathExpr **);
 static void       deleteTree(ExprTree *);
 
 // Callback functions
-static int    (*getVariableIndex) (char *); // return index of named variable
-static double (*getVariableValue) (int);    // return value of indexed variable
+static int    (*getVariableIndex) (MSXproject*, char *); // return index of named variable
+static double (*getVariableValue) (MSXproject*, int);    // return value of indexed variable
 
 //=============================================================================
 
@@ -187,10 +187,10 @@ int getMathFunc()
 
 //=============================================================================
 
-int getVariable()
+int getVariable(MSXproject *MSX)
 {
     if ( !getVariableIndex ) return 0;
-    Ivar = getVariableIndex(Token);
+    Ivar = getVariableIndex(MSX, Token);
     if (Ivar >= 0) return 8;
     return 0;
 }
@@ -286,7 +286,7 @@ int getOperand()
 
 //=============================================================================
 
-int getLex()
+int getLex(MSXproject *MSX)
 {
     int n;
 
@@ -304,7 +304,7 @@ int getLex()
         {
             getToken();
             n = getMathFunc();
-            if ( n == 0 ) n = getVariable();
+            if ( n == 0 ) n = getVariable(MSX);
         }
         else if ( isDigit(S[Pos]) )
         {
@@ -338,7 +338,7 @@ ExprTree * newNode()
 
 //=============================================================================
 
-ExprTree * getSingleOp(int *lex)
+ExprTree * getSingleOp(MSXproject *MSX, int *lex)
 {
     int opcode;
     ExprTree *left;
@@ -347,7 +347,7 @@ ExprTree * getSingleOp(int *lex)
     if ( *lex == 1 )
     {
         Bc++;
-        left = getTree();
+        left = getTree(MSX);
     }
 
     else
@@ -373,7 +373,7 @@ ExprTree * getSingleOp(int *lex)
         /* --- function which must have a '(' after it */
         else
         {
-            *lex = getLex();
+            *lex = getLex(MSX);
             if ( *lex != 1 )
             {
                Err = 1;
@@ -381,11 +381,11 @@ ExprTree * getSingleOp(int *lex)
             }
             Bc++;
             left = newNode();
-            left->left = getTree();
+            left->left = getTree(MSX);
             left->opcode = opcode;
         }
     }   
-    *lex = getLex();
+    *lex = getLex(MSX);
 
     /* --- exponentiation */  // code deleted                                  //(L.Rossman - 11/03/10)
 
@@ -394,7 +394,7 @@ ExprTree * getSingleOp(int *lex)
 
 //=============================================================================
 
-ExprTree * getOp(int *lex)
+ExprTree * getOp(MSXproject *MSX, int *lex)
 {
     int opcode;
     ExprTree *left;
@@ -402,22 +402,22 @@ ExprTree * getOp(int *lex)
     ExprTree *node;
     int neg = 0;
 
-    *lex = getLex();
+    *lex = getLex(MSX);
     if (PrevLex == 0 || PrevLex == 1 )
     {
         if ( *lex == 4 )
         {
             neg = 1;
-            *lex = getLex();
+            *lex = getLex(MSX);
         }
-        else if ( *lex == 3) *lex = getLex();
+        else if ( *lex == 3) *lex = getLex(MSX);
     }
-    left = getSingleOp(lex);
+    left = getSingleOp(MSX, lex);
     while ( *lex == 5 || *lex == 6 || *lex == 31)                              //(L.Rossman - 11/03/10)
     {
         opcode = *lex;
-        *lex = getLex();
-        right = getSingleOp(lex);
+        *lex = getLex(MSX);
+        right = getSingleOp(MSX, lex);
         node = newNode();
         if (Err) return NULL;
         node->left = left;
@@ -439,7 +439,7 @@ ExprTree * getOp(int *lex)
 
 //=============================================================================
 
-ExprTree * getTree()
+ExprTree * getTree(MSXproject *MSX)
 {
     int      lex;
     int      opcode;
@@ -447,7 +447,7 @@ ExprTree * getTree()
     ExprTree *right;
     ExprTree *node;
 
-    left = getOp(&lex);
+    left = getOp(MSX, &lex);
     for (;;)
     {
         if ( lex == 0 || lex == 2 )
@@ -463,7 +463,7 @@ ExprTree * getTree()
         }
 
         opcode = lex;
-        right = getOp(&lex);
+        right = getOp(MSX, &lex);
         node = newNode();
         if (Err) break;
         node->left = left;
@@ -511,7 +511,7 @@ void deleteTree(ExprTree *tree)
 
 //=============================================================================
 
-double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
+double mathexpr_eval(MSXproject *MSX, MathExpr *expr, double (*getVariableValue) (MSXproject*, int))
 //  Mathematica expression evaluation using a stack
 {
     
@@ -558,7 +558,7 @@ double mathexpr_eval(MathExpr *expr, double (*getVariableValue) (int))
 				break;
 			case 8:
                 if (getVariableValue != NULL)
-                r1 = getVariableValue(node->ivar);
+                r1 = getVariableValue(MSX, node->ivar);
                 else r1 = 0.0;
 				stackindex++;
 				exprStack[stackindex] = r1;
@@ -694,7 +694,7 @@ void mathexpr_delete(MathExpr *expr)
 
 //=============================================================================
 
-MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
+MathExpr * mathexpr_create(MSXproject *MSX, char *formula, int (*getVar) (MSXproject *MSX, char *))
 {
     ExprTree *tree;
     MathExpr *expr = NULL;
@@ -707,7 +707,7 @@ MathExpr * mathexpr_create(char *formula, int (*getVar) (char *))
     Len = strlen(S);
     Pos = 0;
     Bc = 0;
-    tree = getTree();
+    tree = getTree(MSX);
     if (Bc == 0 && Err == 0)
     {
         traverseTree(tree, &expr);

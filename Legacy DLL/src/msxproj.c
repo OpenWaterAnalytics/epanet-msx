@@ -20,14 +20,15 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "msxtypes.h"
+// #include "msxtypes.h"
 #include "msxutils.h"
-//#include "mempool.h"
+// #include "mempool.h"
+#include "mathexpr.h"
 #include "hash.h"
 
 //  Exported variables
 //--------------------
-MSXproject  MSX;                            // MSX project data
+// MSXproject  MSX;                            // MSX project data
 
 //  Local variables
 //-----------------
@@ -64,14 +65,14 @@ static char * Errmsg[] =
 
 //  Imported functions
 //--------------------
-int    MSXinp_countMsxObjects(void);
-int    MSXinp_countNetObjects(void);
-int    MSXinp_readNetData(void);
-int    MSXinp_readMsxData(void);
+int    MSXinp_countMsxObjects(MSXproject *MSX);
+int    MSXinp_countNetObjects(MSXproject *MSX);
+int    MSXinp_readNetData(MSXproject *MSX);
+int    MSXinp_readMsxData(MSXproject *MSX);
 
 //  Exported functions
 //--------------------
-int    MSXproj_open(char *fname);
+int    MSXproj_open(MSXproject *MSX, char *fname);
 int    MSXproj_addObject(int type, char *id, int n);
 int    MSXproj_findObject(int type, char *id);
 char * MSXproj_findID(int type, char *id);
@@ -79,22 +80,22 @@ char * MSXproj_getErrmsg(int errcode);
 
 //  Local functions
 //-----------------
-static void   setDefaults(void);
-static int    convertUnits(void);
-static int    createObjects(void);
-static void   deleteObjects(void);
+static void   setDefaults(MSXproject *MSX);
+static int    convertUnits(MSXproject *MSX);
+static int    createObjects(MSXproject *MSX);
+static void   deleteObjects(MSXproject *MSX);
 static int    createHashTables(void);
 static void   deleteHashTables(void);
 
-static int    openRptFile(void);                                               //(LR-11/20/07)
+static int    openRptFile(MSXproject *MSX);                                               //(LR-11/20/07)
 
-static int  buildadjlists();
-static void freeadjlists();
+static int  buildadjlists(MSXproject *MSX);
+static void freeadjlists(MSXproject *MSX);
 
 
 //=============================================================================
 
-int  MSXproj_open(char *fname)
+int  MSXproj_open(MSXproject *MSX, char *fname)
 /*
 **  Purpose:
 **    opens an EPANET-MSX project.
@@ -109,14 +110,14 @@ int  MSXproj_open(char *fname)
 // --- initialize data to default values
 
     int errcode = 0;
-    MSX.ProjectOpened = FALSE;
-    MSX.QualityOpened = FALSE;
-    setDefaults();
+    MSX->ProjectOpened = FALSE; //TODO make getters??
+    MSX->QualityOpened = FALSE;
+    setDefaults(MSX);
 
 // --- open the MSX input file
 
-    strcpy(MSX.MsxFile.name, fname);
-    if ((MSX.MsxFile.file = fopen(fname,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
+    strcpy(MSX->MsxFile.name, fname); //TODO setter and getter?
+    if ((MSX->MsxFile.file = fopen(fname,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
 
 // --- create hash tables to look up object ID names
 
@@ -124,43 +125,46 @@ int  MSXproj_open(char *fname)
 
 // --- allocate memory for the required number of objects
 
-    CALL(errcode, MSXinp_countMsxObjects());
-    CALL(errcode, MSXinp_countNetObjects());
-    CALL(errcode, createObjects());
+    CALL(errcode, MSXinp_countMsxObjects(MSX));
+    CALL(errcode, MSXinp_countNetObjects(MSX));
+    CALL(errcode, createObjects(MSX));
 
 // --- read in the EPANET and MSX object data
 
-    CALL(errcode, MSXinp_readNetData());
-    CALL(errcode, MSXinp_readMsxData());
+    CALL(errcode, MSXinp_readNetData(MSX));
+    CALL(errcode, MSXinp_readMsxData(MSX));
 
-    if (strcmp(MSX.RptFile.name, ""))                                          //(FS-01/07/2008, to fix bug 08)
-	CALL(errcode, openRptFile());                                              //(LR-11/20/07, to fix bug 08)
+    //TODO getter?
+    if (strcmp(MSX->RptFile.name, ""))                                          //(FS-01/07/2008, to fix bug 08)
+	CALL(errcode, openRptFile(MSX));                                              //(LR-11/20/07, to fix bug 08)
 
 // --- convert user's units to internal units
 
-    CALL(errcode, convertUnits());
+    CALL(errcode, convertUnits(MSX));
 
 
 
     // Build nodal adjacency lists 
-    if (MSX.Adjlist == NULL)
+    if (MSX->Adjlist == NULL) //TODO getter?
     {
-        errcode = buildadjlists();
+        errcode = buildadjlists(MSX);
         if (errcode) return errcode;
     }
+    // printf("ptr: %ld\n", MSX->Adjlist);
 
 
 // --- close input file
 
-    if ( MSX.MsxFile.file ) fclose(MSX.MsxFile.file);
-    MSX.MsxFile.file = NULL;
-    if ( !errcode ) MSX.ProjectOpened = TRUE;
+    //TODO getters and setters?
+    if ( MSX->MsxFile.file ) fclose(MSX->MsxFile.file);
+    MSX->MsxFile.file = NULL;
+    if ( !errcode ) MSX->ProjectOpened = TRUE;
     return errcode;
 }
 
 //=============================================================================
 
-void MSXproj_close()
+void MSXproj_close(MSXproject *MSX)
 /*
 **  Purpose:
 **    closes the current EPANET-MSX project.
@@ -171,27 +175,27 @@ void MSXproj_close()
 {
     // --- close all files
 
-    if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);                          //(LR-11/20/07, to fix bug 08)
-    if ( MSX.HydFile.file ) fclose(MSX.HydFile.file);
-    if ( MSX.TmpOutFile.file && MSX.TmpOutFile.file != MSX.OutFile.file )
-        fclose(MSX.TmpOutFile.file);
-    if ( MSX.OutFile.file ) fclose(MSX.OutFile.file);
+    if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);                          //(LR-11/20/07, to fix bug 08)
+    if ( MSX->HydFile.file ) fclose(MSX->HydFile.file);
+    if ( MSX->TmpOutFile.file && MSX->TmpOutFile.file != MSX->OutFile.file )
+        fclose(MSX->TmpOutFile.file);
+    if ( MSX->OutFile.file ) fclose(MSX->OutFile.file);
 
     // --- delete all temporary files
 
-    if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
-    if ( MSX.OutFile.mode == SCRATCH_FILE ) remove(MSX.OutFile.name);
-    remove(MSX.TmpOutFile.name);
+    if ( MSX->HydFile.mode == SCRATCH_FILE ) remove(MSX->HydFile.name);
+    if ( MSX->OutFile.mode == SCRATCH_FILE ) remove(MSX->OutFile.name);
+    remove(MSX->TmpOutFile.name);
 
     // --- free all allocated memory
 
-    MSX.RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
-    MSX.HydFile.file = NULL;
-    MSX.OutFile.file = NULL;
-    MSX.TmpOutFile.file = NULL;
-    deleteObjects();
+    MSX->RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
+    MSX->HydFile.file = NULL;
+    MSX->OutFile.file = NULL;
+    MSX->TmpOutFile.file = NULL;
+    deleteObjects(MSX);
     deleteHashTables();
-    MSX.ProjectOpened = FALSE;
+    MSX->ProjectOpened = FALSE;
 }
 
 //=============================================================================
@@ -288,7 +292,7 @@ char * MSXproj_getErrmsg(int errcode)
 
 //=============================================================================
 
-void setDefaults()
+void setDefaults(MSXproject *MSX)
 /*
 **  Purpose:
 **    assigns default values to project variables.
@@ -298,48 +302,49 @@ void setDefaults()
 */
 {
     int i;
-    MSX.RptFile.file = NULL;                                                   //(LR-11/20/07)
-    MSX.HydFile.file = NULL;
-    MSX.HydFile.mode = USED_FILE;
-    MSX.OutFile.file = NULL;
-    MSX.OutFile.mode = SCRATCH_FILE;
-    MSX.TmpOutFile.file = NULL;
-    MSXutils_getTempName(MSX.OutFile.name);                                    //1.1.00
-    MSXutils_getTempName(MSX.TmpOutFile.name);                                 //1.1.00
-    strcpy(MSX.RptFile.name, "");
-    strcpy(MSX.Title, "");
-    MSX.Rptflag = 0;
-    for (i=0; i<MAX_OBJECTS; i++) MSX.Nobjects[i] = 0;
-    MSX.Unitsflag = US;
-    MSX.Flowflag = GPM;
-    MSX.Statflag = SERIES;
-    MSX.DefRtol = 0.001;
-    MSX.DefAtol = 0.01;
-    MSX.Solver = EUL;
-    MSX.Coupling = NO_COUPLING;
-    MSX.Compiler = NO_COMPILER;                                                //1.1.00
-    MSX.AreaUnits = FT2;
-    MSX.RateUnits = DAYS;
-    MSX.Qstep = 300;
-    MSX.Rstep = 3600;
-    MSX.Rstart = 0;
-    MSX.Dur = 0;
-    MSX.Node = NULL;
-    MSX.Link = NULL;
-    MSX.Tank = NULL;
-    MSX.D = NULL;
-    MSX.Q = NULL;
-    MSX.H = NULL;
-    MSX.Species = NULL;
-    MSX.Term = NULL;
-    MSX.Const = NULL;
-    MSX.Pattern = NULL;
-    MSX.K = NULL;                                                              //1.1.00
+    MSX->RptFile.file = NULL;                                                   //(LR-11/20/07)
+    MSX->HydFile.file = NULL;
+    MSX->HydFile.mode = USED_FILE;
+    MSX->OutFile.file = NULL;
+    MSX->OutFile.mode = SCRATCH_FILE;
+    MSX->TmpOutFile.file = NULL;
+    MSXutils_getTempName(MSX->OutFile.name);                                    //1.1.00
+    MSXutils_getTempName(MSX->TmpOutFile.name);                                 //1.1.00
+    strcpy(MSX->RptFile.name, "");
+    strcpy(MSX->Title, "");
+    MSX->Rptflag = 0;
+    for (i=0; i<MAX_OBJECTS; i++) MSX->Nobjects[i] = 0;
+    MSX->Unitsflag = US;
+    MSX->Flowflag = GPM;
+    MSX->Statflag = SERIES;
+    MSX->DefRtol = 0.001;
+    MSX->DefAtol = 0.01;
+    MSX->Solver = EUL;
+    MSX->Coupling = NO_COUPLING;
+    MSX->Compiler = NO_COMPILER;                                                //1.1.00
+    MSX->AreaUnits = FT2;
+    MSX->RateUnits = DAYS;
+    MSX->Qstep = 300;
+    MSX->Rstep = 3600;
+    MSX->Rstart = 0;
+    MSX->Dur = 0;
+    MSX->Node = NULL;
+    MSX->Link = NULL;
+    MSX->Tank = NULL;
+    MSX->D = NULL;
+    MSX->Q = NULL;
+    MSX->H = NULL;
+    MSX->Species = NULL;
+    MSX->Term = NULL;
+    MSX->Const = NULL;
+    MSX->Pattern = NULL;
+    MSX->K = NULL;                                                              //1.1.00
+    MSX->Adjlist = NULL;
 }
 
 //=============================================================================
 
-int convertUnits()
+int convertUnits(MSXproject *MSX)
 /*
 **  Purpose:
 **    converts user's units to internal EPANET units.
@@ -362,59 +367,59 @@ int convertUnits()
 
 // --- conversions for length & tank volume
 
-    if ( MSX.Unitsflag == US )
+    if ( MSX->Unitsflag == US )
     {
-        MSX.Ucf[LENGTH_UNITS] = 1.0;
-        MSX.Ucf[DIAM_UNITS]   = 12.0;
-        MSX.Ucf[VOL_UNITS]    = 1.0;
+        MSX->Ucf[LENGTH_UNITS] = 1.0;
+        MSX->Ucf[DIAM_UNITS]   = 12.0;
+        MSX->Ucf[VOL_UNITS]    = 1.0;
     }
     else
     {
-        MSX.Ucf[LENGTH_UNITS] = MperFT;
-        MSX.Ucf[DIAM_UNITS]   = 1000.0*MperFT;
-        MSX.Ucf[VOL_UNITS]    = M3perFT3;
+        MSX->Ucf[LENGTH_UNITS] = MperFT;
+        MSX->Ucf[DIAM_UNITS]   = 1000.0*MperFT;
+        MSX->Ucf[VOL_UNITS]    = M3perFT3;
     }
 
 // --- conversion for surface area
 
-    MSX.Ucf[AREA_UNITS] = 1.0;
-    switch (MSX.AreaUnits)
+    MSX->Ucf[AREA_UNITS] = 1.0;
+    switch (MSX->AreaUnits)
     {
-        case M2:  MSX.Ucf[AREA_UNITS] = M2perFT2;  break;
-        case CM2: MSX.Ucf[AREA_UNITS] = CM2perFT2; break;
+        case M2:  MSX->Ucf[AREA_UNITS] = M2perFT2;  break;
+        case CM2: MSX->Ucf[AREA_UNITS] = CM2perFT2; break;
     }
 
 // --- conversion for flow rate
 
-    MSX.Ucf[FLOW_UNITS] = fcf[MSX.Flowflag];
-    MSX.Ucf[CONC_UNITS] = LperFT3;
+    MSX->Ucf[FLOW_UNITS] = fcf[MSX->Flowflag];
+    MSX->Ucf[CONC_UNITS] = LperFT3;
 
 // --- conversion for reaction rate time
 
-    MSX.Ucf[RATE_UNITS] = rcf[MSX.RateUnits];
+    MSX->Ucf[RATE_UNITS] = rcf[MSX->RateUnits];
 
 // --- convert pipe diameter & length
 
-    for (i=1; i<=MSX.Nobjects[LINK]; i++)
+    for (i=1; i<=MSX->Nobjects[LINK]; i++)
     {
-        MSX.Link[i].diam /= MSX.Ucf[DIAM_UNITS];
-        MSX.Link[i].len /=  MSX.Ucf[LENGTH_UNITS];
+        MSX->Link[i].diam /= MSX->Ucf[DIAM_UNITS];
+        MSX->Link[i].len /=  MSX->Ucf[LENGTH_UNITS];
     }
 
 // --- convert initial tank volumes
 
-    for (i=1; i<=MSX.Nobjects[TANK]; i++)
+    for (i=1; i<=MSX->Nobjects[TANK]; i++)
     {
-        MSX.Tank[i].v0 /= MSX.Ucf[VOL_UNITS];
-        MSX.Tank[i].vMix /= MSX.Ucf[VOL_UNITS];
+        MSX->Tank[i].v0 /= MSX->Ucf[VOL_UNITS];
+        MSX->Tank[i].vMix /= MSX->Ucf[VOL_UNITS];
     }
 
 // --- assign default tolerances to species
 
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        if ( MSX.Species[m].rTol == 0.0 ) MSX.Species[m].rTol = MSX.DefRtol;
-        if ( MSX.Species[m].aTol == 0.0 ) MSX.Species[m].aTol = MSX.DefAtol;
+        if ( MSX->Species[m].rTol == 0.0 ) MSX->Species[m].rTol = MSX->DefRtol;
+        if ( MSX->Species[m].aTol == 0.0 ) MSX->Species[m].aTol = MSX->DefAtol;
     }
     return errcode;
 }
@@ -422,7 +427,7 @@ int convertUnits()
 
 //=============================================================================
 
-int createObjects()
+int createObjects(MSXproject *MSX)
 /*
 **  Purpose:
 **    creates multi-species data objects.
@@ -438,90 +443,90 @@ int createObjects()
 
 // --- create nodes, links, & tanks
 
-    MSX.Node = (Snode *) calloc(MSX.Nobjects[NODE]+1, sizeof(Snode));
-    MSX.Link = (Slink *) calloc(MSX.Nobjects[LINK]+1, sizeof(Slink));
-    MSX.Tank = (Stank *) calloc(MSX.Nobjects[TANK]+1, sizeof(Stank));
+    MSX->Node = (Snode *) calloc(MSX->Nobjects[NODE]+1, sizeof(Snode));
+    MSX->Link = (Slink *) calloc(MSX->Nobjects[LINK]+1, sizeof(Slink));
+    MSX->Tank = (Stank *) calloc(MSX->Nobjects[TANK]+1, sizeof(Stank));
 
 // --- create species, terms, parameters, constants & time patterns
 
-    MSX.Species = (Sspecies *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(Sspecies));
-    MSX.Term    = (Sterm *)    calloc(MSX.Nobjects[TERM]+1,  sizeof(Sterm));
-    MSX.Param   = (Sparam *)   calloc(MSX.Nobjects[PARAMETER]+1, sizeof(Sparam));
-    MSX.Const   = (Sconst *)   calloc(MSX.Nobjects[CONSTANT]+1, sizeof(Sconst));
-    MSX.Pattern = (Spattern *) calloc(MSX.Nobjects[PATTERN]+1, sizeof(Spattern));
-    MSX.K       = (double *)   calloc(MSX.Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
+    MSX->Species = (Sspecies *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(Sspecies));
+    MSX->Term    = (Sterm *)    calloc(MSX->Nobjects[TERM]+1,  sizeof(Sterm));
+    MSX->Param   = (Sparam *)   calloc(MSX->Nobjects[PARAMETER]+1, sizeof(Sparam));
+    MSX->Const   = (Sconst *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(Sconst));
+    MSX->Pattern = (Spattern *) calloc(MSX->Nobjects[PATTERN]+1, sizeof(Spattern));
+    MSX->K       = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
 
 // --- create arrays for demands, heads, & flows
 
-    MSX.D = (float *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
-    MSX.H = (float *) calloc(MSX.Nobjects[NODE]+1, sizeof(float));
-    MSX.Q = (float *) calloc(MSX.Nobjects[LINK]+1, sizeof(float));
+    MSX->D = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
+    MSX->H = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
+    MSX->Q = (float *) calloc(MSX->Nobjects[LINK]+1, sizeof(float));
 
 // --- create arrays for current & initial concen. of each species for each node
 
-    MSX.C0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
-    for (i=1; i<=MSX.Nobjects[NODE]; i++)
+    MSX->C0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    for (i=1; i<=MSX->Nobjects[NODE]; i++)
     {
-        MSX.Node[i].c = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
-        MSX.Node[i].c0 = (double *) calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
-        MSX.Node[i].rpt = 0;
+        MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Node[i].rpt = 0;
     }
 
 // --- create arrays for init. concen. & kinetic parameter values for each link
 
-    for (i=1; i<=MSX.Nobjects[LINK]; i++)
+    for (i=1; i<=MSX->Nobjects[LINK]; i++)
     {
-        MSX.Link[i].c0 = (double *)
-            calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
-        MSX.Link[i].reacted = (double *)
-            calloc(MSX.Nobjects[SPECIES] + 1, sizeof(double));
-        MSX.Link[i].param = (double *)
-            calloc(MSX.Nobjects[PARAMETER]+1, sizeof(double));
-        MSX.Link[i].rpt = 0;
+        MSX->Link[i].c0 = (double *)
+            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Link[i].reacted = (double *)
+            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
+        MSX->Link[i].param = (double *)
+            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+        MSX->Link[i].rpt = 0;
     }
 
 // --- create arrays for kinetic parameter values & current concen. for each tank
 
-    for (i=1; i<=MSX.Nobjects[TANK]; i++)
+    for (i=1; i<=MSX->Nobjects[TANK]; i++)
     {
-        MSX.Tank[i].param = (double *)
-            calloc(MSX.Nobjects[PARAMETER]+1, sizeof(double));
-        MSX.Tank[i].c = (double *)
-            calloc(MSX.Nobjects[SPECIES]+1, sizeof(double));
-        MSX.Tank[i].reacted = (double*)
-            calloc(MSX.Nobjects[SPECIES] + 1, sizeof(double));
+        MSX->Tank[i].param = (double *)
+            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+        MSX->Tank[i].c = (double *)
+            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Tank[i].reacted = (double*)
+            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
     }
 
 // --- initialize contents of each time pattern object
 
-    for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
+    for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
     {
-        MSX.Pattern[i].length = 0;
-        MSX.Pattern[i].first = NULL;
-        MSX.Pattern[i].current = NULL;
+        MSX->Pattern[i].length = 0;
+        MSX->Pattern[i].first = NULL;
+        MSX->Pattern[i].current = NULL;
     }
 
 // --- initialize reaction rate & equil. formulas for each species
 
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        MSX.Species[i].pipeExpr     = NULL;
-        MSX.Species[i].tankExpr     = NULL;
-        MSX.Species[i].pipeExprType = NO_EXPR;
-        MSX.Species[i].tankExprType = NO_EXPR;
-        MSX.Species[i].precision    = 2;
-        MSX.Species[i].rpt = 0;
+        MSX->Species[i].pipeExpr     = NULL;
+        MSX->Species[i].tankExpr     = NULL;
+        MSX->Species[i].pipeExprType = NO_EXPR;
+        MSX->Species[i].tankExprType = NO_EXPR;
+        MSX->Species[i].precision    = 2;
+        MSX->Species[i].rpt = 0;
     }
 
 // --- initialize math expressions for each intermediate term
 
-    for (i=1; i<=MSX.Nobjects[TERM]; i++) MSX.Term[i].expr = NULL;
+    for (i=1; i<=MSX->Nobjects[TERM]; i++) MSX->Term[i].expr = NULL;
     return 0;
 }
 
 //=============================================================================
 
-void deleteObjects()
+void deleteObjects(MSXproject *MSX)
 /*
 **  Purpose:
 **    deletes multi-species data objects.
@@ -536,90 +541,90 @@ void deleteObjects()
 
 // --- free memory used by nodes, links, and tanks
 
-    if (MSX.Node) for (i=1; i<=MSX.Nobjects[NODE]; i++)
+    if (MSX->Node) for (i=1; i<=MSX->Nobjects[NODE]; i++)
     {
-        FREE(MSX.Node[i].c);
-        FREE(MSX.Node[i].c0);
+        FREE(MSX->Node[i].c);
+        FREE(MSX->Node[i].c0);
 
         // --- free memory used by water quality sources                       //ttaxon - 9/7/10
 
-	if(MSX.Node[i].sources)
+	if(MSX->Node[i].sources)
 	{ 
-            source = MSX.Node[i].sources; 
+            source = MSX->Node[i].sources; 
             while (source != NULL)
 	    { 
-                MSX.Node[i].sources = source->next; 
+                MSX->Node[i].sources = source->next; 
                 FREE(source); 
-                source = MSX.Node[i].sources; 
+                source = MSX->Node[i].sources; 
             } 
         }
 
     }
-    if (MSX.Link) for (i=1; i<=MSX.Nobjects[LINK]; i++)
+    if (MSX->Link) for (i=1; i<=MSX->Nobjects[LINK]; i++)
     {
-        FREE(MSX.Link[i].c0);
-        FREE(MSX.Link[i].param);
-        FREE(MSX.Link[i].reacted);
+        FREE(MSX->Link[i].c0);
+        FREE(MSX->Link[i].param);
+        FREE(MSX->Link[i].reacted);
     }
-    if (MSX.Tank) for (i=1; i<=MSX.Nobjects[TANK]; i++)
+    if (MSX->Tank) for (i=1; i<=MSX->Nobjects[TANK]; i++)
     {
-        FREE(MSX.Tank[i].param);
-        FREE(MSX.Tank[i].c);
-        FREE(MSX.Tank[i].reacted);
+        FREE(MSX->Tank[i].param);
+        FREE(MSX->Tank[i].c);
+        FREE(MSX->Tank[i].reacted);
     }
 
 // --- free memory used by time patterns
 
-    if (MSX.Pattern) for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
+    if (MSX->Pattern) for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
     {
-        listItem = MSX.Pattern[i].first;
+        listItem = MSX->Pattern[i].first;
         while (listItem)
         {
-            MSX.Pattern[i].first = listItem->next;
+            MSX->Pattern[i].first = listItem->next;
             free(listItem);
-            listItem = MSX.Pattern[i].first;
+            listItem = MSX->Pattern[i].first;
         }
     }
-    FREE(MSX.Pattern);
+    FREE(MSX->Pattern);
 
 // --- free memory used for hydraulics results
 
-    FREE(MSX.D);
-    FREE(MSX.H);
-    FREE(MSX.Q);
-    FREE(MSX.C0);
+    FREE(MSX->D);
+    FREE(MSX->H);
+    FREE(MSX->Q);
+    FREE(MSX->C0);
 
 // --- delete all nodes, links, and tanks
 
-    FREE(MSX.Node);
-    FREE(MSX.Link);
-    FREE(MSX.Tank);
+    FREE(MSX->Node);
+    FREE(MSX->Link);
+    FREE(MSX->Tank);
 
 // --- free memory used by reaction rate & equilibrium expressions
 
-    if (MSX.Species) for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    if (MSX->Species) for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
     // --- free the species tank expression only if it doesn't
     //     already point to the species pipe expression
-        if ( MSX.Species[i].tankExpr != MSX.Species[i].pipeExpr )
+        if ( MSX->Species[i].tankExpr != MSX->Species[i].pipeExpr )
         {
-            mathexpr_delete(MSX.Species[i].tankExpr);
+            mathexpr_delete(MSX->Species[i].tankExpr);
         }
-        mathexpr_delete(MSX.Species[i].pipeExpr);
+        mathexpr_delete(MSX->Species[i].pipeExpr);
     }
 
 // --- delete all species, parameters, and constants
 
-    FREE(MSX.Species);
-    FREE(MSX.Param);
-    FREE(MSX.Const);
-    FREE(MSX.K);                                                               //1.1.00
+    FREE(MSX->Species);
+    FREE(MSX->Param);
+    FREE(MSX->Const);
+    FREE(MSX->K);                                                               //1.1.00
 
 // --- free memory used by intermediate terms
 
-    if (MSX.Term) for (i=1; i<=MSX.Nobjects[TERM]; i++)
-        mathexpr_delete(MSX.Term[i].expr);
-    FREE(MSX.Term);
+    if (MSX->Term) for (i=1; i<=MSX->Nobjects[TERM]; i++)
+        mathexpr_delete(MSX->Term[i].expr);
+    FREE(MSX->Term);
 }
 
 //=============================================================================
@@ -682,15 +687,15 @@ void deleteHashTables()
 }
 
 // New function added (LR-11/20/07, to fix bug 08)
-int openRptFile()
+int openRptFile(MSXproject *MSX)
 {
-    if ( MSX.RptFile.file ) fclose(MSX.RptFile.file);
-    MSX.RptFile.file = fopen(MSX.RptFile.name, "wt");
-    if ( MSX.RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
+    if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);
+    MSX->RptFile.file = fopen(MSX->RptFile.name, "wt");
+    if ( MSX->RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
     return 0;
 }
 
-int  buildadjlists()   //from epanet2.2 for node sorting in WQ routing
+int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ routing
 /*
 **--------------------------------------------------------------
 ** Input:   none
@@ -704,17 +709,17 @@ int  buildadjlists()   //from epanet2.2 for node sorting in WQ routing
     Padjlist  alink;
 
     // Create an array of adjacency lists
-    freeadjlists();
-    MSX.Adjlist = (Padjlist*)calloc(MSX.Nobjects[NODE]+1, sizeof(Padjlist));
-    if (MSX.Adjlist == NULL) return 101;
-    for (i = 0; i <= MSX.Nobjects[NODE]; i++) 
-        MSX.Adjlist[i] = NULL;
+    freeadjlists(MSX);
+    MSX->Adjlist = (Padjlist*)calloc(MSX->Nobjects[NODE]+1, sizeof(Padjlist));
+    if (MSX->Adjlist == NULL) return 101;
+    for (i = 0; i <= MSX->Nobjects[NODE]; i++) 
+        MSX->Adjlist[i] = NULL;
 
     // For each link, update adjacency lists of its end nodes
-    for (k = 1; k <= MSX.Nobjects[LINK]; k++)
+    for (k = 1; k <= MSX->Nobjects[LINK]; k++)
     {
-        i = MSX.Link[k].n1;
-        j = MSX.Link[k].n2;
+        i = MSX->Link[k].n1;
+        j = MSX->Link[k].n2;
 
         // Include link in start node i's list
         alink = (struct Sadjlist*) malloc(sizeof(struct Sadjlist));
@@ -725,8 +730,8 @@ int  buildadjlists()   //from epanet2.2 for node sorting in WQ routing
         }
         alink->node = j;
         alink->link = k;
-        alink->next = MSX.Adjlist[i];
-        MSX.Adjlist[i] = alink;
+        alink->next = MSX->Adjlist[i];
+        MSX->Adjlist[i] = alink;
 
         // Include link in end node j's list
         alink = (struct Sadjlist*) malloc(sizeof(struct Sadjlist));
@@ -737,15 +742,15 @@ int  buildadjlists()   //from epanet2.2 for node sorting in WQ routing
         }
         alink->node = i;
         alink->link = k;
-        alink->next = MSX.Adjlist[j];
-        MSX.Adjlist[j] = alink;
+        alink->next = MSX->Adjlist[j];
+        MSX->Adjlist[j] = alink;
     }
-    if (errcode) freeadjlists();
+    if (errcode) freeadjlists(MSX);
     return errcode;
 }
 
 
-void  freeadjlists()            //from epanet2.2 for node sorting in WQ routing
+void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting in WQ routing
 /*
 **--------------------------------------------------------------
 ** Input:   none
@@ -757,15 +762,15 @@ void  freeadjlists()            //from epanet2.2 for node sorting in WQ routing
     int   i;
     Padjlist alink;
 
-    if (MSX.Adjlist == NULL) return;
-    for (i = 0; i <= MSX.Nobjects[NODE]; i++)
+    if (MSX->Adjlist == NULL) return;
+    for (i = 0; i <= MSX->Nobjects[NODE]; i++)
     {
-        for (alink = MSX.Adjlist[i]; alink != NULL; alink = MSX.Adjlist[i])
+        for (alink = MSX->Adjlist[i]; alink != NULL; alink = MSX->Adjlist[i])
         {
-            MSX.Adjlist[i] = alink->next;
+            MSX->Adjlist[i] = alink->next;
             free(alink);
         }
     }
-    free(MSX.Adjlist);
+    free(MSX->Adjlist);
 }
 

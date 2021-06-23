@@ -11,8 +11,8 @@
 **  LAST UPDATE:   09/12/08
 **  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
 				   
-				   In funtcion saveSources, MSX.Pattern[source->pat].id rather 
-				   than MSX.Pattern[source->pat] should be printed, 09/12/08 FS
+				   In funtcion saveSources, MSX->Pattern[source->pat].id rather 
+				   than MSX->Pattern[source->pat] should be printed, 09/12/08 FS
 				   
 				   BUG ID 53, check if the source type > -1 before saving. 
 				   FS 09/23/08 
@@ -29,25 +29,25 @@
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;                // MSX project data
+// extern MSXproject  MSX;                // MSX project data
 
 //  Exported functions
 //--------------------
-int MSXfile_save(FILE *f);
+int MSXfile_save(MSXproject *MSX, FILE *f);
 
 //  Local functions
 //-----------------
-static void  saveSpecies(FILE *f);
-static void  saveCoeffs(FILE *f);
-static int   saveInpSections(FILE *f);
-static void  saveParams(FILE *f);
-static void  saveQuality(FILE *f);
-static void  saveSources(FILE *f);
-static void  savePatterns(FILE *f);
+static void  saveSpecies(MSXproject *MSX, FILE *f);
+static void  saveCoeffs(MSXproject *MSX, FILE *f);
+static int   saveInpSections(MSXproject *MSX, FILE *f);
+static void  saveParams(MSXproject *MSX, FILE *f);
+static void  saveQuality(MSXproject *MSX, FILE *f);
+static void  saveSources(MSXproject *MSX, FILE *f);
+static void  savePatterns(MSXproject *MSX, FILE *f);
 
 //=============================================================================
 
-int MSXfile_save(FILE *f)
+int MSXfile_save(MSXproject *MSX, FILE *f)
 /*
 **  Purpose:
 **    saves current MSX project data to file.
@@ -58,68 +58,68 @@ int MSXfile_save(FILE *f)
 {
     int errcode;
     fprintf(f, "[TITLE]");
-    fprintf(f, "\n%s\n", MSX.Title);
-    saveSpecies(f);
-    saveCoeffs(f);
-    errcode = saveInpSections(f);
-    saveParams(f);
-    saveQuality(f);
-    saveSources(f);
-    savePatterns(f);
+    fprintf(f, "\n%s\n", MSX->Title);
+    saveSpecies(MSX, f);
+    saveCoeffs(MSX, f);
+    errcode = saveInpSections(MSX, f);
+    saveParams(MSX, f);
+    saveQuality(MSX, f);
+    saveSources(MSX, f);
+    savePatterns(MSX, f);
     return errcode;
 }
 
 //=============================================================================
 
-void  saveSpecies(FILE *f)
+void  saveSpecies(MSXproject *MSX, FILE *f)
 {
     int  i, n;
     fprintf(f, "\n[SPECIES]");
-    n = MSX.Nobjects[SPECIES];
+    n = MSX->Nobjects[SPECIES];
     for (i=1; i<=n; i++)
     {
-        if ( MSX.Species[i].type == BULK ) fprintf(f, "\nBULK    ");
+        if ( MSX->Species[i].type == BULK ) fprintf(f, "\nBULK    ");
         else                               fprintf(f, "\nWALL    ");
         fprintf(f, "%-32s %-15s %e %e",
-            MSX.Species[i].id, MSX.Species[i].units,
-            MSX.Species[i].aTol, MSX.Species[i].rTol);
+            MSX->Species[i].id, MSX->Species[i].units,
+            MSX->Species[i].aTol, MSX->Species[i].rTol);
     }
 }
 
 //=============================================================================
 
-void  saveCoeffs(FILE *f)
+void  saveCoeffs(MSXproject *MSX, FILE *f)
 {
     int  i, n;
     fprintf(f, "\n\n[COEFFICIENTS]");
-    n = MSX.Nobjects[CONSTANT];
+    n = MSX->Nobjects[CONSTANT];
     for (i=1; i<=n; i++)
     {
         fprintf(f, "\nCONSTANT    %-32s  %e",
-            MSX.Const[i].id, MSX.Const[i].value);
+            MSX->Const[i].id, MSX->Const[i].value);
     }
-    n = MSX.Nobjects[PARAMETER];
+    n = MSX->Nobjects[PARAMETER];
     for (i=1; i<=n; i++)
     {
         fprintf(f, "\nPARAMETER   %-32s  %e",
-            MSX.Param[i].id, MSX.Param[i].value);
+            MSX->Param[i].id, MSX->Param[i].value);
     }
 }
 
 //=============================================================================
 
-int  saveInpSections(FILE *f)
+int  saveInpSections(MSXproject *MSX, FILE *f)
 {
     char   line[MAXLINE+1];
     char   writeLine;
     int    newsect;
 
-    if ((MSX.MsxFile.file = fopen(MSX.MsxFile.name,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
-    rewind(MSX.MsxFile.file);
+    if ((MSX->MsxFile.file = fopen(MSX->MsxFile.name,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
+    rewind(MSX->MsxFile.file);
 
     fprintf(f,"\n\n");
     writeLine = FALSE;
-    while ( fgets(line, MAXLINE, MSX.MsxFile.file) != NULL )
+    while ( fgets(line, MAXLINE, MSX->MsxFile.file) != NULL )
     {
         if (*line == '[' )
         {
@@ -139,42 +139,42 @@ int  saveInpSections(FILE *f)
         }
         if ( writeLine) fprintf(f, "%s", line);
     }
-    if ( MSX.MsxFile.file ) fclose(MSX.MsxFile.file);
-    MSX.MsxFile.file = NULL;
+    if ( MSX->MsxFile.file ) fclose(MSX->MsxFile.file);
+    MSX->MsxFile.file = NULL;
     return 0;
 }
 
 //=============================================================================
 
-void  saveParams(FILE *f)
+void  saveParams(MSXproject *MSX, FILE *f)
 {
     int    i, j, k;
     double x;
     char   id[MAXLINE+1];
 
-    if ( MSX.Nobjects[PARAMETER] > 0 )
+    if ( MSX->Nobjects[PARAMETER] > 0 )
     {
         fprintf(f, "\n\n[PARAMETERS]");
-        for (j=1; j<=MSX.Nobjects[PARAMETER]; j++)
+        for (j=1; j<=MSX->Nobjects[PARAMETER]; j++)
         {
-            x = MSX.Param[j].value;
-            for (i=1; i<=MSX.Nobjects[LINK]; i++)
+            x = MSX->Param[j].value;
+            for (i=1; i<=MSX->Nobjects[LINK]; i++)
             {
-                if ( MSX.Link[i].param[j] != x )
+                if ( MSX->Link[i].param[j] != x )
                 {
                     ENgetlinkid(i, id);
                     fprintf(f, "\nPIPE    %-32s  %-32s  %e",
-                        id, MSX.Param[j].id, MSX.Link[i].param[j]);
+                        id, MSX->Param[j].id, MSX->Link[i].param[j]);
                 }
             }
-            for (i=1; i<=MSX.Nobjects[TANK]; i++)
+            for (i=1; i<=MSX->Nobjects[TANK]; i++)
             {
-                if ( MSX.Tank[i].param[j] != x )
+                if ( MSX->Tank[i].param[j] != x )
                 {
-                    k = MSX.Tank[i].node;
+                    k = MSX->Tank[i].node;
                     ENgetnodeid(k, id);
                     fprintf(f, "\nTANK    %-32s  %-32s  %e",
-                        id, MSX.Param[j].id, MSX.Tank[i].param[j]);
+                        id, MSX->Param[j].id, MSX->Tank[i].param[j]);
                 }
             }
         }
@@ -183,34 +183,34 @@ void  saveParams(FILE *f)
 
 //=============================================================================
 
-void  saveQuality(FILE *f)
+void  saveQuality(MSXproject *MSX, FILE *f)
 {
     int    i, j;
     char   id[MAXLINE+1];
 
     fprintf(f, "\n\n[QUALITY]");
-    for (j=1; j<=MSX.Nobjects[SPECIES]; j++)
+    for (j=1; j<=MSX->Nobjects[SPECIES]; j++)
     {
-		if (MSX.C0[j] > 0.0)
+		if (MSX->C0[j] > 0.0)
 			fprintf(f, "\nGLOBAL  %-32s  %e",
-                    MSX.Species[j].id, MSX.C0[j]);
+                    MSX->Species[j].id, MSX->C0[j]);
 
-        for (i=1; i<=MSX.Nobjects[NODE]; i++)
+        for (i=1; i<=MSX->Nobjects[NODE]; i++)
         {
-            if ( MSX.Node[i].c0[j] > 0.0 && MSX.Node[i].c0[j] != MSX.C0[j])
+            if ( MSX->Node[i].c0[j] > 0.0 && MSX->Node[i].c0[j] != MSX->C0[j])
             {
                 ENgetnodeid(i, id);
                 fprintf(f, "\nNODE    %-32s  %-32s  %e",
-                    id, MSX.Species[j].id, MSX.Node[i].c0[j]);
+                    id, MSX->Species[j].id, MSX->Node[i].c0[j]);
             }
         }
-        for (i=1; i<=MSX.Nobjects[LINK]; i++)
+        for (i=1; i<=MSX->Nobjects[LINK]; i++)
         {
-            if ( MSX.Link[i].c0[j] > 0.0 && MSX.Link[i].c0[j] != MSX.C0[j])			//(FS-01/08/2008, bug fix)
+            if ( MSX->Link[i].c0[j] > 0.0 && MSX->Link[i].c0[j] != MSX->C0[j])			//(FS-01/08/2008, bug fix)
             {
                 ENgetlinkid(i, id);
                 fprintf(f, "\nLINK    %-32s  %-32s  %e",
-                    id, MSX.Species[j].id, MSX.Link[i].c0[j]);
+                    id, MSX->Species[j].id, MSX->Link[i].c0[j]);
             }
         }
     }
@@ -218,16 +218,16 @@ void  saveQuality(FILE *f)
 
 //=============================================================================
 
-void  saveSources(FILE *f)
+void  saveSources(MSXproject *MSX, FILE *f)
 {
     int     i;
     Psource source;
     char    id[MAXLINE+1];
 
     fprintf(f, "\n\n[SOURCES]");
-    for (i=1; i<=MSX.Nobjects[NODE]; i++)
+    for (i=1; i<=MSX->Nobjects[NODE]; i++)
     {
-        source = MSX.Node[i].sources;
+        source = MSX->Node[i].sources;
         while ( source )
         {
             if ( source->c0 > 0.0 && source->type > -1)   //Feng Shang 09/23/2008
@@ -235,9 +235,9 @@ void  saveSources(FILE *f)
                 ENgetnodeid(i, id);
                 fprintf(f, "\n%-10s  %-32s  %-32s  %e",
                     SourceTypeWords[source->type], id,
-                    MSX.Species[source->species].id, source->c0);
+                    MSX->Species[source->species].id, source->c0);
                 if ( source->pat > 0 )
-                    fprintf(f, "  %-32s", MSX.Pattern[source->pat].id);
+                    fprintf(f, "  %-32s", MSX->Pattern[source->pat].id);
             }
             source = source->next;
         }
@@ -246,21 +246,21 @@ void  saveSources(FILE *f)
 
 //=============================================================================
 
-void  savePatterns(FILE *f)
+void  savePatterns(MSXproject *MSX, FILE *f)
 {
     int  i, count;
     SnumList *listItem;
 
-    if ( MSX.Nobjects[PATTERN] > 0 ) fprintf(f, "\n\n[PATTERNS]");
-    for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
+    if ( MSX->Nobjects[PATTERN] > 0 ) fprintf(f, "\n\n[PATTERNS]");
+    for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
     {
         count = 0;
-        listItem = MSX.Pattern[i].first;
+        listItem = MSX->Pattern[i].first;
         while (listItem)
         {
             if ( count % 6 == 0 )
             {
-                fprintf(f, "\n%-32s", MSX.Pattern[i].id);
+                fprintf(f, "\n%-32s", MSX->Pattern[i].id);
             }
             fprintf(f, "  %e", listItem->value);
             count++;

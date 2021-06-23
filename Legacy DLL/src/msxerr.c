@@ -20,7 +20,7 @@
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;                // MSX project data
+// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------
@@ -35,7 +35,7 @@ static char* exprTypeTxt[] =           // see ExpressionType in msxtypes.h
 //--------------------
 void   MSXerr_clearMathError(void);
 int    MSXerr_mathError(void);
-double MSXerr_validate(double x, int index, int element, int exprType);
+double MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType);
 void   MSXerr_writeMathErrorMsg(void);
 
 
@@ -76,7 +76,7 @@ void MSXerr_writeMathErrorMsg()
 
 //=============================================================================
 
-double  MSXerr_validate(double x, int index, int element, int exprType)
+double  MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType)
 /*
 **  Purpose:
 **    checks if a number is valid or not.
@@ -104,13 +104,13 @@ double  MSXerr_validate(double x, int index, int element, int exprType)
 	{
 		sprintf(mathErrorMsg,
 		"Ilegal math operation occurred for term:\n  %s",
-		MSX.Term[index].id);
+		MSX->Term[index].id);
 	}
 	else
 	{
 		sprintf(mathErrorMsg,
 		"Ilegal math operation occurred in %s %s expression for specie:\n  %s",
-		elementTxt[element], exprTypeTxt[exprType], MSX.Species[index].id);
+		elementTxt[element], exprTypeTxt[exprType], MSX->Species[index].id);
 	}
 
 	// set the math error flag and return 0

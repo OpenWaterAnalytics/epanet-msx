@@ -101,8 +101,8 @@ void newton_close()
 
 //=============================================================================
 
-int newton_solve(double x[], int n, int maxit, int numsig, 
-                 void (*func)(double, double*, int, double*))
+int newton_solve(MSXproject *MSX, double x[], int n, int maxit, int numsig, 
+                 void (*func)(MSXproject*, double, double*, int, double*))
 /*
 **  Purpose:
 **    uses newton-raphson iterations to solve n nonlinear eqns.
@@ -138,8 +138,7 @@ int newton_solve(double x[], int n, int maxit, int numsig,
 	for (k=1; k<=maxit; k++) 
 	{
         // --- evaluate the Jacobian matrix
-
-        jacobian(x, n, MSXNewtonSolver.F, MSXNewtonSolver.W, MSXNewtonSolver.J, func);
+        jacobian(MSX, x, n, MSXNewtonSolver.F, MSXNewtonSolver.W, MSXNewtonSolver.J, func);
 
         // --- factorize the Jacobian
 
