@@ -453,8 +453,8 @@ void solve(double **a, int n, int *indx, double b[])
 
 //=============================================================================
 
-void jacobian(double *x, int n, double *f, double *w, double **a,
-              void (*func)(double, double*, int, double*))
+void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **a,
+              void (*func)(MSXproject*, double, double*, int, double*))
 /*
 **  Purpose: 
 **    computes Jacobian matrix of F(t,X) at given X
@@ -490,7 +490,7 @@ void jacobian(double *x, int n, double *f, double *w, double **a,
     {
         temp = x[j];
         x[j] = temp + eps;
-        func(0.0, x, n, f);
+        func(MSX, 0.0, x, n, f);
         if ( temp == 0.0 )
         {
             x[j] = temp;
@@ -501,7 +501,7 @@ void jacobian(double *x, int n, double *f, double *w, double **a,
             x[j] = temp - eps;
             eps2 = 2.0*eps;
         }
-        func(0.0, x, n, w);
+        func(MSX, 0.0, x, n, w);
         for (i=1; i<=n; i++) a[i][j] = (f[i] - w[i]) / eps2;
         x[j] = temp;
     }

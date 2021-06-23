@@ -22,7 +22,7 @@
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;                // MSX project data
+// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------
@@ -32,28 +32,28 @@ static long  LinkBytesPerPeriod;       // Bytes per time period used by all link
 
 //  Imported functions
 //--------------------
-double MSXqual_getNodeQual(int j, int m);
-double MSXqual_getLinkQual(int k, int m);
+double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);
+double MSXqual_getLinkQual(MSXproject *MSX, int k, int m);
 
 //  Exported functions
 //--------------------
-int   MSXout_open(void);
-int   MSXout_saveInitialResults(void);
-int   MSXout_saveResults(void);
-int   MSXout_saveFinalResults(void);
-float MSXout_getNodeQual(int k, int j, int m);
-float MSXout_getLinkQual(int k, int j, int m);
+int   MSXout_open(MSXproject *MSX);
+int   MSXout_saveInitialResults(MSXproject *MSX);
+int   MSXout_saveResults(MSXproject *MSX);
+int   MSXout_saveFinalResults(MSXproject *MSX);
+float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
+float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
 
 //  Local functions
 //-----------------
-static int   saveStatResults(void);
-static void  getStatResults(int objType, int m, double* stats1,
+static int   saveStatResults(MSXproject *MSX);
+static void  getStatResults(MSXproject *MSX, int objType, int m, double* stats1,
              double* stats2, REAL4* x);
 
 
 //=============================================================================
 
-int MSXout_open()
+int MSXout_open(MSXproject *MSX)
 /*
 **  Purpose:
 **    opens an MSX binary output file.
@@ -67,33 +67,33 @@ int MSXout_open()
 {
 // --- close output file if already opened
 
-    if (MSX.OutFile.file != NULL) fclose(MSX.OutFile.file); 
+    if (MSX->OutFile.file != NULL) fclose(MSX->OutFile.file); 
 
 // --- try to open the file
 
-    if ( (MSX.OutFile.file = fopen(MSX.OutFile.name, "w+b")) == NULL)
+    if ( (MSX->OutFile.file = fopen(MSX->OutFile.name, "w+b")) == NULL)
     {
         return ERR_OPEN_OUT_FILE;
     }
 
 // --- open a scratch output file for statistics
 
-    if ( MSX.Statflag == SERIES ) MSX.TmpOutFile.file = MSX.OutFile.file;
-    else if ( (MSX.TmpOutFile.file = fopen(MSX.TmpOutFile.name, "w+b")) == NULL)
+    if ( MSX->Statflag == SERIES ) MSX->TmpOutFile.file = MSX->OutFile.file;
+    else if ( (MSX->TmpOutFile.file = fopen(MSX->TmpOutFile.name, "w+b")) == NULL)
     {
         return ERR_OPEN_OUT_FILE;
     }
 
 // --- write initial results to file
 
-    MSX.Nperiods = 0;
-    MSXout_saveInitialResults();
+    MSX->Nperiods = 0;
+    MSXout_saveInitialResults(MSX);
     return 0;
 }
 
 //=============================================================================
 
-int MSXout_saveInitialResults()
+int MSXout_saveInitialResults(MSXproject *MSX)
 /*
 **  Purpose:
 **    saves general information to beginning of MSX binary output file.
@@ -109,39 +109,39 @@ int MSXout_saveInitialResults()
     INT4  n;
     INT4  magic = MAGICNUMBER;
     INT4  version = VERSION;
-    FILE* f = MSX.OutFile.file;
+    FILE* f = MSX->OutFile.file;
 
     rewind(f);
     fwrite(&magic, sizeof(INT4), 1, f);                     //Magic number
     fwrite(&version, sizeof(INT4), 1, f);                   //Version number
-    n = (INT4)MSX.Nobjects[NODE];
+    n = (INT4)MSX->Nobjects[NODE];
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of nodes
-    n = (INT4)MSX.Nobjects[LINK];
+    n = (INT4)MSX->Nobjects[LINK];
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of links
-    n = (INT4)MSX.Nobjects[SPECIES];
+    n = (INT4)MSX->Nobjects[SPECIES];
     fwrite(&n, sizeof(INT4), 1, f);                         //Number of species
-    n = (INT4)MSX.Rstep;
+    n = (INT4)MSX->Rstep;
     fwrite(&n, sizeof(INT4), 1, f);                         //Reporting step size
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        n = strlen(MSX.Species[m].id);
+        n = strlen(MSX->Species[m].id);
         fwrite(&n, sizeof(INT4), 1, f);                     //Length of species ID
-        fwrite(MSX.Species[m].id, sizeof(char), n, f);      //Species ID string
+        fwrite(MSX->Species[m].id, sizeof(char), n, f);      //Species ID string
     }
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {                                                       //Species mass units
-        fwrite(&MSX.Species[m].units, sizeof(char), MAXUNITS, f);
+        fwrite(&MSX->Species[m].units, sizeof(char), MAXUNITS, f);
     }
     ResultsOffset = ftell(f);
-    NodeBytesPerPeriod = MSX.Nobjects[NODE]*MSX.Nobjects[SPECIES]*sizeof(REAL4);
-    LinkBytesPerPeriod = MSX.Nobjects[LINK]*MSX.Nobjects[SPECIES]*sizeof(REAL4);
+    NodeBytesPerPeriod = MSX->Nobjects[NODE]*MSX->Nobjects[SPECIES]*sizeof(REAL4);
+    LinkBytesPerPeriod = MSX->Nobjects[LINK]*MSX->Nobjects[SPECIES]*sizeof(REAL4);
     return 0;
 }
     
 
 //=============================================================================
 
-int MSXout_saveResults()
+int MSXout_saveResults(MSXproject *MSX)
 /*
 **  Purpose:
 **    saves computed species concentrations for each node and link at the
@@ -160,20 +160,20 @@ int MSXout_saveResults()
     int   m, j;
     REAL4 x;
 
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        for (j=1; j<=MSX.Nobjects[NODE]; j++)
+        for (j=1; j<=MSX->Nobjects[NODE]; j++)
         {
-            x = (REAL4)MSXqual_getNodeQual(j, m);
-            fwrite(&x, sizeof(REAL4), 1, MSX.TmpOutFile.file);
+            x = (REAL4)MSXqual_getNodeQual(MSX, j, m);
+            fwrite(&x, sizeof(REAL4), 1, MSX->TmpOutFile.file);
         }
     }
-    for (m=1; m<=MSX.Nobjects[SPECIES]; m++)
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        for (j=1; j<=MSX.Nobjects[LINK]; j++)
+        for (j=1; j<=MSX->Nobjects[LINK]; j++)
         {
-            x = (REAL4)MSXqual_getLinkQual(j, m);
-            fwrite(&x, sizeof(REAL4), 1, MSX.TmpOutFile.file);
+            x = (REAL4)MSXqual_getLinkQual(MSX, j, m);
+            fwrite(&x, sizeof(REAL4), 1, MSX->TmpOutFile.file);
         }
     }
     return 0;
@@ -181,7 +181,7 @@ int MSXout_saveResults()
 
 //=============================================================================
 
-int MSXout_saveFinalResults()
+int MSXout_saveFinalResults(MSXproject *MSX)
 /*
 **  Purpose:
 **    saves any statistical results plus the following information to the end
@@ -204,24 +204,24 @@ int MSXout_saveFinalResults()
 
 // --- save statistical results to the file
 
-    if ( MSX.Statflag != SERIES ) err = saveStatResults();
+    if ( MSX->Statflag != SERIES ) err = saveStatResults(MSX);
     if ( err > 0 ) return err;
 
 // --- write closing records to the file
 
     n = (INT4)ResultsOffset;
-    fwrite(&n, sizeof(INT4), 1, MSX.OutFile.file);
-    n = (INT4)MSX.Nperiods;
-    fwrite(&n, sizeof(INT4), 1, MSX.OutFile.file);
-    n = (INT4)MSX.ErrCode;
-    fwrite(&n, sizeof(INT4), 1, MSX.OutFile.file);
-    fwrite(&magic, sizeof(INT4), 1, MSX.OutFile.file);
+    fwrite(&n, sizeof(INT4), 1, MSX->OutFile.file);
+    n = (INT4)MSX->Nperiods;
+    fwrite(&n, sizeof(INT4), 1, MSX->OutFile.file);
+    n = (INT4)MSX->ErrCode;
+    fwrite(&n, sizeof(INT4), 1, MSX->OutFile.file);
+    fwrite(&magic, sizeof(INT4), 1, MSX->OutFile.file);
     return 0;
 }
 
 //=============================================================================
 
-float MSXout_getNodeQual(int k, int j, int m)
+float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m)
 /*
 **  Purpose:
 **    retrieves a result for a specific node from the MSX binary output file.
@@ -237,15 +237,15 @@ float MSXout_getNodeQual(int k, int j, int m)
 {
     REAL4 c;
     long bp = ResultsOffset + k * (NodeBytesPerPeriod + LinkBytesPerPeriod);
-    bp += ((m-1)*MSX.Nobjects[NODE] + (j-1)) * sizeof(REAL4);
-    fseek(MSX.OutFile.file, bp, SEEK_SET);
-    fread(&c, sizeof(REAL4), 1, MSX.OutFile.file);
+    bp += ((m-1)*MSX->Nobjects[NODE] + (j-1)) * sizeof(REAL4);
+    fseek(MSX->OutFile.file, bp, SEEK_SET);
+    fread(&c, sizeof(REAL4), 1, MSX->OutFile.file);
     return (float)c;
 }
 
 //=============================================================================
 
-float MSXout_getLinkQual(int k, int j, int m)
+float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m)
 /*
 **  Purpose:
 **    retrieves a result for a specific link from the MSX binary output file.
@@ -261,15 +261,15 @@ float MSXout_getLinkQual(int k, int j, int m)
 {
     REAL4 c;
     long bp = ResultsOffset + ((k+1)*NodeBytesPerPeriod) + (k*LinkBytesPerPeriod);
-    bp += ((m-1)*MSX.Nobjects[LINK] + (j-1)) * sizeof(REAL4);
-    fseek(MSX.OutFile.file, bp, SEEK_SET);
-    fread(&c, sizeof(REAL4), 1, MSX.OutFile.file);
+    bp += ((m-1)*MSX->Nobjects[LINK] + (j-1)) * sizeof(REAL4);
+    fseek(MSX->OutFile.file, bp, SEEK_SET);
+    fread(&c, sizeof(REAL4), 1, MSX->OutFile.file);
     return (float)c;
 }
 
 //=============================================================================
 
-int  saveStatResults()
+int  saveStatResults(MSXproject *MSX)
 /*
 **  Purpose:
 **    saves time statistic results (average, min., max., or range) for each
@@ -289,8 +289,8 @@ int  saveStatResults()
 
 // --- create arrays used to store statistics results
 
-    if ( MSX.Nperiods <= 0 ) return err;
-    m = MAX(MSX.Nobjects[NODE], MSX.Nobjects[LINK]);
+    if ( MSX->Nperiods <= 0 ) return err;
+    m = MAX(MSX->Nobjects[NODE], MSX->Nobjects[LINK]);
     x = (REAL4 *) calloc(m+1, sizeof(REAL4));
     stats1 = (double *) calloc(m+1, sizeof(double));
     stats2 = (double *) calloc(m+1, sizeof(double));
@@ -299,17 +299,17 @@ int  saveStatResults()
 
     if ( x && stats1 && stats2 )
     {
-        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++ )
+        for (m = 1; m <= MSX->Nobjects[SPECIES]; m++ )
         {
-            getStatResults(NODE, m, stats1, stats2, x);
-            fwrite(x+1, sizeof(REAL4), MSX.Nobjects[NODE], MSX.OutFile.file);
+            getStatResults(MSX, NODE, m, stats1, stats2, x);
+            fwrite(x+1, sizeof(REAL4), MSX->Nobjects[NODE], MSX->OutFile.file);
         }
-        for (m = 1; m <= MSX.Nobjects[SPECIES]; m++)
+        for (m = 1; m <= MSX->Nobjects[SPECIES]; m++)
         {
-            getStatResults(LINK, m, stats1, stats2, x);    
-            fwrite(x+1, sizeof(REAL4), MSX.Nobjects[LINK], MSX.OutFile.file);
+            getStatResults(MSX, LINK, m, stats1, stats2, x);    
+            fwrite(x+1, sizeof(REAL4), MSX->Nobjects[LINK], MSX->OutFile.file);
         }
-        MSX.Nperiods = 1;
+        MSX->Nperiods = 1;
     }
     else err = ERR_MEMORY;
 
@@ -323,7 +323,7 @@ int  saveStatResults()
 
 //=============================================================================
 
-void getStatResults(int objType, int m, double * stats1, double * stats2,
+void getStatResults(MSXproject *MSX, int objType, int m, double * stats1, double * stats2,
                     REAL4 * x)
 /*
 **  Purpose:
@@ -342,7 +342,7 @@ void getStatResults(int objType, int m, double * stats1, double * stats2,
 */
 {
     int  j, k;
-    int  n = MSX.Nobjects[objType];
+    int  n = MSX->Nobjects[objType];
     long bp;
 
 // --- initialize work arrays
@@ -355,7 +355,7 @@ void getStatResults(int objType, int m, double * stats1, double * stats2,
 
 // --- for all time periods
 
-    for (k = 0; k < MSX.Nperiods; k++)
+    for (k = 0; k < MSX->Nperiods; k++)
     {
 
     // --- position file at start of time period
@@ -363,19 +363,19 @@ void getStatResults(int objType, int m, double * stats1, double * stats2,
         bp = k*(NodeBytesPerPeriod + LinkBytesPerPeriod);
         if ( objType == NODE )
         {
-            bp += (m-1) * MSX.Nobjects[NODE] * sizeof(REAL4);
+            bp += (m-1) * MSX->Nobjects[NODE] * sizeof(REAL4);
         }
         if ( objType == LINK)
         {
             bp += NodeBytesPerPeriod + 
-                  (m-1) * MSX.Nobjects[LINK] * sizeof(REAL4);
+                  (m-1) * MSX->Nobjects[LINK] * sizeof(REAL4);
         }
-        fseek(MSX.TmpOutFile.file, bp, SEEK_SET);
+        fseek(MSX->TmpOutFile.file, bp, SEEK_SET);
 
     // --- read concentrations and update stats for all objects
 
-        fread(x+1, sizeof(REAL4), n, MSX.TmpOutFile.file);
-        if ( MSX.Statflag == AVGERAGE )
+        fread(x+1, sizeof(REAL4), n, MSX->TmpOutFile.file);
+        if ( MSX->Statflag == AVGERAGE )
         { 
             for (j = 1; j <= n; j++) stats1[j] += x[j];
         }
@@ -388,18 +388,18 @@ void getStatResults(int objType, int m, double * stats1, double * stats2,
 
 // --- place final stat value for each object in x
 
-    if ( MSX.Statflag == AVGERAGE )
+    if ( MSX->Statflag == AVGERAGE )
     {
-        for ( j = 1; j <= n; j++) stats1[j] /= (double)MSX.Nperiods;
+        for ( j = 1; j <= n; j++) stats1[j] /= (double)MSX->Nperiods;
     }
-    if ( MSX.Statflag == RANGE )
+    if ( MSX->Statflag == RANGE )
     {
         for ( j = 1; j <= n; j++)
             stats1[j] = fabs(stats2[j] - stats1[j]);
     }
-    if ( MSX.Statflag == MAXIMUM)
+    if ( MSX->Statflag == MAXIMUM)
     {
-        for ( j = 1; j <= MSX.Nobjects[NODE]; j++) stats1[j] = stats2[j]; 
+        for ( j = 1; j <= MSX->Nobjects[NODE]; j++) stats1[j] = stats2[j]; 
     }
     for (j = 1; j <= n; j++) x[j] = (REAL4)stats1[j];
 }

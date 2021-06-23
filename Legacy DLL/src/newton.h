@@ -11,6 +11,10 @@
 **  LAST UPDATE:   3/1/07
 ******************************************************************************/
 
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
+
 typedef struct
 {
     int      Nmax;          // max. number of equations
@@ -27,5 +31,5 @@ int  newton_open(int n);
 void newton_close(void);
 
 // Applies the solver to a specific system of equations
-int  newton_solve(double x[], int n, int maxit, int numsig,  
-                  void (*func)(double, double*, int, double*));
+int  newton_solve(MSXproject*MSX, double x[], int n, int maxit, int numsig,  
+                  void (*func)(MSXproject *,double, double*, int, double*));

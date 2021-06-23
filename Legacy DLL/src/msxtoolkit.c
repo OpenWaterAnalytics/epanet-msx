@@ -55,35 +55,35 @@
 #include <stdlib.h>
 #include <float.h>
 
-#include "msxtypes.h"
+// #include "msxtypes.h"
 #include "msxutils.h"                                                          //1.1.00
 #include "epanet2.h"
 #include "epanetmsx.h"
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;                // MSX project data
+// extern MSXproject  MSX;                // MSX project data
 
 //  Imported functions
 //--------------------
-int    MSXproj_open(char *fname);
-int    MSXproj_close(void);
+int    MSXproj_open(MSXproject *MSX, char *fname);
+int    MSXproj_close(MSXproject *MSX);
 int    MSXproj_addObject(int type, char *id, int n);
 int    MSXproj_findObject(int type, char *id);
 char * MSXproj_findID(int type, char *id);
 char * MSXproj_getErrmsg(int errcode);
-int    MSXqual_open(void);
-int    MSXqual_init(void);
-int    MSXqual_step(long *t, long *tleft);
-int    MSXqual_close(void);
-double MSXqual_getNodeQual(int j, int m);
-double MSXqual_getLinkQual(int k, int m);
-int    MSXrpt_write(void);
-int    MSXfile_save(FILE *f);
+int    MSXqual_open(MSXproject *MSX);
+int    MSXqual_init(MSXproject *MSX);
+int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
+int    MSXqual_close(MSXproject *MSX);
+double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);
+double MSXqual_getLinkQual(MSXproject *MSX, int k, int m);
+int    MSXrpt_write(MSXproject *MSX);
+int    MSXfile_save(MSXproject *MSX, FILE *f);
 
 //=============================================================================
 
-int  DLLEXPORT  MSXopen(char *fname)
+int  DLLEXPORT  MSXopen(MSXproject *MSX, char *fname)
 /*
 **  Purpose:
 **    opens the EPANET-MSX toolkit system.
@@ -95,10 +95,10 @@ int  DLLEXPORT  MSXopen(char *fname)
 **    an error code (or 0 for no error).
 */
 {
-    int err = 0;
-    if (MSX.ProjectOpened) return(ERR_MSX_OPENED);
-    CALL(err, MSXproj_open(fname));
-    CALL(err, MSXqual_open());
+    int err = 0; 
+    if (MSX->ProjectOpened) return(ERR_MSX_OPENED); //TODO make a getter??
+    CALL(err, MSXproj_open(MSX, fname));
+    CALL(err, MSXqual_open(MSX));
 
     if ( err )
     {
@@ -111,7 +111,7 @@ int  DLLEXPORT  MSXopen(char *fname)
 
 //=============================================================================
 
-int   DLLEXPORT  MSXsolveH()
+int   DLLEXPORT  MSXsolveH(MSXproject *MSX)
 /*
 **  Purpose:
 **    solves for system hydraulics which are written to a temporary file.
@@ -127,33 +127,33 @@ int   DLLEXPORT  MSXsolveH()
 
 // --- check that an MSX project was opened
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
 
 // --- close & remove any existing hydraulics file
 
-    if ( MSX.HydFile.file )
+    if ( MSX->HydFile.file )
     {
-        fclose(MSX.HydFile.file);
-        MSX.HydFile.file = NULL;
+        fclose(MSX->HydFile.file);
+        MSX->HydFile.file = NULL;
     }
-    if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);
+    if ( MSX->HydFile.mode == SCRATCH_FILE ) remove(MSX->HydFile.name);
 
 // --- create a temporary hydraulics file
 
-    MSXutils_getTempName(MSX.HydFile.name);                                    //1.1.00
-    MSX.HydFile.mode = SCRATCH_FILE;                                           //(LR-10/05/08)
+    MSXutils_getTempName(MSX->HydFile.name);                                    //1.1.00
+    MSX->HydFile.mode = SCRATCH_FILE;                                           //(LR-10/05/08)
 
 // --- use EPANET to solve for & save hydraulics results
 
     CALL(err, ENsolveH());
-    CALL(err, ENsavehydfile(MSX.HydFile.name));
-    CALL(err, MSXusehydfile(MSX.HydFile.name));
+    CALL(err, ENsavehydfile(MSX->HydFile.name));
+    CALL(err, MSXusehydfile(MSX));
     return err;
 }
 
 //=============================================================================
 
-int   DLLEXPORT  MSXusehydfile(char *fname)
+int   DLLEXPORT  MSXusehydfile(MSXproject *MSX)
 /*
 **  Purpose:
 **    registers a hydraulics solution file with the MSX system.
@@ -165,50 +165,51 @@ int   DLLEXPORT  MSXusehydfile(char *fname)
 **    an error code (or 0 for no error).
 */
 {
+    char *fname = MSX->HydFile.name;
     INT4 magic;
     INT4 version;
     INT4 n;
 
 // --- check that an MSX project was opened
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
 
 // --- close any existing hydraulics file 
 
-    if ( MSX.HydFile.file )
+    if ( MSX->HydFile.file )
     {
-        fclose(MSX.HydFile.file);
-        if ( MSX.HydFile.mode == SCRATCH_FILE ) remove(MSX.HydFile.name);      //(LR-10/05/08)   
+        fclose(MSX->HydFile.file);
+        if ( MSX->HydFile.mode == SCRATCH_FILE ) remove(MSX->HydFile.name);      //(LR-10/05/08)   
     } 
 	
 
 // --- open hydraulics file
 
-    //MSX.HydFile.mode = USED_FILE;                                            //(LR-10/05/08)
-    MSX.HydFile.file = fopen(fname, "rb");
-    if (!MSX.HydFile.file) return ERR_OPEN_HYD_FILE;
+    //MSX->HydFile.mode = USED_FILE;                                            //(LR-10/05/08)
+    MSX->HydFile.file = fopen(fname, "rb");
+    if (!MSX->HydFile.file) return ERR_OPEN_HYD_FILE;
 
 // --- check that file is really a hydraulics file for current project
 
-    fread(&magic, sizeof(INT4), 1, MSX.HydFile.file);
+    fread(&magic, sizeof(INT4), 1, MSX->HydFile.file);
     if ( magic != MAGICNUMBER ) return ERR_READ_HYD_FILE;
-    fread(&version, sizeof(INT4), 1, MSX.HydFile.file);
-    fread(&n, sizeof(INT4), 1, MSX.HydFile.file);
-    if ( n != MSX.Nobjects[NODE] ) return ERR_READ_HYD_FILE;
-    fread(&n, sizeof(INT4), 1, MSX.HydFile.file);
-    if ( n != MSX.Nobjects[LINK] ) return ERR_READ_HYD_FILE;
-    fseek(MSX.HydFile.file, 3*sizeof(INT4), SEEK_CUR);
+    fread(&version, sizeof(INT4), 1, MSX->HydFile.file);
+    fread(&n, sizeof(INT4), 1, MSX->HydFile.file);
+    if ( n != MSX->Nobjects[NODE] ) return ERR_READ_HYD_FILE;
+    fread(&n, sizeof(INT4), 1, MSX->HydFile.file);
+    if ( n != MSX->Nobjects[LINK] ) return ERR_READ_HYD_FILE;
+    fseek(MSX->HydFile.file, 3*sizeof(INT4), SEEK_CUR);
 
 // --- read length of simulation period covered by file
 
-    fread(&MSX.Dur, sizeof(INT4), 1, MSX.HydFile.file);
-    MSX.HydOffset = ftell(MSX.HydFile.file);
+    fread(&MSX->Dur, sizeof(INT4), 1, MSX->HydFile.file);
+    MSX->HydOffset = ftell(MSX->HydFile.file);
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsolveQ()
+int  DLLEXPORT  MSXsolveQ(MSXproject *MSX)
 /*
 **  Purpose:
 **    runs a MSX water quality analysis over the entire simulation period.
@@ -222,16 +223,16 @@ int  DLLEXPORT  MSXsolveQ()
 {
     long t, tleft = 0;
     int err = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    CALL(err, MSXinit(1));
-    do CALL(err, MSXstep(&t, &tleft));
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    CALL(err, MSXinit(MSX, 1));
+    do CALL(err, MSXstep(MSX, &t, &tleft));
     while (tleft > 0 && err == 0);
     return err;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXinit(int saveFlag)
+int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
 /*
 **  Purpose:
 **    initializes a MSX water quality analysis.
@@ -244,15 +245,15 @@ int  DLLEXPORT  MSXinit(int saveFlag)
 */
 {
     int err= 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    MSX.Saveflag = saveFlag;
-    err = MSXqual_init();
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    MSX->Saveflag = saveFlag;
+    err = MSXqual_init(MSX);
     return err;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXstep(long *t, long *tleft)
+int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
 /*
 **  Purpose:
 **    advances the WQ simulation over a single time step.
@@ -268,13 +269,13 @@ int  DLLEXPORT  MSXstep(long *t, long *tleft)
 **    an error code (or 0 for no error).
 */
 {
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    return MSXqual_step(t, tleft);
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    return MSXqual_step(MSX, t, tleft);
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsaveoutfile(char *fname)
+int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
 /*
 **  Purpose:
 **    saves all results of the WQ simulation to a binary file.
@@ -289,18 +290,18 @@ int  DLLEXPORT  MSXsaveoutfile(char *fname)
     FILE *f;
     int   c;
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( !MSX.OutFile.file ) return ERR_OPEN_OUT_FILE;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->OutFile.file ) return ERR_OPEN_OUT_FILE;
     if ( (f = fopen(fname,"w+b") ) == NULL) return ERR_OPEN_OUT_FILE;
-    fseek(MSX.OutFile.file, 0, SEEK_SET);
-    while ( (c = fgetc(MSX.OutFile.file)) != EOF) fputc(c, f);
+    fseek(MSX->OutFile.file, 0, SEEK_SET);
+    while ( (c = fgetc(MSX->OutFile.file)) != EOF) fputc(c, f);
     fclose(f);
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXreport()
+int  DLLEXPORT  MSXreport(MSXproject *MSX)
 /*
 **  Purpose:
 **    writes requested WQ simulation results to a text file.
@@ -317,14 +318,14 @@ int  DLLEXPORT  MSXreport()
 **    the MSX input file.
 */
 {
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( MSX.Rptflag ) return MSXrpt_write();
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( MSX->Rptflag ) return MSXrpt_write(MSX);
     else return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXclose()
+int  DLLEXPORT  MSXclose(MSXproject *MSX)
 /*
 **  Purpose:
 **    closes the EPANET-MSX toolkit system.
@@ -336,14 +337,14 @@ int  DLLEXPORT  MSXclose()
 **    an error code (or 0 for no error).
 */
 {
-    MSXqual_close();
-    MSXproj_close();
+    MSXqual_close(MSX);
+    MSXproj_close(MSX);
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetindex(int type, char *id, int *index)
+int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)
 /*
 **  Purpose:
 **    retrieves the index of a named MSX object.
@@ -361,7 +362,7 @@ int  DLLEXPORT  MSXgetindex(int type, char *id, int *index)
 {
     int i;
     *index = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
         case MSX_SPECIES:   i = MSXproj_findObject(SPECIES, id);   break;
@@ -376,7 +377,7 @@ int  DLLEXPORT  MSXgetindex(int type, char *id, int *index)
 }
 //=============================================================================
 
-int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
+int  DLLEXPORT  MSXgetIDlen(MSXproject *MSX, int type, int index, int *len)
 /*
 **  Purpose:
 **    retrieves the number of characters in the ID name of an MSX object.
@@ -395,7 +396,7 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
 {
     int i;
     *len = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
         case MSX_SPECIES:   i = SPECIES;   break;
@@ -404,20 +405,20 @@ int  DLLEXPORT  MSXgetIDlen(int type, int index, int *len)
         case MSX_PATTERN:   i = PATTERN;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
-    if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIES:   *len = strlen(MSX.Species[index].id); break;
-        case CONSTANT:  *len = strlen(MSX.Const[index].id);   break;
-        case PARAMETER: *len = strlen(MSX.Param[index].id);   break;
-        case PATTERN:   *len = strlen(MSX.Pattern[index].id); break;
+        case SPECIES:   *len = strlen(MSX->Species[index].id); break;
+        case CONSTANT:  *len = strlen(MSX->Const[index].id);   break;
+        case PARAMETER: *len = strlen(MSX->Param[index].id);   break;
+        case PATTERN:   *len = strlen(MSX->Pattern[index].id); break;
     }
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
+int  DLLEXPORT  MSXgetID(MSXproject *MSX, int type, int index, char *id, int len)
 /*
 **  Purpose:
 **    retrieves the name of an object given its index.
@@ -437,7 +438,7 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
 {
     int i;
     strcpy(id, "");
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
         case MSX_SPECIES:   i = SPECIES;   break;
@@ -446,13 +447,13 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
         case MSX_PATTERN:   i = PATTERN;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
-    if ( index < 1 || index > MSX.Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIES:   strncpy(id, MSX.Species[index].id, len);  break;
-        case CONSTANT:  strncpy(id, MSX.Const[index].id, len);   break;
-        case PARAMETER: strncpy(id, MSX.Param[index].id, len);   break;
-        case PATTERN:   strncpy(id, MSX.Pattern[index].id, len); break;
+        case SPECIES:   strncpy(id, MSX->Species[index].id, len);  break;
+        case CONSTANT:  strncpy(id, MSX->Const[index].id, len);   break;
+        case PARAMETER: strncpy(id, MSX->Param[index].id, len);   break;
+        case PATTERN:   strncpy(id, MSX->Pattern[index].id, len); break;
     }
 	id[len] = '\0';                                                            //(L. Rossman - 11/01/10)
     return 0;
@@ -460,7 +461,7 @@ int  DLLEXPORT  MSXgetID(int type, int index, char *id, int len)
 
 //=============================================================================
 
-int DLLEXPORT  MSXgetcount(int type, int *count)
+int DLLEXPORT  MSXgetcount(MSXproject *MSX, int type, int *count)
 /*
 **  Purpose:
 **    retrieves the number of objects of a specific type.
@@ -476,13 +477,13 @@ int DLLEXPORT  MSXgetcount(int type, int *count)
 */
 {
     *count = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIES:   *count = MSX.Nobjects[SPECIES];   break;
-        case MSX_CONSTANT:  *count = MSX.Nobjects[CONSTANT];  break;
-        case MSX_PARAMETER: *count = MSX.Nobjects[PARAMETER]; break;
-        case MSX_PATTERN:   *count = MSX.Nobjects[PATTERN];   break;
+        case MSX_SPECIES:   *count = MSX->Nobjects[SPECIES];   break;
+        case MSX_CONSTANT:  *count = MSX->Nobjects[CONSTANT];  break;
+        case MSX_PARAMETER: *count = MSX->Nobjects[PARAMETER]; break;
+        case MSX_PATTERN:   *count = MSX->Nobjects[PATTERN];   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     return 0;
@@ -490,7 +491,7 @@ int DLLEXPORT  MSXgetcount(int type, int *count)
 
 //=============================================================================
 
-int DLLEXPORT  MSXgetspecies(int index, int *type, char *units,
+int DLLEXPORT  MSXgetspecies(MSXproject *MSX, int index, int *type, char *units,
                              double *aTol, double * rTol)
 /*
 **  Purpose:
@@ -516,18 +517,18 @@ int DLLEXPORT  MSXgetspecies(int index, int *type, char *units,
     strcpy(units, "");
     *aTol  = 0.0;
     *rTol  = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( index < 1 || index > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    *type  = MSX.Species[index].type;
-    strncpy(units, MSX.Species[index].units, MAXUNITS);
-    *aTol  = MSX.Species[index].aTol;
-    *rTol  = MSX.Species[index].rTol;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( index < 1 || index > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    *type  = MSX->Species[index].type;
+    strncpy(units, MSX->Species[index].units, MAXUNITS);
+    *aTol  = MSX->Species[index].aTol;
+    *rTol  = MSX->Species[index].rTol;
     return 0;
 }
 
 //=============================================================================
 
-int DLLEXPORT  MSXgetconstant(int index, double *value)
+int DLLEXPORT  MSXgetconstant(MSXproject *MSX, int index, double *value)
 /*
 **  Purpose:
 **    retrieves the value of a particular reaction constant.
@@ -543,15 +544,15 @@ int DLLEXPORT  MSXgetconstant(int index, double *value)
 */
 {
     *value = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( index < 1 || index > MSX.Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
-    *value = MSX.Const[index].value;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( index < 1 || index > MSX->Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
+    *value = MSX->Const[index].value;
     return 0;
 }
 
 //=============================================================================
 
-int DLLEXPORT MSXgetparameter(int type, int index, int param, double *value)
+int DLLEXPORT MSXgetparameter(MSXproject *MSX, int type, int index, int param, double *value)
 /*
 **  Purpose:
 **    retrieves the value of a particular reaction parameter for a given pipe
@@ -571,18 +572,18 @@ int DLLEXPORT MSXgetparameter(int type, int index, int param, double *value)
 {
     int j;
     *value = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( param < 1 || param > MSX.Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
-        if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        j = MSX.Node[index].tank;
-        if ( j > 0 ) *value = MSX.Tank[j].param[param];
+        if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+        j = MSX->Node[index].tank;
+        if ( j > 0 ) *value = MSX->Tank[j].param[param];
     }
     else if ( type == MSX_LINK )
     {
-        if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSX.Link[index].param[param];
+        if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
+        *value = MSX->Link[index].param[param];
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -590,7 +591,7 @@ int DLLEXPORT MSXgetparameter(int type, int index, int param, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
+int  DLLEXPORT MSXgetsource(MSXproject *MSX, int node, int species, int *type, double *level,
                             int *pat)
 /*
 **  Purpose:
@@ -620,10 +621,10 @@ int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
     *type  = MSX_NOSOURCE;
     *level = 0.0;
     *pat   = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( node < 1 || node > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    source = MSX.Node[node].sources;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( node < 1 || node > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    source = MSX->Node[node].sources;
     while ( source )
     {
         if ( source->species == species )
@@ -640,7 +641,7 @@ int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetpatternlen(int pat, int *len)
+int  DLLEXPORT  MSXgetpatternlen(MSXproject *MSX, int pat, int *len)
 /*
 **  Purpose:
 **    retrieves the number of time periods within a source time pattern.
@@ -656,15 +657,15 @@ int  DLLEXPORT  MSXgetpatternlen(int pat, int *len)
 */
 {
     *len = 0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( pat < 1 || pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
-    *len = MSX.Pattern[pat].length;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
+    *len = MSX->Pattern[pat].length;
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetpatternvalue(int pat, int period, double *value)
+int  DLLEXPORT  MSXgetpatternvalue(MSXproject *MSX, int pat, int period, double *value)
 /*
 **  Purpose:
 **    retrieves the multiplier at a specific time period for a given
@@ -684,19 +685,19 @@ int  DLLEXPORT  MSXgetpatternvalue(int pat, int period, double *value)
 {
     int n = 1;
     *value = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( pat < 1 || pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( period <= MSX.Pattern[pat].length )
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( period <= MSX->Pattern[pat].length )
     {
-        MSX.Pattern[pat].current = MSX.Pattern[pat].first;
-        while ( MSX.Pattern[pat].current )
+        MSX->Pattern[pat].current = MSX->Pattern[pat].first;
+        while ( MSX->Pattern[pat].current )
         {
             if ( n == period )
             {
-                *value = MSX.Pattern[pat].current->value;
+                *value = MSX->Pattern[pat].current->value;
                 return 0;
             }
-            MSX.Pattern[pat].current = MSX.Pattern[pat].current->next;
+            MSX->Pattern[pat].current = MSX->Pattern[pat].current->next;
             n++;
         }
     }
@@ -705,7 +706,7 @@ int  DLLEXPORT  MSXgetpatternvalue(int pat, int period, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetinitqual(int type, int index, int species, double *value)
+int  DLLEXPORT  MSXgetinitqual(MSXproject *MSX, int type, int index, int species, double *value)
 /*
 **  Purpose:
 **    retrieves the initial concentration of a particular chemical species
@@ -724,17 +725,17 @@ int  DLLEXPORT  MSXgetinitqual(int type, int index, int species, double *value)
 */
 {
     *value = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
-        if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSX.Node[index].c0[species];
+        if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+        *value = MSX->Node[index].c0[species];
     }
     else if ( type == MSX_LINK )
     {
-        if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSX.Link[index].c0[species];
+        if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
+        *value = MSX->Link[index].c0[species];
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -742,7 +743,7 @@ int  DLLEXPORT  MSXgetinitqual(int type, int index, int species, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetqual(int type, int index, int species, double *value)
+int  DLLEXPORT  MSXgetqual(MSXproject *MSX, int type, int index, int species, double *value)
 /*
 **  Purpose:
 **    retrieves the current concentration of a species at a particular node
@@ -761,17 +762,17 @@ int  DLLEXPORT  MSXgetqual(int type, int index, int species, double *value)
 */
 {
     *value = 0.0;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
-        if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSXqual_getNodeQual(index, species);
+        if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+        *value = MSXqual_getNodeQual(MSX, index, species);
     }
     else if ( type == MSX_LINK )
     {
-        if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        *value = MSXqual_getLinkQual(index, species);
+        if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
+        *value = MSXqual_getLinkQual(MSX, index, species);
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -779,7 +780,7 @@ int  DLLEXPORT  MSXgetqual(int type, int index, int species, double *value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgeterror(int code, char *msg, int len)
+int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
 /*
 **  Purpose:
 **    retrieves text of an error message.
@@ -801,7 +802,7 @@ int  DLLEXPORT  MSXgeterror(int code, char *msg, int len)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetconstant(int index, double value)
+int  DLLEXPORT  MSXsetconstant(MSXproject *MSX, int index, double value)
 /*
 **  Purpose:
 **    assigns a new value to a specific reaction constant.
@@ -817,15 +818,15 @@ int  DLLEXPORT  MSXsetconstant(int index, double value)
 **    an error code or 0 for no error.
 */
 {
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( index < 1 || index > MSX.Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
-    MSX.Const[index].value = value;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( index < 1 || index > MSX->Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
+    MSX->Const[index].value = value;
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetparameter(int type, int index, int param, double value)
+int  DLLEXPORT  MSXsetparameter(MSXproject *MSX, int type, int index, int param, double value)
 /*
 **  Purpose:
 **    assigns a value to a particular reaction parameter for a given pipe
@@ -845,18 +846,18 @@ int  DLLEXPORT  MSXsetparameter(int type, int index, int param, double value)
 */
 {
     int j;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( param < 1 || param > MSX.Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
-        if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        j = MSX.Node[index].tank;
-        if ( j > 0 ) MSX.Tank[j].param[param] = value;
+        if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+        j = MSX->Node[index].tank;
+        if ( j > 0 ) MSX->Tank[j].param[param] = value;
     }
     else if ( type == MSX_LINK )
     {
-        if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        MSX.Link[index].param[param] = value;
+        if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
+        MSX->Link[index].param[param] = value;
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -864,7 +865,7 @@ int  DLLEXPORT  MSXsetparameter(int type, int index, int param, double value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetinitqual(int type, int index, int species, double value)
+int  DLLEXPORT  MSXsetinitqual(MSXproject *MSX, int type, int index, int species, double value)
 /*
 **  Purpose:
 **    assigns an initial concentration of a particular chemical species
@@ -883,18 +884,18 @@ int  DLLEXPORT  MSXsetinitqual(int type, int index, int species, double value)
 **    an error code (or 0 for no error).
 */
 {
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == MSX_NODE )
     {
-        if ( index < 1 || index > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-        if ( MSX.Species[species].type == BULK )
-            MSX.Node[index].c0[species] = value;
+        if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+        if ( MSX->Species[species].type == BULK )
+            MSX->Node[index].c0[species] = value;
     }
     else if ( type == MSX_LINK )
     {
-        if ( index < 1 || index > MSX.Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
-        MSX.Link[index].c0[species] = value;
+        if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
+        MSX->Link[index].c0[species] = value;
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
@@ -902,7 +903,7 @@ int  DLLEXPORT  MSXsetinitqual(int type, int index, int species, double value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetsource(int node, int species, int type, double level,
+int  DLLEXPORT  MSXsetsource(MSXproject *MSX, int node, int species, int type, double level,
                              int pat)
 /*
 **  Purpose:
@@ -933,19 +934,19 @@ int  DLLEXPORT  MSXsetsource(int node, int species, int type, double level,
 
 // --- check for valid source parameters
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( node < 1 || node > MSX.Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( species < 1 || species > MSX.Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( node < 1 || node > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( pat < 0 ) pat = 0;
     if ( type < MSX_NOSOURCE ||
          type > MSX_FLOWPACED ) return ERR_INVALID_OBJECT_PARAMS;
-    if ( MSX.Species[species].type != BULK ) return ERR_INVALID_OBJECT_PARAMS;
+    if ( MSX->Species[species].type != BULK ) return ERR_INVALID_OBJECT_PARAMS;
     if ( level < 0.0 ) return ERR_INVALID_OBJECT_PARAMS;
 
 // --- check if a source for this species already exists at the node
 
-    source = MSX.Node[node].sources;
+    source = MSX->Node[node].sources;
     while ( source )
     {
         if ( source->species == species ) break;
@@ -958,8 +959,8 @@ int  DLLEXPORT  MSXsetsource(int node, int species, int type, double level,
     {
         source = (struct Ssource *) malloc(sizeof(struct Ssource));
         if ( source == NULL ) return ERR_MEMORY;
-        source->next = MSX.Node[node].sources;
-        MSX.Node[node].sources = source;
+        source->next = MSX->Node[node].sources;
+        MSX->Node[node].sources = source;
     }
 
 // --- assign parameters to the source
@@ -973,7 +974,7 @@ int  DLLEXPORT  MSXsetsource(int node, int species, int type, double level,
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetpatternvalue(int pat, int period, double value)
+int  DLLEXPORT  MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double value)
 /*
 **  Purpose:
 **    assigns a new value to the multiplier for a specific time period in
@@ -996,22 +997,22 @@ int  DLLEXPORT  MSXsetpatternvalue(int pat, int period, double value)
 
 // --- check that pattern & period exists
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( pat < 1 || pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( period <= 0 || period > MSX.Pattern[pat].length )
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( period <= 0 || period > MSX->Pattern[pat].length )
         return ERR_INVALID_OBJECT_PARAMS;
 
 // --- find desired time period in the pattern
 
-    MSX.Pattern[pat].current = MSX.Pattern[pat].first;
-    while ( MSX.Pattern[pat].current )
+    MSX->Pattern[pat].current = MSX->Pattern[pat].first;
+    while ( MSX->Pattern[pat].current )
     {
         if ( n == period )
         {
-            MSX.Pattern[pat].current->value = value;
+            MSX->Pattern[pat].current->value = value;
             return 0;
         }
-        MSX.Pattern[pat].current = MSX.Pattern[pat].current->next;
+        MSX->Pattern[pat].current = MSX->Pattern[pat].current->next;
         n++;
     }
     return 0;
@@ -1019,7 +1020,7 @@ int  DLLEXPORT  MSXsetpatternvalue(int pat, int period, double value)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXaddpattern(char *id)
+int  DLLEXPORT  MSXaddpattern(MSXproject *MSX, char *id)
 /*
 **  Purpose:
 **    adds a new MSX time pattern to the project.
@@ -1042,23 +1043,23 @@ int  DLLEXPORT  MSXaddpattern(char *id)
 
 // --- check if a pattern with same id already exists
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( MSXproj_findObject(PATTERN, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
 
 // --- allocate memory for a new array of patterns
 
-    n = MSX.Nobjects[PATTERN] + 1;
+    n = MSX->Nobjects[PATTERN] + 1;
     tmpPat = (Spattern *) calloc(n+1, sizeof(Spattern));
     if ( tmpPat == NULL ) return ERR_MEMORY;
 
 // --- copy contents of old pattern array to new one
 
-    for (i=1; i<=MSX.Nobjects[PATTERN]; i++)
+    for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
     {
-        tmpPat[i].id      = MSX.Pattern[i].id;
-        tmpPat[i].length  = MSX.Pattern[i].length;
-        tmpPat[i].first   = MSX.Pattern[i].first;
-        tmpPat[i].current = MSX.Pattern[i].current;
+        tmpPat[i].id      = MSX->Pattern[i].id;
+        tmpPat[i].length  = MSX->Pattern[i].length;
+        tmpPat[i].first   = MSX->Pattern[i].first;
+        tmpPat[i].current = MSX->Pattern[i].current;
     }
 
 // --- add info for the new pattern
@@ -1075,15 +1076,15 @@ int  DLLEXPORT  MSXaddpattern(char *id)
 
 // --- replace old pattern array with new one
 
-    FREE(MSX.Pattern);
-    MSX.Pattern = tmpPat;
-    MSX.Nobjects[PATTERN]++;
+    FREE(MSX->Pattern);
+    MSX->Pattern = tmpPat;
+    MSX->Nobjects[PATTERN]++;
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
+int  DLLEXPORT  MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len)
 /*
 **  Purpose:
 **    Assigns a new set of multipliers to a given time pattern.
@@ -1106,57 +1107,57 @@ int  DLLEXPORT  MSXsetpattern(int pat, double mult[], int len)
 
 // --- check that pattern exists
 
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( pat < 1 || pat > MSX.Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( len < 0) len = 0;
 
 // --- delete current multipliers
 
-    listItem = MSX.Pattern[pat].first;
+    listItem = MSX->Pattern[pat].first;
     while (listItem)
     {
-        MSX.Pattern[pat].first = listItem->next;
+        MSX->Pattern[pat].first = listItem->next;
         free(listItem);
-        listItem = MSX.Pattern[pat].first;
+        listItem = MSX->Pattern[pat].first;
     }
-    MSX.Pattern[pat].first = NULL;
+    MSX->Pattern[pat].first = NULL;
 
 // --- create a new set of multipliers
 
-    MSX.Pattern[pat].length = 0;
+    MSX->Pattern[pat].length = 0;
     for ( i = 0; i < len; i++ )
     {
         listItem = (SnumList *) malloc(sizeof(SnumList));
         if ( listItem == NULL ) return ERR_MEMORY;
         listItem->value = mult[i];
         listItem->next = NULL;
-        if ( MSX.Pattern[pat].first == NULL )
+        if ( MSX->Pattern[pat].first == NULL )
         {
-            MSX.Pattern[pat].current = listItem;
-            MSX.Pattern[pat].first = listItem;
+            MSX->Pattern[pat].current = listItem;
+            MSX->Pattern[pat].first = listItem;
         }
         else
         {
-            MSX.Pattern[pat].current->next = listItem;
-            MSX.Pattern[pat].current = listItem;
+            MSX->Pattern[pat].current->next = listItem;
+            MSX->Pattern[pat].current = listItem;
         }
-        MSX.Pattern[pat].length++;
+        MSX->Pattern[pat].length++;
     }
 	
-    MSX.Pattern[pat].interval = 0;			  //Feng Shang   04/17/2008
-    MSX.Pattern[pat].current = MSX.Pattern[pat].first;    //Feng Shang   04/17/2008
+    MSX->Pattern[pat].interval = 0;			  //Feng Shang   04/17/2008
+    MSX->Pattern[pat].current = MSX->Pattern[pat].first;    //Feng Shang   04/17/2008
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT MSXsavemsxfile(char *fname)
+int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
 {
     int errcode;
     FILE *f;
-    if ( !MSX.ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ((f = fopen(fname,"wt")) == NULL) return ERR_OPEN_OUT_FILE;
-    errcode = MSXfile_save(f);
+    errcode = MSXfile_save(MSX, f);
     fclose(f);
     return errcode;
 }

@@ -7,6 +7,10 @@
 **  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
+
 typedef struct
 {
     int      Nmax;          // max. number of equations
@@ -29,6 +33,6 @@ int  rk5_open(int n, int itmax, int adjust);
 void rk5_close(void);
 
 // Applies the solver to integrate a specific system of ODEs
-int  rk5_integrate(double y[], int n, double t, double tnext,
+int  rk5_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                    double* htry, double atol[], double rtol[],
-                   void (*func)(double, double*, int, double*));
+                   void (*func)(MSXproject*,double, double*, int, double*));

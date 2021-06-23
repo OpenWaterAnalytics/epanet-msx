@@ -14,6 +14,11 @@
 #ifndef EPANETMSX_H
 #define EPANETMSX_H
 
+// Define msxtpyes.h
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
+
 // --- define WINDOWS
 
 #undef WINDOWS
@@ -64,40 +69,40 @@
 
 // --- declare MSX functions
 
-int  DLLEXPORT MSXopen(char *fname);
-int  DLLEXPORT MSXsolveH(void);
-int  DLLEXPORT MSXusehydfile(char *fname);
-int  DLLEXPORT MSXsolveQ(void);
-int  DLLEXPORT MSXinit(int saveFlag);
-int  DLLEXPORT MSXstep(long *t, long *tleft);
-int  DLLEXPORT MSXsaveoutfile(char *fname);
-int  DLLEXPORT MSXsavemsxfile(char *fname);
-int  DLLEXPORT MSXreport(void);
-int  DLLEXPORT MSXclose(void);
+int  DLLEXPORT MSXopen(MSXproject *MSX, char *fname);
+int  DLLEXPORT MSXsolveH(MSXproject *MSX);
+int  DLLEXPORT MSXusehydfile(MSXproject *MSX);
+int  DLLEXPORT MSXsolveQ(MSXproject *MSX);
+int  DLLEXPORT MSXinit(MSXproject *MSX, int saveFlag);
+int  DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
+int  DLLEXPORT MSXsaveoutfile(MSXproject *MSX, char *fname);
+int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname);
+int  DLLEXPORT MSXreport(MSXproject *MSX);
+int  DLLEXPORT MSXclose(MSXproject *MSX);
 
-int  DLLEXPORT MSXgetindex(int type, char *id, int *index);
-int  DLLEXPORT MSXgetIDlen(int type, int index, int *len);
-int  DLLEXPORT MSXgetID(int type, int index, char *id, int len);
-int  DLLEXPORT MSXgetcount(int type, int *count);
-int  DLLEXPORT MSXgetspecies(int index, int *type, char *units, double *aTol,
+int  DLLEXPORT MSXgetindex(MSXproject *MSX, int type, char *id, int *index);
+int  DLLEXPORT MSXgetIDlen(MSXproject *MSX, int type, int index, int *len);
+int  DLLEXPORT MSXgetID(MSXproject *MSX, int type, int index, char *id, int len);
+int  DLLEXPORT MSXgetcount(MSXproject *MSX, int type, int *count);
+int  DLLEXPORT MSXgetspecies(MSXproject *MSX, int index, int *type, char *units, double *aTol,
                double *rTol);
-int  DLLEXPORT MSXgetconstant(int index, double *value);
-int  DLLEXPORT MSXgetparameter(int type, int index, int param, double *value);
-int  DLLEXPORT MSXgetsource(int node, int species, int *type, double *level,
+int  DLLEXPORT MSXgetconstant(MSXproject *MSX, int index, double *value);
+int  DLLEXPORT MSXgetparameter(MSXproject *MSX, int type, int index, int param, double *value);
+int  DLLEXPORT MSXgetsource(MSXproject *MSX, int node, int species, int *type, double *level,
                int *pat);
-int  DLLEXPORT MSXgetpatternlen(int pat, int *len);
-int  DLLEXPORT MSXgetpatternvalue(int pat, int period, double *value);
-int  DLLEXPORT MSXgetinitqual(int type, int index, int species, double *value);
-int  DLLEXPORT MSXgetqual(int type, int index, int species, double *value);
-int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
+int  DLLEXPORT MSXgetpatternlen(MSXproject *MSX, int pat, int *len);
+int  DLLEXPORT MSXgetpatternvalue(MSXproject *MSX, int pat, int period, double *value);
+int  DLLEXPORT MSXgetinitqual(MSXproject *MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSXgetqual(MSXproject *MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSXgeterror(MSXproject *MSX, int code, char *msg, int len);
 
-int  DLLEXPORT MSXsetconstant(int index, double value);
-int  DLLEXPORT MSXsetparameter(int type, int index, int param, double value);
-int  DLLEXPORT MSXsetinitqual(int type, int index, int species, double value);
-int  DLLEXPORT MSXsetsource(int node, int species, int type, double level,
+int  DLLEXPORT MSXsetconstant(MSXproject *MSX, int index, double value);
+int  DLLEXPORT MSXsetparameter(MSXproject *MSX, int type, int index, int param, double value);
+int  DLLEXPORT MSXsetinitqual(MSXproject *MSX, int type, int index, int species, double value);
+int  DLLEXPORT MSXsetsource(MSXproject *MSX, int node, int species, int type, double level,
                int pat);
-int  DLLEXPORT MSXsetpatternvalue(int pat, int period, double value);
-int  DLLEXPORT MSXsetpattern(int pat, double mult[], int len);
-int  DLLEXPORT MSXaddpattern(char *id);
+int  DLLEXPORT MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double value);
+int  DLLEXPORT MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len);
+int  DLLEXPORT MSXaddpattern(MSXproject *MSX, char *id);
 
 #endif

@@ -3,128 +3,128 @@
 #include "msxtypes.h"
 #endif
 
-int getNobjects(int type, int *Nobjects) ;
+int getNobjects(MSXproject *MSX, int type, int *Nobjects) ;
 
-int getFlowUnits(int *Flowflag, int *Unitsflag);
+int getFlowUnits(MSXproject *MSX, int *Flowflag, int *Unitsflag);
 
-int getAreaUnits(int *AreaUnits);
+int getAreaUnits(MSXproject *MSX, int *AreaUnits);
 
-int getRateUnits(int *RateUnits);
+int getRateUnits(MSXproject *MSX, int *RateUnits);
 
-int getSolver(int *solver);
+int getSolver(MSXproject *MSX, int *solver);
 
-int getCoupling(int *coupling);
+int getCoupling(MSXproject *MSX, int *coupling);
 
-int getCompiler(int *compiler);
+int getCompiler(MSXproject *MSX, int *compiler);
 
-int getQstep(int *Qstep);
+int getQstep(MSXproject *MSX, int *Qstep);
 
-int getRstep(int *Rstep);
+int getRstep(MSXproject *MSX, int *Rstep);
 
-int getRstart(int *Rstart);
+int getRstart(MSXproject *MSX, int *Rstart);
 
-int getPstep(int *Pstep);
+int getPstep(MSXproject *MSX, int *Pstep);
 
-int getPstart(int *Pstart);
+int getPstart(MSXproject *MSX, int *Pstart);
 
-int getStatflag(int *Statflag);
+int getStatflag(MSXproject *MSX, int *Statflag);
 
-int getDefaultRelativeErrorTolerance(double *DefRtol);
+int getDefaultRelativeErrorTolerance(MSXproject *MSX, double *DefRtol);
 
-int getDefaultAbsoluteErrorTolerance(double *DefAtol);
+int getDefaultAbsoluteErrorTolerance(MSXproject *MSX, double *DefAtol);
 
-int getInitialQualityVector(int index, double *value);
+int getInitialQualityVector(MSXproject *MSX, int index, double *value);
 
 // Node getters
 
-int getNodeTank(int nodeIndex, int *tank);
+int getNodeTank(MSXproject *MSX, int nodeIndex, int *tank);
 
-int getNodeInitialSpeciesConcentration(int nodeIndex, int speciesIndex, double *concentration);
+int getNodeInitialSpeciesConcentration(MSXproject *MSX, int nodeIndex, int speciesIndex, double *concentration);
 
-int getNodeSources(int nodeIndex, Psource *sources);
+int getNodeSources(MSXproject *MSX, int nodeIndex, Psource *sources);
 
-int getNodeReport(int nodeIndex, char *report);
+int getNodeReport(MSXproject *MSX, int nodeIndex, char *report);
 
 // Tank getters
 
-int getTankNode(int tankIndex, int *node);
+int getTankNode(MSXproject *MSX, int tankIndex, int *node);
 
-int getTankArea(int tankIndex, double *area);
+int getTankArea(MSXproject *MSX, int tankIndex, double *area);
 
-int getTankInitialVolume(int tankIndex, double *v0);
+int getTankInitialVolume(MSXproject *MSX, int tankIndex, double *v0);
 
-int getTankMixModel(int tankIndex, int *mix);
+int getTankMixModel(MSXproject *MSX, int tankIndex, int *mix);
 
-int getTankMixingSize(int tankIndex, double *vMix);
+int getTankMixingSize(MSXproject *MSX, int tankIndex, double *vMix);
 
-int getTankParameter(int tankIndex, int paramIndex, double *val);
+int getTankParameter(MSXproject *MSX, int tankIndex, int paramIndex, double *val);
 
 // Link getters
 
-int getLinkStartNode(int linkIndex, int *startNode);
+int getLinkStartNode(MSXproject *MSX, int linkIndex, int *startNode);
 
-int getLinkEndNode(int linkIndex, int *endNode);
+int getLinkEndNode(MSXproject *MSX, int linkIndex, int *endNode);
 
-int getLinkDiameter(int linkIndex, double *diameter);
+int getLinkDiameter(MSXproject *MSX, int linkIndex, double *diameter);
 
-int getLinkLength(int linkIndex, double *length);
+int getLinkLength(MSXproject *MSX, int linkIndex, double *length);
 
-int getLinkRoughness(int linkIndex, double *roughness);
+int getLinkRoughness(MSXproject *MSX, int linkIndex, double *roughness);
 
-int getLinkParameter(int linkIndex, int paramIndex, double *val);
+int getLinkParameter(MSXproject *MSX, int linkIndex, int paramIndex, double *val);
 
-int getLinkInitialSpeciesConcentration(int linkIndex, int speciesIndex, double *concentration);
+int getLinkInitialSpeciesConcentration(MSXproject *MSX, int linkIndex, int speciesIndex, double *concentration);
 
-int getLinkReport(int linkIndex, char *report);
+int getLinkReport(MSXproject *MSX, int linkIndex, char *report);
 
 // Species getters
 
-int getSpeciesId(int speciesIndex, char **id);
+int getSpeciesId(MSXproject *MSX, int speciesIndex, char **id);
 
-int getSpeciesType(int speciesIndex, int *type);
+int getSpeciesType(MSXproject *MSX, int speciesIndex, int *type);
 
-int getSpeciesUnits(int speciesIndex, char **units);
+int getSpeciesUnits(MSXproject *MSX, int speciesIndex, char **units);
 
-int getSpeciesAbsoluteTolerance(int speciesIndex, double *aTol);
+int getSpeciesAbsoluteTolerance(MSXproject *MSX, int speciesIndex, double *aTol);
 
-int getSpeciesRelativeTolerance(int speciesIndex, double *rTol);
+int getSpeciesRelativeTolerance(MSXproject *MSX, int speciesIndex, double *rTol);
 
-int getSpeciesPipeExpressionType(int speciesIndex, int *type);
+int getSpeciesPipeExpressionType(MSXproject *MSX, int speciesIndex, int *type);
 
-int getSpeciesPipeExpression(int speciesIndex, MathExpr **expr);
+int getSpeciesPipeExpression(MSXproject *MSX, int speciesIndex, MathExpr **expr);
 
-int getSpeciesTankExpressionType(int speciesIndex, int *type);
+int getSpeciesTankExpressionType(MSXproject *MSX, int speciesIndex, int *type);
 
-int getSpeciesTankExpression(int speciesIndex, MathExpr **expr);
+int getSpeciesTankExpression(MSXproject *MSX, int speciesIndex, MathExpr **expr);
 
-int getSpeciesReport(int speciesIndex, char *report);
+int getSpeciesReport(MSXproject *MSX, int speciesIndex, char *report);
 
-int getSpeciesPrecision(int speciesIndex, int *precision);
+int getSpeciesPrecision(MSXproject *MSX, int speciesIndex, int *precision);
 
 // Parameter getters
 
-int getParameterId(int paramIndex, char **id);
+int getParameterId(MSXproject *MSX, int paramIndex, char **id);
 
-int getParameterValue(int paramIndex, double *value);
+int getParameterValue(MSXproject *MSX, int paramIndex, double *value);
 
 // Constant getters
 
-int getConstantId(int constantIndex, char **id);
+int getConstantId(MSXproject *MSX, int constantIndex, char **id);
 
-int getConstantValue(int constantIndex, double *value);
+int getConstantValue(MSXproject *MSX, int constantIndex, double *value);
 
 // Term getters
 
-int getTermId(int termIndex, char **id);
+int getTermId(MSXproject *MSX, int termIndex, char **id);
 
-int getTermExpression(int termIndex, MathExpr **expr);
+int getTermExpression(MSXproject *MSX, int termIndex, MathExpr **expr);
 
 // Pattern getters
 
-int getPatternId(int patternIndex, char **id);
+int getPatternId(MSXproject *MSX, int patternIndex, char **id);
 
-int getPatternLength(int patternIndex, int *length);
+int getPatternLength(MSXproject *MSX, int patternIndex, int *length);
 
-int getPatternFirstMultiplier(int patternIndex, SnumList **first);
+int getPatternFirstMultiplier(MSXproject *MSX, int patternIndex, SnumList **first);
 
-int getPatternCurrentMultiplier(int patternIndex, SnumList **current);
+int getPatternCurrentMultiplier(MSXproject *MSX, int patternIndex, SnumList **current);

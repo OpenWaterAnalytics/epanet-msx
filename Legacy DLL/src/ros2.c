@@ -105,9 +105,9 @@ void ros2_close()
 
 //=============================================================================
       
-int ros2_integrate(double y[], int n, double t, double tnext,
+int ros2_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                    double* htry, double atol[], double rtol[],
-                   void (*func)(double, double*, int, double*))
+                   void (*func)(MSXproject*, double, double*, int, double*))
 /*
 **  Purpose:
 **    integrates a system of ODEs over a specified time interval.
@@ -168,7 +168,7 @@ int ros2_integrate(double y[], int n, double t, double tnext,
     h = *htry;
     if ( h == 0.0 )
     {
-        func(t, y, n, MSXRosenbrockSolver.K1);
+        func(MSX, t, y, n, MSXRosenbrockSolver.K1);
         nfcn += 1;
         adjust = 1;
         h = tnext - t;
@@ -202,7 +202,7 @@ int ros2_integrate(double y[], int n, double t, double tnext,
 
         if ( isReject == 0 )
         {
-            jacobian(y, n, MSXRosenbrockSolver.K1, MSXRosenbrockSolver.K2, MSXRosenbrockSolver.A, func);
+            jacobian(MSX, y, n, MSXRosenbrockSolver.K1, MSXRosenbrockSolver.K2, MSXRosenbrockSolver.A, func);
             njac++;
             nfcn += 2*n;
             ghinv1 = 0.0;
@@ -221,7 +221,7 @@ int ros2_integrate(double y[], int n, double t, double tnext,
 
     // --- Stage 1 solution
 
-        func(t, y, n, MSXRosenbrockSolver.K1);
+        func(MSX, t, y, n, MSXRosenbrockSolver.K1);
         nfcn += 1;
         for (j=1; j<=n; j++) MSXRosenbrockSolver.K1[j] *= ghinv;
         solve(MSXRosenbrockSolver.A, n, MSXRosenbrockSolver.Jindx, MSXRosenbrockSolver.K1);
@@ -232,7 +232,7 @@ int ros2_integrate(double y[], int n, double t, double tnext,
         {
             MSXRosenbrockSolver.Ynew[j] = y[j] + h* MSXRosenbrockSolver.K1[j];
         }
-        func(t, MSXRosenbrockSolver.Ynew, n, MSXRosenbrockSolver.K2);
+        func(MSX, t, MSXRosenbrockSolver.Ynew, n, MSXRosenbrockSolver.K2);
         nfcn += 1;
         for (j=1; j<=n; j++)
         {

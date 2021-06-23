@@ -3,131 +3,131 @@
 #include "msxtypes.h"
 #endif
 
-int setNobjects(int type, int Nobjects);
+int setNobjects(MSXproject *MSX, int type, int Nobjects);
 
-int setFlowUnits(int Flowflag, int Unitsflag);
+int setFlowUnits(MSXproject *MSX, int Flowflag, int Unitsflag);
 
-int setAreaUnits(int AreaUnits);
+int setAreaUnits(MSXproject *MSX, int AreaUnits);
 
-int setRateUnits(int RateUnits);
+int setRateUnits(MSXproject *MSX, int RateUnits);
 
-int setSolver(int solver);
+int setSolver(MSXproject *MSX, int solver);
 
-int setCoupling(int coupling);
+int setCoupling(MSXproject *MSX, int coupling);
 
-int setCompiler(int compiler);
+int setCompiler(MSXproject *MSX, int compiler);
 
-int setQstep(int Qstep);
+int setQstep(MSXproject *MSX, int Qstep);
 
-int setRstep(int Rstep);
+int setRstep(MSXproject *MSX, int Rstep);
 
-int setRstart(int Rstart);
+int setRstart(MSXproject *MSX, int Rstart);
 
-int setPstep(int Pstep);
+int setPstep(MSXproject *MSX, int Pstep);
 
-int setPstart(int Pstart);
+int setPstart(MSXproject *MSX, int Pstart);
 
-int setStatflag(int Statflag);
+int setStatflag(MSXproject *MSX, int Statflag);
 
-int setDefaultRelativeErrorTolerance(double DefRtol);
+int setDefaultRelativeErrorTolerance(MSXproject *MSX, double DefRtol);
 
-int setDefaultAbsoluteErrorTolerance(double DefAtol);
+int setDefaultAbsoluteErrorTolerance(MSXproject *MSX, double DefAtol);
 
-int setInitialQualityVector(int index, double value);
+int setInitialQualityVector(MSXproject *MSX, int index, double value);
 
 // Node setters
 
-int setNodeTank(int nodeIndex, int tank);
+int setNodeTank(MSXproject *MSX, int nodeIndex, int tank);
 
-int setNodeInitialSpeciesConcentration(int nodeIndex, int speciesIndex, double concentration);
+int setNodeInitialSpeciesConcentration(MSXproject *MSX, int nodeIndex, int speciesIndex, double concentration);
 
-int setNodeSources(int nodeIndex, Psource sources);
+int setNodeSources(MSXproject *MSX, int nodeIndex, Psource sources);
 
-int setNodeReport(int nodeIndex, char report);
+int setNodeReport(MSXproject *MSX, int nodeIndex, char report);
 
 // Tank setters
 
-int setTankNode(int tankIndex, int node);
+int setTankNode(MSXproject *MSX, int tankIndex, int node);
 
-int setTankArea(int tankIndex, double area);
+int setTankArea(MSXproject *MSX, int tankIndex, double area);
 
-int setTankInitialVolume(int tankIndex, double initialV);
+int setTankInitialVolume(MSXproject *MSX, int tankIndex, double initialV);
 
-int setTankMixModel(int tankIndex, int mix);
+int setTankMixModel(MSXproject *MSX, int tankIndex, int mix);
 
-int setTankMixingSize(int tankIndex, float vMix);
+int setTankMixingSize(MSXproject *MSX, int tankIndex, float vMix);
 
-int setTankParameter(int tankIndex, int paramIndex, double val);
+int setTankParameter(MSXproject *MSX, int tankIndex, int paramIndex, double val);
 
 // Link setters
 
-int setLinkStartNode(int linkIndex, int startNode);
+int setLinkStartNode(MSXproject *MSX, int linkIndex, int startNode);
 
-int setLinkEndNode(int linkIndex, int endNode);
+int setLinkEndNode(MSXproject *MSX, int linkIndex, int endNode);
 
-int setLinkDiameter(int linkIndex, double diameter);
+int setLinkDiameter(MSXproject *MSX, int linkIndex, double diameter);
 
-int setLinkLength(int linkIndex, double length);
+int setLinkLength(MSXproject *MSX, int linkIndex, double length);
 
-int setLinkRoughness(int linkIndex, double roughness);
+int setLinkRoughness(MSXproject *MSX, int linkIndex, double roughness);
 
-int setLinkParameter(int linkIndex, int paramIndex, double val);
+int setLinkParameter(MSXproject *MSX, int linkIndex, int paramIndex, double val);
 
-int setLinkInitialSpeciesConcentration(int linkIndex, int speciesIndex, double concentration);
+int setLinkInitialSpeciesConcentration(MSXproject *MSX, int linkIndex, int speciesIndex, double concentration);
 
-int setLinkReport(int linkIndex, char report);
+int setLinkReport(MSXproject *MSX, int linkIndex, char report);
 
 // Species setters
 
-int setSpeciesId(int speciesIndex, char *id);
+int setSpeciesId(MSXproject *MSX, int speciesIndex, char *id);
 
-int setSpeciesType(int speciesIndex, int type);
+int setSpeciesType(MSXproject *MSX, int speciesIndex, int type);
 
-int setSpeciesUnits(int speciesIndex, char * units);
+int setSpeciesUnits(MSXproject *MSX, int speciesIndex, char * units);
 
-int setSpeciesAbsoluteTolerance(int speciesIndex, double aTol);
+int setSpeciesAbsoluteTolerance(MSXproject *MSX, int speciesIndex, double aTol);
 
-int setSpeciesRelativeTolerance(int speciesIndex, double rTol);
+int setSpeciesRelativeTolerance(MSXproject *MSX, int speciesIndex, double rTol);
 
-int setSpeciesPipeExpressionType(int speciesIndex, int type);
+int setSpeciesPipeExpressionType(MSXproject *MSX, int speciesIndex, int type);
 
-int setSpeciesPipeExpression(int speciesIndex, MathExpr *expr);
+int setSpeciesPipeExpression(MSXproject *MSX, int speciesIndex, MathExpr *expr);
 
-int setSpeciesTankExpressionType(int speciesIndex, int type);
+int setSpeciesTankExpressionType(MSXproject *MSX, int speciesIndex, int type);
 
-int setSpeciesTankExpression(int speciesIndex, MathExpr *expr);
+int setSpeciesTankExpression(MSXproject *MSX, int speciesIndex, MathExpr *expr);
 
-int setSpeciesReport(int speciesIndex, char report);
+int setSpeciesReport(MSXproject *MSX, int speciesIndex, char report);
 
-int setSpeciesPrecision(int speciesIndex, int precision);
+int setSpeciesPrecision(MSXproject *MSX, int speciesIndex, int precision);
 
 // Parameter setters
 
-int setParameterId(int paramIndex, char *id);
+int setParameterId(MSXproject *MSX, int paramIndex, char *id);
 
-int setParameterValue(int paramIndex, double value);
+int setParameterValue(MSXproject *MSX, int paramIndex, double value);
 
 // Constant setters
 
-int setConstantId(int constantIndex, char *id);
+int setConstantId(MSXproject *MSX, int constantIndex, char *id);
 
-int setConstantValue(int constantIndex, double value);
+int setConstantValue(MSXproject *MSX, int constantIndex, double value);
 
 // Term setters
 
-int setTermId(int termIndex, char *id);
+int setTermId(MSXproject *MSX, int termIndex, char *id);
 
-int setTermExpression(int termIndex, MathExpr *expr);
+int setTermExpression(MSXproject *MSX, int termIndex, MathExpr *expr);
 
 // Pattern setters
 
-int setPatternId(int patternIndex, char *id);
+int setPatternId(MSXproject *MSX, int patternIndex, char *id);
 
-int setPatternLength(int patternIndex, int length);
+int setPatternLength(MSXproject *MSX, int patternIndex, int length);
 
-int setPatternFirstMultiplier(int patternIndex, SnumList *first);
+int setPatternFirstMultiplier(MSXproject *MSX, int patternIndex, SnumList *first);
 
-int setPatternCurrentMultiplier(int patternIndex, SnumList *current);
+int setPatternCurrentMultiplier(MSXproject *MSX, int patternIndex, SnumList *current);
 
-int setPatternNextMultiplier(int patternIndex, SnumList *next);
+int setPatternNextMultiplier(MSXproject *MSX, int patternIndex, SnumList *next);
 

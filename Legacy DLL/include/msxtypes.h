@@ -14,8 +14,24 @@
 **                 Bug ID 09 (add roughness as hydraulic variable) Feng Shang 01/29/2008
 ***********************************************************************/
 
-#include "mathexpr.h"
+// #include "mathexpr.h"
 #include "mempool.h"
+#include <stdio.h>
+
+// mathexpr.h below
+
+//  Node in a tokenized math expression list
+struct ExprNode
+{
+    int    opcode;                // operator code
+    int    ivar;                  // variable index
+    double fvalue;                // numerical value
+    struct ExprNode *prev;        // previous node
+    struct ExprNode *next;        // next node
+};
+typedef struct ExprNode MathExpr;
+
+// end mathexpr.h
 
 //-----------------------------------------------------------------------------
 //  Definition of 4-byte integers & reals

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "msxtypes.h"
+#include "mathexpr.h"
 #include "msxfuncs.h"
 #include "msxutils.h"
 
@@ -41,7 +42,7 @@ int  Compiled;               // Flag for compilation step
 
 //  External variables
 //--------------------
-extern MSXproject  MSX;       // MSX project data
+// extern MSXproject  MSX;       // MSX project data
 
 //  Imported functions
 //--------------------
@@ -49,16 +50,16 @@ char * MSXchem_getVariableStr(int i, char *s);
 
 //  Exported functions
 //--------------------
-int  MSXcompiler_open(void);
+int  MSXcompiler_open(MSXproject *MSX);
 void MSXcompiler_close(void);
 
 //  Local functions
 //-----------------
-static void  writeSrcFile(FILE* f);
+static void  writeSrcFile(MSXproject *MSX, FILE* f);
 
 //=============================================================================
 
-int MSXcompiler_open()
+int MSXcompiler_open(MSXproject *MSX)
 /*
 **  Purpose:
 **    compiles MSX chemistry functions into a dynamic link library
@@ -104,19 +105,19 @@ int MSXcompiler_open()
 
     f = fopen(srcFile, "wt");
     if ( f == NULL ) return ERR_COMPILE_FAILED;
-    writeSrcFile(f);
+    writeSrcFile(MSX, f);
     fclose(f);
 
 // --- compile the source code file to a dynamic link library file
 
 #ifdef WINDOWS
-    if ( MSX.Compiler == VC )
+    if ( MSX->Compiler == VC )
     {
 	sprintf(cmd, "CL /O2 /LD /nologo %s", srcFile);
         err = MSXfuncs_run(cmd);
     }
 
-    else if ( MSX.Compiler == GC )
+    else if ( MSX->Compiler == GC )
     {
 	sprintf(cmd, "gcc -c -O3 %s", srcFile);
 	err = MSXfuncs_run(cmd);
@@ -187,7 +188,7 @@ void MSXcompiler_close()
 
 //=============================================================================
 
-void  writeSrcFile(FILE* f)
+void  writeSrcFile(MSXproject *MSX, FILE* f)
 /*
 **  Purpose:
 **    writes C statements to the chemistry function source code file
@@ -275,13 +276,13 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n double term(int i, double c[], double k[], double p[], double h[])\n { \n");
-    if ( MSX.Nobjects[TERM] > 0 )
+    if ( MSX->Nobjects[TERM] > 0 )
     {
        fprintf(f, "     switch(i) { \n");
-        for (i=1; i<=MSX.Nobjects[TERM]; i++)
+        for (i=1; i<=MSX->Nobjects[TERM]; i++)
         {
             fprintf(f, "     case %d: return %s; \n",
-            i, mathexpr_getStr(MSX.Term[i].expr, e, MSXchem_getVariableStr));
+            i, mathexpr_getStr(MSX->Term[i].expr, e, MSXchem_getVariableStr));
         }
         fprintf(f, "     } \n");
     }
@@ -291,10 +292,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetPipeRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].pipeExprType == RATE )
-            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
+        if ( MSX->Species[i].pipeExprType == RATE )
+            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");
@@ -303,10 +304,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetTankRates(double c[], double k[], double p[], double h[], double f[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].tankExprType == RATE )
-            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
+        if ( MSX->Species[i].tankExprType == RATE )
+            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");
@@ -315,10 +316,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetPipeEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].pipeExprType == EQUIL )
-            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
+        if ( MSX->Species[i].pipeExprType == EQUIL )
+            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");
@@ -327,10 +328,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetTankEquil(double c[], double k[], double p[], double h[], double f[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].tankExprType == EQUIL )
-            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
+        if ( MSX->Species[i].tankExprType == EQUIL )
+            fprintf(f, "     f[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");
@@ -339,10 +340,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetPipeFormulas(double c[], double k[],  double p[], double h[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].pipeExprType == FORMULA )
-            fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].pipeExpr, e,
+        if ( MSX->Species[i].pipeExprType == FORMULA )
+            fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].pipeExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");
@@ -351,10 +352,10 @@ void  writeSrcFile(FILE* f)
 
     fprintf(f,
 "\n void DLLEXPORT MSXgetTankFormulas(double c[], double k[], double p[], double h[])\n { \n");
-    for (i=1; i<=MSX.Nobjects[SPECIES]; i++)
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
     {
-        if ( MSX.Species[i].tankExprType == FORMULA )
-            fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX.Species[i].tankExpr, e,
+        if ( MSX->Species[i].tankExprType == FORMULA )
+            fprintf(f, "     c[%d] = %s; \n", i, mathexpr_getStr(MSX->Species[i].tankExpr, e,
                 MSXchem_getVariableStr));
     }
     fprintf(f, " }\n");

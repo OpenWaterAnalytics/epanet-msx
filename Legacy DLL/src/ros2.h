@@ -7,6 +7,10 @@
 **  LAST UPDATE:   3/1/07
 ***********************************************************************/
 
+#ifndef MAGICNUMBER
+#include "msxtypes.h"
+#endif
+
 typedef struct {
 
     double** A;                     // Jacobian matrix
@@ -25,6 +29,6 @@ int  ros2_open(int n, int adjust);
 void ros2_close(void);
 
 // Applies the solver to integrate a specific system of ODEs
-int  ros2_integrate(double y[], int n, double t, double tnext,
+int  ros2_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                     double* htry, double atol[], double rtol[],
-                    void (*func)(double, double*, int, double*));
+                    void (*func)(MSXproject*, double, double*, int, double*));
