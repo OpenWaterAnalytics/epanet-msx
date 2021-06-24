@@ -16,7 +16,7 @@
 #include <string.h>
 
 #include "msxtypes.h"
-#include "epanet2.h"
+// #include "epanet2.h"
 
 //  External variables
 //--------------------
@@ -63,8 +63,9 @@ void MSXerr_writeMathErrorMsg()
 **    writes math error message to EPANET report file.
 */
 {
-	ENwriteline(mathErrorMsg);
-	ENwriteline("");
+	// ENwriteline(mathErrorMsg);
+	// ENwriteline("");
+	printf("%s\n", mathErrorMsg);
 }
 
 //=============================================================================

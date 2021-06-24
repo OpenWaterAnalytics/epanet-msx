@@ -47,6 +47,8 @@ else(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/EPANET/build/lib)
+find_library(TRANSPORT_LIB transport_lib NAMES transport_lib PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
+
 
 IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   message("   ************************************")
@@ -58,10 +60,10 @@ IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ELSEIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
   add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(epanetmsx ${EPANET_LIB} ${TRANSPORT_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
   add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(epanetmsx ${EPANET_LIB} ${TRANSPORT_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
 
 target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/include)
