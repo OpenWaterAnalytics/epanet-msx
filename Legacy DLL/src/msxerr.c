@@ -31,13 +31,6 @@ static char* elementTxt[] =            // see ObjectType in msxtypes.h
 static char* exprTypeTxt[] =           // see ExpressionType in msxtypes.h
     {"", "rate", "formula", "equilibrium"};
 
-//  Exported functions
-//--------------------
-void   MSXerr_clearMathError(void);
-int    MSXerr_mathError(void);
-double MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType);
-void   MSXerr_writeMathErrorMsg(void);
-
 
 //=============================================================================
 

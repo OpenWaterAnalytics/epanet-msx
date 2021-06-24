@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <float.h>
 
-#include "epanet2.h"                   // EPANET toolkit header file
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
 int main(int argc, char *argv[])
@@ -60,6 +59,8 @@ int main(int argc, char *argv[])
     long   t, tleft;
     long   oldHour, newHour;
 
+    //TODO Need to add suport for the other kind of input
+
 // --- check command line arguments
 
     if ( argc < 4 )
@@ -71,23 +72,14 @@ int main(int argc, char *argv[])
     MSXproject *MSX = malloc(sizeof(MSXproject)); //MSX Project data
     MSX->ProjectOpened = 0;
 
-// --- open EPANET file
-
-    printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
+    // printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
     printf("\n  o Processing EPANET input file");
-    err = ENopen(argv[1], argv[3], "");
     do
     {
-        if (err)
-        {
-            printf("\n\n... Cannot read EPANET file; error code = %d\n", err);
-            ENclose();
-            return 0;
-        }
 
     // --- open the MSX input file
         printf("\n  o Processing MSX input file   ");
-        err = MSXopen(MSX, argv[2]);
+        err = MSXopen(MSX, argv);
         if (err)
         {
             printf("\n\n... Cannot read EPANET-MSX file; error code = %d\n", err);
@@ -166,7 +158,6 @@ int main(int argc, char *argv[])
 //--- Close both the multi-species & EPANET systems
 
     MSXclose(MSX);
-    ENclose();
     if ( !err ) printf("\n\n... EPANET-MSX completed successfully.");
     printf("\n");
     return err;

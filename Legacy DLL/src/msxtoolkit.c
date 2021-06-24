@@ -83,7 +83,7 @@ int    MSXfile_save(MSXproject *MSX, FILE *f);
 
 //=============================================================================
 
-int  DLLEXPORT  MSXopen(MSXproject *MSX, char *fname)
+int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
 /*
 **  Purpose:
 **    opens the EPANET-MSX toolkit system.
@@ -95,7 +95,15 @@ int  DLLEXPORT  MSXopen(MSXproject *MSX, char *fname)
 **    an error code (or 0 for no error).
 */
 {
-    int err = 0; 
+    int err = 0;
+    err = ENopen(argv[1], argv[3], "");
+    if (err)
+    {
+        printf("\n\n... Cannot read EPANET file; error code = %d\n", err);
+        ENclose();
+        return err;
+    }
+    char *fname = argv[2];
     if (MSX->ProjectOpened) return(ERR_MSX_OPENED); //TODO make a getter??
     CALL(err, MSXproj_open(MSX, fname));
     CALL(err, MSXqual_open(MSX));
@@ -339,6 +347,7 @@ int  DLLEXPORT  MSXclose(MSXproject *MSX)
 {
     MSXqual_close(MSX);
     MSXproj_close(MSX);
+    ENclose();
     return 0;
 }
 

@@ -3,9 +3,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(EPANETMSX LANGUAGES C)
 
-include_directories(
-  ../Legacy\ DLL/EPANET/include
-)
+#include_directories(
+#  ../Legacy\ DLL/EPANET/include
+#)
 include_directories(
   ../Legacy\ DLL/include
 )
@@ -43,7 +43,7 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/EPANET/build/lib)
+#find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/EPANET/build/lib)
 find_library(EPANETMSX_LIB epanetmsx NAMES epanetmsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/EPANET/build/lib)
 
 #target_link_libraries(${EPANETMSX_LIB} ${EPANET_LIB} OpenMP::OpenMP_C)

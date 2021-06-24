@@ -69,7 +69,7 @@
 
 // --- declare MSX functions
 
-int  DLLEXPORT MSXopen(MSXproject *MSX, char *fname);
+int  DLLEXPORT MSXopen(MSXproject *MSX, char*argv[]);
 int  DLLEXPORT MSXsolveH(MSXproject *MSX);
 int  DLLEXPORT MSXusehydfile(MSXproject *MSX);
 int  DLLEXPORT MSXsolveQ(MSXproject *MSX);
