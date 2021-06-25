@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.12)
 project(EPANETMSX LANGUAGES C)
 
 include_directories(
-  EPANET/include
+  /../../EPANET/include
 )
 
 include_directories(
@@ -46,7 +46,7 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/EPANET/build/lib)
+find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib)
 find_library(TRANSPORT_LIB transport_lib NAMES transport_lib PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
 
 

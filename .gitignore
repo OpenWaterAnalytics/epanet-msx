@@ -183,3 +183,6 @@ $RECYCLE.BIN/
 # Visual Studio Code folder
 
 .vscode
+
+# Doxygen Folder
+Doxygen
