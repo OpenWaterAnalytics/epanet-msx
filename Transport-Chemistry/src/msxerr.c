@@ -35,7 +35,7 @@ static char* exprTypeTxt[] =           // see ExpressionType in msxtypes.h
 //=============================================================================
 
 void MSXerr_clearMathError()
-/*
+/**
 **  Purpose:
 **    clears the math error flag.
 */
@@ -47,7 +47,7 @@ void MSXerr_clearMathError()
 //=============================================================================
 
 int  MSXerr_mathError()
-/*
+/**
 **  Purpose:
 **    returns the current state of the math error flag.
 */
@@ -58,7 +58,7 @@ int  MSXerr_mathError()
 //=============================================================================
 
 void MSXerr_writeMathErrorMsg()
-/*
+/**
 **  Purpose:
 **    writes math error message to EPANET report file.
 */
@@ -71,7 +71,7 @@ void MSXerr_writeMathErrorMsg()
 //=============================================================================
 
 double  MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType)
-/*
+/**
 **  Purpose:
 **    checks if a number is valid or not.
 **

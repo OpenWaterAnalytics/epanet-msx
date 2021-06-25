@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.12)
 project(EPANETMSX LANGUAGES C)
 
 include_directories(
-  /../../EPANET/include
+  ../../EPANET/include
 )
 
 include_directories(

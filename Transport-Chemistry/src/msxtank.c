@@ -41,7 +41,7 @@ void   MSXtank_mix4(MSXproject *MSX, int i, double vin, double *massin, double v
 //=============================================================================
 
 void  MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vnet)
-/*
+/**
 **  Purpose:
 **    computes new WQ at end of time step in a completely mixed tank
 **    (after contents have been reacted).
@@ -89,7 +89,7 @@ void  MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vn
 //=============================================================================
 
 void  MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vnet)
-/*
+/**
 **   Purpose: 2-compartment tank model                      
 **
 **   Input:   i = tank index
@@ -197,7 +197,7 @@ void  MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vn
 //=============================================================================
 
 void  MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vnet)
-/*
+/**
 **   Purpose: computes concentrations in the segments that form a
 **            first-in-first-out (FIFO) tank model.
 **                    
@@ -301,7 +301,7 @@ void  MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vn
 //=============================================================================
 
 void  MSXtank_mix4(MSXproject *MSX, int i, double vin, double *massin, double vnet)
-/*
+/**
 **----------------------------------------------------------
 **   Input:   i = tank index
 **            vin = volume of inflow to tank (ft3)

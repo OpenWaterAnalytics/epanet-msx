@@ -96,7 +96,7 @@ static void freeadjlists(MSXproject *MSX);
 //=============================================================================
 
 int  MSXproj_open(MSXproject *MSX, char *fname)
-/*
+/**
 **  Purpose:
 **    opens an EPANET-MSX project.
 **
@@ -165,7 +165,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 //=============================================================================
 
 void MSXproj_close(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    closes the current EPANET-MSX project.
 **
@@ -201,7 +201,7 @@ void MSXproj_close(MSXproject *MSX)
 //=============================================================================
 
 int   MSXproj_addObject(int type, char *id, int n)
-/*
+/**
 **  Purpose:
 **    adds an object ID to the project's hash tables.
 **
@@ -239,7 +239,7 @@ int   MSXproj_addObject(int type, char *id, int n)
 //=============================================================================
 
 int   MSXproj_findObject(int type, char *id)
-/*
+/**
 **  Purpose:
 **    uses hash table to find index of an object with a given ID.
 **
@@ -257,7 +257,7 @@ int   MSXproj_findObject(int type, char *id)
 //=============================================================================
 
 char * MSXproj_findID(int type, char *id)
-/*
+/**
 **  Purpose:
 **    uses hash table to find address of given string entry.
 **
@@ -275,7 +275,7 @@ char * MSXproj_findID(int type, char *id)
 //=============================================================================
 
 char * MSXproj_getErrmsg(int errcode)
-/*
+/**
 **  Purpose:
 **    gets the text of an error message.
 **
@@ -293,7 +293,7 @@ char * MSXproj_getErrmsg(int errcode)
 //=============================================================================
 
 void setDefaults(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    assigns default values to project variables.
 **
@@ -345,7 +345,7 @@ void setDefaults(MSXproject *MSX)
 //=============================================================================
 
 int convertUnits(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    converts user's units to internal EPANET units.
 **
@@ -428,7 +428,7 @@ int convertUnits(MSXproject *MSX)
 //=============================================================================
 
 int createObjects(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    creates multi-species data objects.
 **
@@ -527,7 +527,7 @@ int createObjects(MSXproject *MSX)
 //=============================================================================
 
 void deleteObjects(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    deletes multi-species data objects.
 **
@@ -630,7 +630,7 @@ void deleteObjects(MSXproject *MSX)
 //=============================================================================
 
 int createHashTables()
-/*
+/**
 **  Purpose:
 **    allocates memory for object ID hash tables.
 **
@@ -660,7 +660,7 @@ int createHashTables()
 //=============================================================================
 
 void deleteHashTables()
-/*
+/**
 **  Purpose:
 **    frees memory allocated for object ID hash tables.
 **
@@ -696,7 +696,7 @@ int openRptFile(MSXproject *MSX)
 }
 
 int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ routing
-/*
+/**
 **--------------------------------------------------------------
 ** Input:   none
 ** Output:  returns error code
@@ -751,7 +751,7 @@ int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ ro
 
 
 void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting in WQ routing
-/*
+/**
 **--------------------------------------------------------------
 ** Input:   none
 ** Output:  none

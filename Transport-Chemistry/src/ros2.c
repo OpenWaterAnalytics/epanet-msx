@@ -32,7 +32,7 @@ MSXRosenbrock MSXRosenbrockSolver;
 //=============================================================================
 
 int ros2_open(int n, int adjust)
-/*
+/**
 **  Purpose:
 **    Opens the ROS2 integrator.
 **
@@ -80,7 +80,7 @@ int ros2_open(int n, int adjust)
 //=============================================================================
 
 void ros2_close()
-/*
+/**
 **  Purpose:
 **    closes the ROS2 integrator.
 **
@@ -108,7 +108,7 @@ void ros2_close()
 int ros2_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                    double* htry, double atol[], double rtol[],
                    void (*func)(MSXproject*, double, double*, int, double*))
-/*
+/**
 **  Purpose:
 **    integrates a system of ODEs over a specified time interval.
 **

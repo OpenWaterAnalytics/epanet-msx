@@ -48,7 +48,7 @@ static void  savePatterns(MSXproject *MSX, FILE *f);
 //=============================================================================
 
 int MSXfile_save(MSXproject *MSX, FILE *f)
-/*
+/**
 **  Purpose:
 **    saves current MSX project data to file.
 **

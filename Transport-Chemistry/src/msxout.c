@@ -54,7 +54,7 @@ static void  getStatResults(MSXproject *MSX, int objType, int m, double* stats1,
 //=============================================================================
 
 int MSXout_open(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    opens an MSX binary output file.
 **
@@ -94,7 +94,7 @@ int MSXout_open(MSXproject *MSX)
 //=============================================================================
 
 int MSXout_saveInitialResults(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    saves general information to beginning of MSX binary output file.
 **
@@ -142,7 +142,7 @@ int MSXout_saveInitialResults(MSXproject *MSX)
 //=============================================================================
 
 int MSXout_saveResults(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    saves computed species concentrations for each node and link at the
 **    current time period to the temporary MSX binary output file (which
@@ -182,7 +182,7 @@ int MSXout_saveResults(MSXproject *MSX)
 //=============================================================================
 
 int MSXout_saveFinalResults(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    saves any statistical results plus the following information to the end
 **    of the MSX binary output file:
@@ -222,7 +222,7 @@ int MSXout_saveFinalResults(MSXproject *MSX)
 //=============================================================================
 
 float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m)
-/*
+/**
 **  Purpose:
 **    retrieves a result for a specific node from the MSX binary output file.
 **
@@ -246,7 +246,7 @@ float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m)
 //=============================================================================
 
 float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m)
-/*
+/**
 **  Purpose:
 **    retrieves a result for a specific link from the MSX binary output file.
 **
@@ -270,7 +270,7 @@ float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m)
 //=============================================================================
 
 int  saveStatResults(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    saves time statistic results (average, min., max., or range) for each
 **    node and link to the permanent binary output file.
@@ -325,7 +325,7 @@ int  saveStatResults(MSXproject *MSX)
 
 void getStatResults(MSXproject *MSX, int objType, int m, double * stats1, double * stats2,
                     REAL4 * x)
-/*
+/**
 **  Purpose:
 **    reads all results for a given type of object from the temporary
 **    binary output file and computes the required statistic (average,

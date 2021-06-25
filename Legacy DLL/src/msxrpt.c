@@ -352,7 +352,7 @@ void  writeLine(MSXproject *MSX, char *line)
 
 
 void writemassbalance(MSXproject *MSX)
-/*
+/**
 **-------------------------------------------------------------
 **   Input:   none
 **   Output:  none

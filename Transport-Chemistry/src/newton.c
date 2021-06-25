@@ -30,7 +30,7 @@ MSXNewton MSXNewtonSolver;
 //=============================================================================
 
 int newton_open(int n)
-/*
+/**
 **  Purpose:
 **    opens the algebraic solver to handle a system of n equations.
 **
@@ -77,7 +77,7 @@ int newton_open(int n)
 //=============================================================================
 
 void newton_close()
-/*
+/**
 **  Purpose:
 **    closes the algebraic solver.
 **
@@ -103,7 +103,7 @@ void newton_close()
 
 int newton_solve(MSXproject *MSX, double x[], int n, int maxit, int numsig, 
                  void (*func)(MSXproject*, double, double*, int, double*))
-/*
+/**
 **  Purpose:
 **    uses newton-raphson iterations to solve n nonlinear eqns.
 **

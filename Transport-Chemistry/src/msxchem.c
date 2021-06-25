@@ -104,7 +104,7 @@ static int    isValidNumber(double x);                                         /
 //=============================================================================
 
 int  MSXchem_open(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    opens the multi-species chemistry system.
 **
@@ -238,7 +238,7 @@ int  MSXchem_open(MSXproject *MSX)
 //=============================================================================
 
 void MSXchem_close(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    closes the multi-species chemistry system.
 **
@@ -272,7 +272,7 @@ void MSXchem_close(MSXproject *MSX)
 //=============================================================================
 
 int MSXchem_react(MSXproject *MSX, long dt)
-/*
+/**
 **  Purpose:
 **    computes reactions in all pipes and tanks.
 **
@@ -342,7 +342,7 @@ int MSXchem_react(MSXproject *MSX, long dt)
 //=============================================================================
 
 int MSXchem_equil(MSXproject *MSX, int zone, double *c)
-/*
+/**
 **  Purpose:
 **    computes equilibrium concentrations for a set of chemical species.
 **
@@ -374,7 +374,7 @@ int MSXchem_equil(MSXproject *MSX, int zone, double *c)
 //=============================================================================
 
 char* MSXchem_getVariableStr(int i, char *s)                                   //1.1.00
-/*
+/**
 **  Purpose:
 **    returns a string representation of a variable used in the chemistry
 **    functions appearing in the C source code file used to compile
@@ -429,7 +429,7 @@ char* MSXchem_getVariableStr(int i, char *s)                                   /
 //=============================================================================
 
 void setSpeciesChemistry(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    determines which species are described by reaction rate
 **    expressions, equilibrium expressions, or simple formulas.
@@ -488,7 +488,7 @@ void setSpeciesChemistry(MSXproject *MSX)
 //=============================================================================
 
 void setTankChemistry(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    assigns pipe chemistry expressions to tank chemistry for
 **    each chemical species.
@@ -522,7 +522,7 @@ void setTankChemistry(MSXproject *MSX)
 //=============================================================================
 
 void evalHydVariables(MSXproject *MSX, int k)
-/*
+/**
 **  Purpose:
 **    retrieves current values of hydraulic variables for the
 **    current link being analyzed.
@@ -582,7 +582,7 @@ void evalHydVariables(MSXproject *MSX, int k)
 //=============================================================================
 
 int evalPipeReactions(MSXproject *MSX, int k, long dt)
-/*
+/**
 **  Purpose:
 **    updates species concentrations in each WQ segment of a pipe
 **    after reactions occur over time step dt.
@@ -703,7 +703,7 @@ int evalPipeReactions(MSXproject *MSX, int k, long dt)
 //=============================================================================
 
 int evalTankReactions(MSXproject *MSX, int k, long dt)
-/*
+/**
 **  Purpose:
 **    updates species concentrations in a given storage tank
 **    after reactions occur over time step dt.
@@ -822,7 +822,7 @@ int evalTankReactions(MSXproject *MSX, int k, long dt)
 //=============================================================================
 
 int evalPipeEquil(MSXproject *MSX, double *c)
-/*
+/**
 **  Purpose:
 **    computes equilibrium concentrations for water in a pipe segment.
 **
@@ -861,7 +861,7 @@ int evalPipeEquil(MSXproject *MSX, double *c)
 //=============================================================================
 
 int evalTankEquil(MSXproject *MSX, double *c)
-/*
+/**
 **  Purpose:
 **    computes equilibrium concentrations for water in a tank.
 **
@@ -898,7 +898,7 @@ int evalTankEquil(MSXproject *MSX, double *c)
 //=============================================================================
 
 void evalPipeFormulas(MSXproject *MSX, double *c)
-/*
+/**
 **  Purpose:
 **    evaluates species concentrations in a pipe segment that are simple
 **    formulas involving other known species concentrations.
@@ -941,7 +941,7 @@ void evalPipeFormulas(MSXproject *MSX, double *c)
 //=============================================================================
 
 void evalTankFormulas(MSXproject *MSX, double *c)
-/*
+/**
 **  Purpose:
 **    evaluates species concentrations in a tank that are simple
 **    formulas involving other known species concentrations.
@@ -984,7 +984,7 @@ void evalTankFormulas(MSXproject *MSX, double *c)
 //=============================================================================
 
 double getPipeVariableValue(MSXproject *MSX, int i)
-/*
+/**
 **  Purpose:
 **    finds the value of a species, a parameter, or a constant for 
 **    the pipe link being analyzed.
@@ -1053,7 +1053,7 @@ double getPipeVariableValue(MSXproject *MSX, int i)
 //=============================================================================
 
 double getTankVariableValue(MSXproject *MSX, int i)
-/*
+/**
 **  Purpose:
 **    finds the value of a species, a parameter, or a constant for 
 **    the current node being analyzed.
@@ -1123,7 +1123,7 @@ double getTankVariableValue(MSXproject *MSX, int i)
 //=============================================================================
 
 void getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
-/*
+/**
 **  Purpose:
 **    finds reaction rate (dC/dt) for each reacting species in a pipe.
 **
@@ -1185,7 +1185,7 @@ void getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 //=============================================================================
 
 void getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
-/*
+/**
 **  Purpose:
 **    finds reaction rate (dC/dt) for each reacting species in a tank.
 **
@@ -1247,7 +1247,7 @@ void getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 //=============================================================================
 
 void getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[])
-/*
+/**
 **  Purpose:
 **    evaluates equilibrium expressions for pipe chemistry.
 **
@@ -1298,7 +1298,7 @@ void getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[])
 //=============================================================================
 
 void getTankEquil(MSXproject *MSX, double t, double y[], int n, double f[])
-/*
+/**
 **  Purpose:
 **    evaluates equilibrium expressions for tank chemistry.
 **

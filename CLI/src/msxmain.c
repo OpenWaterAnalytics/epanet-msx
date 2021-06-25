@@ -34,7 +34,7 @@
 #include "epanetmsx.h"                 // EPANET-MSX toolkit header file
 
 int main(int argc, char *argv[])
-/*
+/**
 **  Purpose:
 **    main function for the console version of EPANET-MSX.
 **

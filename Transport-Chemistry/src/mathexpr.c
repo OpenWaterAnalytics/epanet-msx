@@ -119,7 +119,7 @@ static double (*getVariableValue) (MSXproject*, int);    // return value of inde
 //=============================================================================
 
 int  sametext(char *s1, char *s2)
-/*
+/**
 **  Purpose:
 **    performs case insensitive comparison of two strings.
 **

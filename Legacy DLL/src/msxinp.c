@@ -114,7 +114,7 @@ static int    traceTermPath(int i, int istar, int n);                          /
 //=============================================================================
 
 int MSXinp_countMsxObjects(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    reads multi-species input file to determine number of system objects.
 **
@@ -181,7 +181,7 @@ int MSXinp_countMsxObjects(MSXproject *MSX)
 //=============================================================================
 
 int  MSXinp_countNetObjects(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    queries EPANET data base to determine number of network objects.
 **
@@ -209,7 +209,7 @@ int  MSXinp_countNetObjects(MSXproject *MSX)
 //=============================================================================
 
 int MSXinp_readNetData(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    retrieves required input data from the EPANET project data.
 **
@@ -311,7 +311,7 @@ int MSXinp_readNetData(MSXproject *MSX)
 //=============================================================================
 
 int  MSXinp_readMsxData(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    reads multi-species data from the EPANET-MSX input file.
 **
@@ -392,7 +392,7 @@ int  MSXinp_readMsxData(MSXproject *MSX)
 //=============================================================================
 
 void   MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units)
-/*
+/**
 **  Purpose:
 **    constructs the character string for a species concentration units.
 **
@@ -420,7 +420,7 @@ void   MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units)
 //=============================================================================
 
 int  getLineLength(char *line)
-/*
+/**
 **  Purpose:
 **    determines number of characters of data in a line of input.
 **
@@ -445,7 +445,7 @@ int  getLineLength(char *line)
 //=============================================================================
 
 int  getNewSection(char *tok, char *sectWords[], int *sect)
-/*
+/**
 **  Purpose:
 **    checks if a line begins a new section in the input file.
 **
@@ -479,7 +479,7 @@ int  getNewSection(char *tok, char *sectWords[], int *sect)
 //=============================================================================
 
 int addSpecies(MSXproject *MSX, char *line)
-/* 
+/** 
 **  Purpose:
 **    adds a species ID name to the project.
 **
@@ -508,7 +508,7 @@ int addSpecies(MSXproject *MSX, char *line)
 //=============================================================================
 
 int addCoeff(MSXproject *MSX, char *line)
-/* 
+/**
 **  Purpose:
 **    adds a coefficient ID name to the project.
 **
@@ -547,7 +547,7 @@ int addCoeff(MSXproject *MSX, char *line)
 //=============================================================================
 
 int addTerm(MSXproject *MSX, char *id)
-/* 
+/**
 **  Purpose:
 **    adds an intermediate expression term ID name to the project.
 **
@@ -575,7 +575,7 @@ int addTerm(MSXproject *MSX, char *id)
 //=============================================================================
 
 int addPattern(MSXproject *MSX, char *id)
-/* 
+/**
 **  Purpose:
 **    adds a time pattern ID name to the project.
 **
@@ -606,7 +606,7 @@ int addPattern(MSXproject *MSX, char *id)
 //=============================================================================
 
 int checkID(char *id)
-/* 
+/**
 **  Purpose:
 **    checks that an object's name is unique
 **
@@ -638,7 +638,7 @@ int checkID(char *id)
 //=============================================================================
 
 int parseLine(MSXproject *MSX, int sect, char *line)
-/* 
+/**
 **  Purpose:
 **    parses the contents of a line of input data.
 **
@@ -696,7 +696,7 @@ int parseLine(MSXproject *MSX, int sect, char *line)
 //=============================================================================
 
 int parseOption(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a project option.
 **
@@ -776,7 +776,7 @@ int parseOption(MSXproject *MSX)
 //=============================================================================
 
 int parseSpecies(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a species variable.
 **
@@ -835,7 +835,7 @@ int parseSpecies(MSXproject *MSX)
 //=============================================================================
 
 int parseCoeff(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a coefficient definition.
 **
@@ -905,7 +905,7 @@ int parseCoeff(MSXproject *MSX)
 //=============================================================================
 
 int parseTerm(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing an intermediate expression term .
 **
@@ -950,7 +950,7 @@ int parseTerm(MSXproject *MSX)
 //=============================================================================
 
 int parseExpression(MSXproject *MSX, int classType)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a math expression.
 **
@@ -1019,7 +1019,7 @@ int parseExpression(MSXproject *MSX, int classType)
 //=============================================================================
 
 int parseQuality(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing initial species concentrations.
 **
@@ -1099,7 +1099,7 @@ int parseQuality(MSXproject *MSX)
 //=============================================================================
 
 int parseParameter(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a parameter data.
 **
@@ -1150,7 +1150,7 @@ int parseParameter(MSXproject *MSX)
 //=============================================================================
 
 int parseSource(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a source input data.
 **
@@ -1230,7 +1230,7 @@ int parseSource(MSXproject *MSX)
 //=============================================================================
 
 int parsePattern(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    parses an input line containing a time pattern data.
 **
@@ -1377,7 +1377,7 @@ int parseReport(MSXproject *MSX)
 //=============================================================================
 
 int getVariableCode(MSXproject *MSX, char *id)
-/*
+/**
 **  Purpose:
 **    finds the index assigned to a species, intermediate term,
 **    parameter, or constant that appears in a math expression.
@@ -1437,7 +1437,7 @@ int getVariableCode(MSXproject *MSX, char *id)
 //=============================================================================
 
 int  getTokens(char *s)
-/*
+/**
 **  Purpose:
 **    scans a string for tokens, saving pointers to them
 **    in shared variable Tok[].
@@ -1514,7 +1514,7 @@ void writeInpErrMsg(int errcode, char *sect, char *line, int lineCount)
 //=============================================================================
 
 int checkCyclicTerms(MSXproject *MSX)                                                         //1.1.00
-/*
+/**
 **  Purpose:
 **    checks for cyclic references in Term expressions (e.g., T1 = T2 + T3
 **    and T3 = T2/T1)
@@ -1549,7 +1549,7 @@ int checkCyclicTerms(MSXproject *MSX)                                           
 //=============================================================================
 
 int traceTermPath(int i, int istar, int n)                                     //1.1.00
-/*
+/**
 **  Purpose:
 **    checks if Term[istar] is in the path of terms that appear when evaluating
 **    Term[i]

@@ -60,7 +60,7 @@ static void  writeSrcFile(MSXproject *MSX, FILE* f);
 //=============================================================================
 
 int MSXcompiler_open(MSXproject *MSX)
-/*
+/**
 **  Purpose:
 **    compiles MSX chemistry functions into a dynamic link library
 **    and loads the functions into the running application
@@ -156,7 +156,7 @@ int MSXcompiler_open(MSXproject *MSX)
 //=============================================================================
 
 void MSXcompiler_close()
-/*
+/**
 **  Purpose:
 **    frees resources used to load chemistry functions from the shared
 **    library and deletes all files used to compile and link the library.
@@ -189,7 +189,7 @@ void MSXcompiler_close()
 //=============================================================================
 
 void  writeSrcFile(MSXproject *MSX, FILE* f)
-/*
+/**
 **  Purpose:
 **    writes C statements to the chemistry function source code file
 **

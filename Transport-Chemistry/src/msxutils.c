@@ -37,7 +37,7 @@
 //=============================================================================
 
 char * MSXutils_getTempName(char *s)                                           //1.1.00
-/*
+/**
 **  Purpose:
 **    gets the name of a temporary file with path name and periods stripped
 **
@@ -81,7 +81,7 @@ char * MSXutils_getTempName(char *s)                                           /
 //=============================================================================
 
 int  MSXutils_strcomp(char *s1, char *s2)
-/*
+/**
 **  Purpose:
 **    performs case insensitive comparison of two strings.
 **
@@ -102,7 +102,7 @@ int  MSXutils_strcomp(char *s1, char *s2)
 //=============================================================================
 
 int  MSXutils_findmatch(char *s, char *keyword[])
-/*
+/**
 **  Purpose:
 **    finds a match between a string and an array of keyword strings.
 **
@@ -126,7 +126,7 @@ int  MSXutils_findmatch(char *s, char *keyword[])
 //=============================================================================
 
 int  MSXutils_match(char *str, char *substr)
-/*
+/**
 **  Purpose:
 **    sees if a sub-string of characters appears in a string
 **    (not case sensitive).
@@ -158,7 +158,7 @@ int  MSXutils_match(char *str, char *substr)
 //=============================================================================
 
 int MSXutils_strToSeconds(char *s, long *seconds)
-/*
+/**
 **  Purpose:
 **    converts a string in either decimal hours or hr:min:sec
 **    format to number of seconds.
@@ -190,7 +190,7 @@ int MSXutils_strToSeconds(char *s, long *seconds)
 //=============================================================================
 
 int  MSXutils_getInt(char *s, int *y)
-/*
+/**
 **  Purpose:
 **    converts a string to an integer number.
 **
@@ -219,7 +219,7 @@ int  MSXutils_getInt(char *s, int *y)
 //=============================================================================
 
 int  MSXutils_getFloat(char *s, float *y)
-/*
+/**
 **  Purpose:
 **    converts a string to a single precision floating point number.
 **
@@ -242,7 +242,7 @@ int  MSXutils_getFloat(char *s, float *y)
 //=============================================================================
 
 int  MSXutils_getDouble(char *s, double *y)
-/*
+/**
 **  Purpose:
 **    converts a string to a double precision floating point number.
 **
@@ -265,7 +265,7 @@ int  MSXutils_getDouble(char *s, double *y)
 //=============================================================================
 
 double ** createMatrix(int nrows, int ncols)
-/*
+/**
 **  Purpose:
 **    allocates memory for a 2-dimensional array of doubles.
 **
@@ -304,7 +304,7 @@ double ** createMatrix(int nrows, int ncols)
 //=============================================================================
 
 void freeMatrix(double **a)
-/*
+/**
 **  Purpose:
 **    frees the memory allocated for a matrix of doubles.
 **
@@ -322,7 +322,7 @@ void freeMatrix(double **a)
 //=============================================================================
 
 int factorize(double **a, int n, double *w, int *indx)
-/*
+/**
 **  Purpose:
 **    performs an LU decomposition of a matrix.
 **
@@ -407,7 +407,7 @@ int factorize(double **a, int n, double *w, int *indx)
 //=============================================================================
 
 void solve(double **a, int n, int *indx, double b[])
-/*
+/**
 **  Purpose:
 **    solves linear equations AX = B after LU decomposition of A.
 **
@@ -455,7 +455,7 @@ void solve(double **a, int n, int *indx, double b[])
 
 void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **a,
               void (*func)(MSXproject*, double, double*, int, double*))
-/*
+/**
 **  Purpose: 
 **    computes Jacobian matrix of F(t,X) at given X
 **

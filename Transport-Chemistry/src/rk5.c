@@ -34,7 +34,7 @@ MSXRungeKutta MSXRungeKuttaSolver;
 //=============================================================================
 
 int rk5_open(int n, int itmax, int adjust)
-/*
+/**
 **  Purpose:
 **    Opens the RK5 solver to solve system of n equations
 **
@@ -83,7 +83,7 @@ int rk5_open(int n, int itmax, int adjust)
 //=============================================================================
 
 void rk5_close()
-/*
+/**
 **  Purpose:
 **    Closes the RK5 solver.
 */
@@ -108,7 +108,7 @@ void rk5_close()
 int rk5_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
                   double* htry, double atol[], double rtol[],
                   void (*func)(MSXproject*, double, double*, int, double*))
-/*
+/**
 **  Purpose:
 **    Integrates system of equations dY/dt = F(t,Y) over a
 **    given interval.

@@ -38,7 +38,7 @@ HMODULE hDLL;
 //=============================================================================
 
 int MSXfuncs_load(char * libName)
-/*
+/**
 **  Purpose:
 **    loads compiled chemistry functions from a named library
 **
@@ -87,7 +87,7 @@ int MSXfuncs_load(char * libName)
 //=============================================================================
 
 void MSXfuncs_free()
-/*
+/**
 **  Purpose:
 **    frees the handle to the shared function library
 **
@@ -108,7 +108,7 @@ void MSXfuncs_free()
 //=============================================================================
 
 int MSXfuncs_run(char* cmdLine)
-/*
+/**
 **  Purpose:
 **    executes a program and waits for it to end
 **
