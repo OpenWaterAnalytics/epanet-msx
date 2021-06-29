@@ -105,4 +105,7 @@ int  DLLEXPORT MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double v
 int  DLLEXPORT MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len);
 int  DLLEXPORT MSXaddpattern(MSXproject *MSX, char *id);
 
+int DLLEXPORT runLegacy(MSXproject *MSX, int argc, char *argv[]);
+
+
 #endif

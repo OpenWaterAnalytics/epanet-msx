@@ -19,7 +19,7 @@ ENDIF (MSVC)
 
 # Set up file groups for exe target
 set(MSX_CLI_SOURCES msxmain.c)
-include_directories(include)
+#include_directories(include)
 
 source_group("CLI" FILES ${MSX_CLI_SOURCES})
 
