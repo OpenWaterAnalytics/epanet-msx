@@ -47,6 +47,7 @@ else(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib)
+#find_library(TRANSPORT transport NAMES transport PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
 find_library(TRANSPORT_LIB transport_lib NAMES transport_lib PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
 
 

@@ -1,11 +1,8 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX 1.1
 
 cmake_minimum_required(VERSION 3.12)
-project(EPANETMSX LANGUAGES C)
+project(CLI LANGUAGES C)
 
-#include_directories(
-#  ../Legacy\ DLL/EPANET/include
-#)
 include_directories(
   ../Legacy\ DLL/include
 )
@@ -48,8 +45,9 @@ else(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 find_library(EPANETMSX_LIB epanetmsx NAMES epanetmsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
+find_library(TRANSPORT_LIB transport NAMES transport PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
 
 
 
-#target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/include)
+#target_include_directories(cli PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/include)
 

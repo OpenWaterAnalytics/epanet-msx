@@ -46,8 +46,9 @@ endif(OPENMP_FOUND)
 
 add_library(transport SHARED ${TRANSPORT_SOURCES})
 add_library(transport_lib STATIC ${TRANSPORT_SOURCES})
-target_link_libraries(transport ${TRANSPORT_LIB} OpenMP::OpenMP_C)
+target_link_libraries(transport OpenMP::OpenMP_C)
+target_link_libraries(transport_lib OpenMP::OpenMP_C)
+
 
 target_include_directories(transport PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(transport_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
-#target_include_directories(transport PUBLIC ${PROJECT_SOURCE_DIR}/..Legacy\ DLL/include)
