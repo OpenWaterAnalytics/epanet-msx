@@ -25,7 +25,6 @@
 **  format of these files is described in the EPANET and EPANET-MSX Users
 **  Manuals, respectively.
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdlib.h>
 #include <stdio.h>

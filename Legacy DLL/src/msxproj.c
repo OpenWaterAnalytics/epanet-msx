@@ -13,22 +13,15 @@
 **  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
 **                 Memory leak fixed, T. Taxon - 9/7/10
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
-// #include "msxtypes.h"
 #include "msxutils.h"
-// #include "mempool.h"
 #include "mathexpr.h"
 #include "hash.h"
-
-//  Exported variables
-//--------------------
-// MSXproject  MSX;                            // MSX project data
 
 //  Local variables
 //-----------------
@@ -225,13 +218,13 @@ int   MSXproj_addObject(int type, char *id, int n)
 // --- use memory from the hash tables' common memory pool to store
 //     a copy of the object's ID string
 
-    len = strlen(id) + 1;
+    len = (int) strlen(id) + 1;
     newID = (char *) Alloc(len*sizeof(char));
     strcpy(newID, id);
 
 // --- insert object's ID into the hash table for that type of object
 
-    result = HTinsert(Htable[type], newID, n);
+    result = (int) HTinsert(Htable[type], newID, n);
     if ( result == 0 ) result = -1;
     return result;
 }

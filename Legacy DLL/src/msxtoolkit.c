@@ -23,7 +23,6 @@
 **  detailed descriptions of the input data file formats required by both
 **  the original EPANET and its multi-species extension.
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 // --- define WINDOWS
 
 #undef WINDOWS
@@ -55,14 +54,10 @@
 #include <stdlib.h>
 #include <float.h>
 
-// #include "msxtypes.h"
 #include "msxutils.h"                                                          //1.1.00
 #include "epanet2.h"
 #include "epanetmsx.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Imported functions
 //--------------------
@@ -417,10 +412,10 @@ int  DLLEXPORT  MSXgetIDlen(MSXproject *MSX, int type, int index, int *len)
     if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
     switch(i)
     {
-        case SPECIES:   *len = strlen(MSX->Species[index].id); break;
-        case CONSTANT:  *len = strlen(MSX->Const[index].id);   break;
-        case PARAMETER: *len = strlen(MSX->Param[index].id);   break;
-        case PATTERN:   *len = strlen(MSX->Pattern[index].id); break;
+        case SPECIES:   *len = (int) strlen(MSX->Species[index].id); break;
+        case CONSTANT:  *len = (int) strlen(MSX->Const[index].id);   break;
+        case PARAMETER: *len = (int) strlen(MSX->Param[index].id);   break;
+        case PATTERN:   *len = (int) strlen(MSX->Pattern[index].id); break;
     }
     return 0;
 }
@@ -1174,7 +1169,8 @@ int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
 
 int DLLEXPORT runLegacy(MSXproject *MSX, int argc, char *argv[])
 {
-    int    err, done = 1;
+    int err = 0;
+    int done = 1;
     long   t, tleft;
     long   oldHour, newHour;
 

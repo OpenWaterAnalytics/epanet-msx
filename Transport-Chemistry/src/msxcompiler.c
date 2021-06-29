@@ -8,7 +8,6 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   11/01/10
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,9 +39,6 @@ char objFile[MAXFNAME];      // Name of object file
 char libFile[MAXFNAME];      // Name of library file
 int  Compiled;               // Flag for compilation step
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;       // MSX project data
 
 //  Imported functions
 //--------------------

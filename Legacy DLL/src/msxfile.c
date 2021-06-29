@@ -17,7 +17,6 @@
 				   BUG ID 53, check if the source type > -1 before saving. 
 				   FS 09/23/08 
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -27,9 +26,6 @@
 #include "msxdict.h"
 #include "epanet2.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Exported functions
 //--------------------

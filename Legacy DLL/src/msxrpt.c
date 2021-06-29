@@ -12,7 +12,6 @@
 **  LAST UPDATE:   2/8/11
 **  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -27,9 +26,6 @@
 #define SERIES_TABLE  0
 #define STATS_TABLE   1
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------

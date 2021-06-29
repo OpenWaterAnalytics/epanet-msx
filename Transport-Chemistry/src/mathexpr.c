@@ -42,7 +42,6 @@
 **  28 = step (x<=0 ? 0 : 1)
 **	31 = ^
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -704,7 +703,7 @@ MathExpr * mathexpr_create(MSXproject *MSX, char *formula, int (*getVar) (MSXpro
     PrevLex = 0;
     CurLex = 0;
     S = formula;
-    Len = strlen(S);
+    Len = (int) strlen(S);
     Pos = 0;
     Bc = 0;
     tree = getTree(MSX);

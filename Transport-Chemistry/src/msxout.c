@@ -11,7 +11,6 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   7/31/07
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -20,9 +19,6 @@
 
 #include "msxtypes.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------
@@ -124,7 +120,7 @@ int MSXout_saveInitialResults(MSXproject *MSX)
     fwrite(&n, sizeof(INT4), 1, f);                         //Reporting step size
     for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
     {
-        n = strlen(MSX->Species[m].id);
+        n = (int) strlen(MSX->Species[m].id);
         fwrite(&n, sizeof(INT4), 1, f);                     //Length of species ID
         fwrite(MSX->Species[m].id, sizeof(char), n, f);      //Species ID string
     }

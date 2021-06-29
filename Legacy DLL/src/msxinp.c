@@ -12,14 +12,12 @@
 **  LAST UPDATE:   11/01/10
 **  BUG FIX:	   BUG ID 09 (add roughness as a hydraulic variable) Feng Shang 01/29/2008	
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-// #include "msxtypes.h"
 #include "mathexpr.h"
 #include "msxutils.h"
 #include "msxdict.h"
@@ -34,9 +32,6 @@
 #define MAXTOKS  40                    // Max. items per line of input
 #define SEPSTR  " \t\n\r"              // Token separator characters
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------

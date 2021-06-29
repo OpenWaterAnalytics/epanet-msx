@@ -10,7 +10,6 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   2/8/11
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -18,9 +17,6 @@
 #include "msxtypes.h"
 // #include "epanet2.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------

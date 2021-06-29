@@ -11,7 +11,6 @@
 **  LAST UPDATE:   2/8/11
 **  BUG FIXES  :   Bug ID 8,  Feng Shang, 01/29/2008
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -25,9 +24,6 @@
 #include "msxfuncs.h"                                                          //1.1.00
 #include "mathexpr.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 
 //  Constants

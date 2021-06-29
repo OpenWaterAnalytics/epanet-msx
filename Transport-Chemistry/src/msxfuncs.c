@@ -8,7 +8,6 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   11/01/10
 *******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 

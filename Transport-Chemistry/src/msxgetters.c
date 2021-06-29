@@ -4,9 +4,6 @@
 
 #include "msxgetters.h"
 
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //TODO add comments for functions
 

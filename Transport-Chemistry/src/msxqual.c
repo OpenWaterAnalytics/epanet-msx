@@ -10,7 +10,6 @@
 **  VERSION:       1.1.00
 **  LAST UPDATE:   2/8/11
 ******************************************************************************/
-#define _CRT_SECURE_NO_DEPRECATE
 
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +17,6 @@
 #include <math.h>
 
 #include "msxtypes.h"
-//#include "mempool.h"
 #include "msxutils.h"
 
 // Macros to identify upstream & downstream nodes of a link
@@ -27,10 +25,6 @@
 #define   UP_NODE(x)   ( (MSX.FlowDir[(x)]==POSITIVE) ? MSX.Link[(x)].n1 : MSX.Link[(x)].n2 )
 #define   DOWN_NODE(x) ( (MSX.FlowDir[(x)]==POSITIVE) ? MSX.Link[(x)].n2 : MSX.Link[(x)].n1 )
 #define   LINKVOL(k)   ( 0.785398*MSX->Link[(k)].len*SQR(MSX->Link[(k)].diam) )
-
-//  External variables
-//--------------------
-// extern MSXproject  MSX;                // MSX project data
 
 //  Local variables
 //-----------------
