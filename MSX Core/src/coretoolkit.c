@@ -5,7 +5,7 @@
 
 
 #include "objects.h"
-#include "newtoolkit.h"
+#include "coretoolkit.h"
 
 // Imported
 double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);

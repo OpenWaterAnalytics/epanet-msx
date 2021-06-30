@@ -1,7 +1,7 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX
 
 cmake_minimum_required(VERSION 3.12)
-project(TRANSPORT_LIB LANGUAGES C)
+project(CORE_LIB LANGUAGES C)
 
 #include_directories(
 #  ../Legacy\ DLL/include
@@ -32,7 +32,7 @@ IF (MSVC)
 ENDIF (MSVC)
 
 # configure file groups
-file(GLOB TRANSPORT_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
+file(GLOB CORE_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
 
 include(FindOpenMP)
 if(OPENMP_FOUND)
@@ -44,11 +44,11 @@ endif(OPENMP_FOUND)
 
 #find_library(MSX_LIB epanetmsx NAMES epanetmsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
 
-add_library(transport SHARED ${TRANSPORT_SOURCES})
-add_library(transport_lib STATIC ${TRANSPORT_SOURCES})
-target_link_libraries(transport OpenMP::OpenMP_C)
-target_link_libraries(transport_lib OpenMP::OpenMP_C)
+add_library(core SHARED ${CORE_SOURCES})
+add_library(core_lib STATIC ${CORE_SOURCES})
+target_link_libraries(core OpenMP::OpenMP_C)
+target_link_libraries(core_lib OpenMP::OpenMP_C)
 
 
-target_include_directories(transport PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(transport_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(core_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)

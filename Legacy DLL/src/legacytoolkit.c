@@ -56,8 +56,8 @@
 
 #include "msxutils.h"                                                          //1.1.00
 #include "epanet2.h"
-#include "epanetmsx.h"
-#include "newtoolkit.h"
+#include "legacytoolkit.h"
+#include "coretoolkit.h"
 #include "objects.h"
 
 

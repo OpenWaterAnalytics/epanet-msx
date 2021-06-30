@@ -1,5 +1,5 @@
 /******************************************************************************
-**  MODULE:        EPANETMSX.H
+**  MODULE:        legacytoolkit.h
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   C/C++ header file for EPANET Multi-Species Extension Toolkit
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.

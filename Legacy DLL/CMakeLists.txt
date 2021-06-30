@@ -8,10 +8,10 @@ include_directories(
 )
 
 include_directories(
-  ../Transport-Chemistry/include
+  ../MSX\ Core/include
 )
 include_directories(
-  ../Transport-Chemistry/src
+  ../MSX\ Core/src
 )
 
 # Append local dir to module search path
@@ -50,8 +50,8 @@ else(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib)
-#find_library(TRANSPORT transport NAMES transport PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
-find_library(TRANSPORT_LIB transport_lib NAMES transport_lib PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
+#find_library(CORE core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
+find_library(CORE_LIB core_lib NAMES core_lib PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 
 
 IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
@@ -64,13 +64,13 @@ IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
 ELSEIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
   add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} ${TRANSPORT_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(epanetmsx ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
   add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} ${TRANSPORT_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(epanetmsx ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
 
 target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/src)
-target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/include)
+target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/src)
+target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/include)
 

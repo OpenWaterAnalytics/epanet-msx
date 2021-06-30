@@ -8,10 +8,10 @@ include_directories(
 )
 
 include_directories(
-  ../Transport-Chemistry/include
+  ../MSX\ Core/include
 )
 include_directories(
-  ../Transport-Chemistry/src
+  ../MSX\ Core/src
 )
 
 # Append local dir to module search path
@@ -48,9 +48,9 @@ else(OPENMP_FOUND)
 endif(OPENMP_FOUND)
 
 find_library(EPANETMSX_LIB epanetmsx NAMES epanetmsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
-find_library(TRANSPORT_LIB transport NAMES transport PATHS ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib/* ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/build/lib)
+find_library(CORE_LIB core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 
 
 
-#target_include_directories(cli PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/include)
+#target_include_directories(cli PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/include)
 

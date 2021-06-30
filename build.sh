@@ -1,9 +1,9 @@
 #!/bin/bash
 
-printf "\n\n-------- Building Transport-Chemistry --------\n\n"
+printf "\n\n-------- Building MSX Core --------\n\n"
 
-# Build Transport-Chemistry
-cd Transport-Chemistry
+# Build MSX Core
+cd MSX\ Core
 rm -rf build
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Debug ..
@@ -36,6 +36,6 @@ cd ../..
 # Copy epanetmsx.dll
 cp "Legacy DLL"/build/bin/*/epanetmsx.dll CLI/build/bin/*/
 
-# Copy transport.dll
-cp Transport-Chemistry/build/bin/*/transport.dll CLI/build/bin/*/
+# Copy core.dll
+cp MSX\ Core/build/bin/*/core.dll CLI/build/bin/*/
 
