@@ -25,6 +25,7 @@
 
 #include "msxsetters.h"
 #include "msxgetters.h"
+#include "objects.h"
 
 //  Constants
 //-----------
@@ -64,11 +65,6 @@ static char  *InpErrorTxt[INP_ERR_LAST-INP_ERR_FIRST] = {
     "Error 408 (species already assigned an expression)", 
     "Error 409 (illegal math expression)"};
 
-//  Imported functions
-//--------------------
-int    MSXproj_addObject(int type, char *id, int n);
-int    MSXproj_findObject(int type, char *id);
-char * MSXproj_findID(int type, char *id);
 
 //  Exported functions
 //--------------------
@@ -492,7 +488,7 @@ int addSpecies(MSXproject *MSX, char *line)
     if ( errcode ) return errcode;
     int numSpecies;
     CALL(errcode, getNobjects(MSX, SPECIES, &numSpecies));
-    if ( MSXproj_addObject(SPECIES, Tok[1], numSpecies+1) < 0 )
+    if ( addObject(SPECIES, Tok[1], numSpecies+1) < 0 )
         errcode = 101;
     else {
         CALL(errcode, setNobjects(MSX, SPECIES, numSpecies+1));
@@ -531,7 +527,7 @@ int addCoeff(MSXproject *MSX, char *line)
     if ( errcode ) return errcode;
     int Nobjects;
     CALL(errcode, getNobjects(MSX, k, &Nobjects));
-    if ( MSXproj_addObject(k, Tok[1], Nobjects+1) < 0 )
+    if ( addObject(k, Tok[1], Nobjects+1) < 0 )
         errcode = 101;
     else {
         CALL(errcode, setNobjects(MSX, k, Nobjects+1));
@@ -558,7 +554,7 @@ int addTerm(MSXproject *MSX, char *id)
     {
         int numTerms;
         CALL(errcode, getNobjects(MSX, TERM, &numTerms));
-        if ( MSXproj_addObject(TERM, id, numTerms+1) < 0 )
+        if ( addObject(TERM, id, numTerms+1) < 0 )
             errcode = 101;
         else {
             CALL(errcode, setNobjects(MSX, TERM, numTerms+1));
@@ -585,11 +581,11 @@ int addPattern(MSXproject *MSX, char *id)
 
     // --- a time pattern can span several lines
 
-    if ( MSXproj_findObject(PATTERN, id) <= 0 )
+    if ( findObject(PATTERN, id) <= 0 )
     {
         int numPatterns;
         CALL(errcode, getNobjects(MSX, PATTERN, &numPatterns));
-        if ( MSXproj_addObject(PATTERN, id, numPatterns+1) < 0 )
+        if ( addObject(PATTERN, id, numPatterns+1) < 0 )
             errcode = 101;
         else {
             CALL(errcode, setNobjects(MSX, PATTERN, numPatterns+1));
@@ -622,10 +618,10 @@ int checkID(char *id)
     
 // --- check that id name not used before
 
-    if ( MSXproj_findObject(SPECIES, id)   > 0 ||
-         MSXproj_findObject(TERM, id)      > 0 ||
-         MSXproj_findObject(PARAMETER, id) > 0 ||
-         MSXproj_findObject(CONSTANT, id)  > 0
+    if ( findObject(SPECIES, id)   > 0 ||
+         findObject(TERM, id)      > 0 ||
+         findObject(PARAMETER, id) > 0 ||
+         findObject(CONSTANT, id)  > 0
        ) return ERR_DUP_NAME;
     return 0;
 }        
@@ -787,11 +783,11 @@ int parseSpecies(MSXproject *MSX)
 // --- get Species index
 
     if ( Ntokens < 3 ) return ERR_ITEMS;
-    i = MSXproj_findObject(SPECIES, Tok[1]);
+    i = findObject(SPECIES, Tok[1]);
     if ( i <= 0 ) return ERR_NAME;
 
 // --- get pointer to Species name
-    setSpeciesId(MSX, i, MSXproj_findID(SPECIES, Tok[1]));
+    setSpeciesId(MSX, i, findID(SPECIES, Tok[1]));
 
 // --- get Species type
 
@@ -851,12 +847,12 @@ int parseCoeff(MSXproject *MSX)
     {
     // --- get Parameter's index
 
-        i = MSXproj_findObject(PARAMETER, Tok[1]);
+        i = findObject(PARAMETER, Tok[1]);
         if ( i <= 0 ) return ERR_NAME;
 
     // --- get Parameter's value
 
-        setParameterId(MSX, i, MSXproj_findID(PARAMETER, Tok[1]));
+        setParameterId(MSX, i, findID(PARAMETER, Tok[1]));
         if ( Ntokens >= 3 )
         {
             if ( !MSXutils_getDouble(Tok[2], &x) ) return ERR_NUMBER;
@@ -877,12 +873,12 @@ int parseCoeff(MSXproject *MSX)
     {
     // --- get Constant's index
 
-        i = MSXproj_findObject(CONSTANT, Tok[1]);
+        i = findObject(CONSTANT, Tok[1]);
         if ( i <= 0 ) return ERR_NAME;
 
     // --- get Constant's value
 
-        setConstantId(MSX,i, MSXproj_findID(CONSTANT, Tok[1]));
+        setConstantId(MSX,i, findID(CONSTANT, Tok[1]));
         double value = 0.0;
         setConstantValue(MSX, i, value);
         if ( Ntokens >= 3 )
@@ -919,15 +915,15 @@ int parseTerm(MSXproject *MSX)
 // --- get term's name
 
     if ( Ntokens < 2 ) return 0;
-    i = MSXproj_findObject(TERM, Tok[0]);
-    setTermId(MSX, i, MSXproj_findID(TERM, Tok[0]));
+    i = findObject(TERM, Tok[0]);
+    setTermId(MSX, i, findID(TERM, Tok[0]));
 
 // --- reconstruct the expression string from its tokens
 
     for (j=1; j<Ntokens; j++)
     {                                                                          //1.1.00
         strcat(s, Tok[j]);                     
-        k = MSXproj_findObject(TERM, Tok[j]);                                  //1.1.00
+        k = findObject(TERM, Tok[j]);                                  //1.1.00
         if ( k > 0 ) TermArray[i][k] = 1.0;                                    //1.1.00
     }                                                                          //1.1.00
     
@@ -968,7 +964,7 @@ int parseExpression(MSXproject *MSX, int classType)
 
 // --- determine species associated with expression
 
-    i = MSXproj_findObject(SPECIES, Tok[1]);
+    i = findObject(SPECIES, Tok[1]);
     if ( i < 1 ) return ERR_NAME;
 
 // --- check that species does not already have an expression
@@ -1040,7 +1036,7 @@ int parseQuality(MSXproject *MSX)
 
     k = 1;
     if ( i >= 2 ) k = 2;
-    m = MSXproj_findObject(SPECIES, Tok[k]);
+    m = findObject(SPECIES, Tok[k]);
     if ( m <= 0 ) return ERR_NAME;
 
 // --- get quality value
@@ -1111,7 +1107,7 @@ int parseParameter(MSXproject *MSX)
 // --- get parameter name
 
     if ( Ntokens < 4 ) return 0;
-    i = MSXproj_findObject(PARAMETER, Tok[2]);
+    i = findObject(PARAMETER, Tok[2]);
 
 // --- get parameter value
 
@@ -1173,7 +1169,7 @@ int parseSource(MSXproject *MSX)
 
 //  --- get species index
 
-    m = MSXproj_findObject(SPECIES, Tok[2]);
+    m = findObject(SPECIES, Tok[2]);
     if ( m <= 0 ) return ERR_NAME;
 
 // --- check that species is a BULK species
@@ -1190,7 +1186,7 @@ int parseSource(MSXproject *MSX)
     i = 0;
     if ( Ntokens >= 5 )
     {
-        i = MSXproj_findObject(PATTERN, Tok[4]);
+        i = findObject(PATTERN, Tok[4]);
         if ( i <= 0 ) return ERR_NAME;
     }
 
@@ -1243,9 +1239,9 @@ int parsePattern(MSXproject *MSX)
 // --- get time pattern index
 
     if ( Ntokens < 2 ) return ERR_ITEMS;
-    i = MSXproj_findObject(PATTERN, Tok[0]);
+    i = findObject(PATTERN, Tok[0]);
     if ( i <= 0 ) return ERR_NAME;
-    setPatternId(MSX, i, MSXproj_findID(PATTERN, Tok[0]));
+    setPatternId(MSX, i, findID(PATTERN, Tok[0]));
 
 // --- begin reading pattern multipliers
 
@@ -1336,7 +1332,7 @@ int parseReport(MSXproject *MSX)
     // --- keyword is SPECIES; get YES/NO & precision
 
         case 2:
-            j = MSXproj_findObject(SPECIES, Tok[1]);
+            j = findObject(SPECIES, Tok[1]);
             if ( j <= 0 ) return ERR_NAME;
             if ( Ntokens >= 3 )
             {
@@ -1388,15 +1384,15 @@ int getVariableCode(MSXproject *MSX, char *id)
 **    and proceeding through each Species, Term, Parameter and Constant.
 */
 {
-    int j = MSXproj_findObject(SPECIES, id);
+    int j = findObject(SPECIES, id);
     if ( j >= 1 ) return j;
-    j = MSXproj_findObject(TERM, id);
+    j = findObject(TERM, id);
     if ( j >= 1 ) {
         int numSpecies;
         getNobjects(MSX, SPECIES, &numSpecies);
         return numSpecies + j;
     }
-    j = MSXproj_findObject(PARAMETER, id);
+    j = findObject(PARAMETER, id);
     if ( j >= 1 ){
         int numSpecies;
         int numTerms;
@@ -1404,7 +1400,7 @@ int getVariableCode(MSXproject *MSX, char *id)
         getNobjects(MSX, TERM, &numTerms);
         return numSpecies + numTerms + j;
     }
-    j = MSXproj_findObject(CONSTANT, id);
+    j = findObject(CONSTANT, id);
     if ( j >= 1 ){
         int numSpecies;
         int numTerms;

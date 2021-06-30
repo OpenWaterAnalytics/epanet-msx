@@ -10,6 +10,9 @@ include_directories(
 include_directories(
   ../Transport-Chemistry/include
 )
+include_directories(
+  ../Transport-Chemistry/src
+)
 
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -68,5 +71,6 @@ ELSE(TRUE)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
 
 target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/src)
 target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../Transport-Chemistry/include)
 

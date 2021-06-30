@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
     err = Proj_init(&MSX);
     //If legacy then
     err = runLegacy(&MSX, argc, argv);
+
+
+   // add_node()
     //Else then run the new API
     return err;
 }
