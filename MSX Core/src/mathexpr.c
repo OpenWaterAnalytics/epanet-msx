@@ -693,7 +693,7 @@ void mathexpr_delete(MathExpr *expr)
 
 //=============================================================================
 
-MathExpr * mathexpr_create(MSXproject *MSX, char *formula, int (*getVar) (MSXproject *MSX, char *))
+MathExpr * mathexpr_create(MSXproject *MSX, char *formula, int (*getVar) (MSXproject *, char *))
 {
     ExprTree *tree;
     MathExpr *expr = NULL;

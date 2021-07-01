@@ -3,6 +3,8 @@
 #include "msxtypes.h"
 #endif
 
+int setDefaults(MSXproject *MSX);
+
 int setNobjects(MSXproject *MSX, int type, int Nobjects);
 
 int setFlowUnits(MSXproject *MSX, int Flowflag, int Unitsflag);

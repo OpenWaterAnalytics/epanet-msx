@@ -1,7 +1,7 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX
 
 cmake_minimum_required(VERSION 3.12)
-project(EPANETMSX LANGUAGES C)
+project(LEGACY LANGUAGES C)
 
 include_directories(
   ../../EPANET/include
@@ -59,18 +59,18 @@ IF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
   message("   Configuring with msx.def mapping")
   message("   ************************************")
   find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/include NO_DEFAULT_PATH)
-  add_library(epanetmsx SHARED ${MSX_SOURCES} ${PROJECT_SOURCE_DIR}/include/epanetmsx.def)
+  add_library(legacy SHARED ${MSX_SOURCES} ${PROJECT_SOURCE_DIR}/include/legacy.def)
   set_source_files_properties(${PROJECT_SOURCE_DIR}/include/msx.def PROPERTIES_HEADER_FILE_ONLY TRUE)
-  target_link_libraries(epanetmsx ${EPANET_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(legacy ${EPANET_LIB} OpenMP::OpenMP_C)
 ELSEIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
-  add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  add_library(legacy SHARED ${MSX_SOURCES})
+  target_link_libraries(legacy ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
-  add_library(epanetmsx SHARED ${MSX_SOURCES})
-  target_link_libraries(epanetmsx ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  add_library(legacy SHARED ${MSX_SOURCES})
+  target_link_libraries(legacy ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
 
-target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/src)
-target_include_directories(epanetmsx PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/include)
+target_include_directories(legacy PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(legacy PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/src)
+target_include_directories(legacy PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/include)
 

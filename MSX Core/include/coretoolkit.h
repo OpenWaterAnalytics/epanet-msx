@@ -34,14 +34,14 @@
 
 // --- define MSX constants
 
-#define MSX_NODE      0
-#define MSX_LINK      1
-#define MSX_TANK      2
-#define MSX_SPECIES   3
-#define MSX_TERM      4
-#define MSX_PARAMETER 5
-#define MSX_CONSTANT  6
-#define MSX_PATTERN   7
+// #define MSX_NODE      0
+// #define MSX_LINK      1
+// #define MSX_TANK      2
+// #define MSX_SPECIES   3
+// #define MSX_TERM      4
+// #define MSX_PARAMETER 5
+// #define MSX_CONSTANT  6
+// #define MSX_PATTERN   7
 
 #define MSX_BULK      0
 #define MSX_WALL      1
@@ -53,9 +53,20 @@
 #define MSX_FLOWPACED  3
 
 
-int DLLEXPORT Proj_init(MSXproject *MSX);
+int DLLEXPORT MSX_init(MSXproject *MSX);
 
-int DLLEXPORT Proj_free(MSXproject *MSX);
+int DLLEXPORT MSX_free(MSXproject *MSX);
+
+//setFlowUnits()
+//setQualityTimestep()
+//setReportTimestep()
+//setReportStart()
+//setPatternTimestep()
+//setPatternStart()
+//setStatistic()
+
+int DLLEXPORT MSXaddNode(MSXproject *MSX);
+int DLLEXPORT MSXaddTank(MSXproject *MSX);
 
 // add_species()
 

@@ -4,27 +4,108 @@
 #include <malloc.h>
 
 
+#include "msxsetters.h"
 #include "objects.h"
 #include "coretoolkit.h"
 
-// Imported
+// Imported Functions
 double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);
 double MSXqual_getLinkQual(MSXproject *MSX, int k, int m);
 
 
-int DLLEXPORT Proj_init(MSXproject *MSX)
+int DLLEXPORT MSX_init(MSXproject *MSX)
+/**
+**  Purpose:
+**    initializes the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
 {
     MSX->ProjectOpened = 0;
+    setDefaults(MSX);
     return 0;
 }
 
-int DLLEXPORT Proj_free(MSXproject *MSX)
+int DLLEXPORT MSX_free(MSXproject *MSX)
 {
     free(MSX);
     MSX = NULL;
     return 0;
 }
 
+
+int DLLEXPORT MSXaddNode(MSXproject *MSX)
+/**
+**  Purpose:
+**    adds a node to the network.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    int err = 0;
+    int numNodes = MSX->Nobjects[NODE];
+    if (numNodes == 0) {
+        MSX->NodesCapacity = 10;
+        MSX->Node = (Snode *) calloc(MSX->NodesCapacity+1, sizeof(Snode));
+    }
+    if (numNodes == MSX->NodesCapacity) {
+        MSX->NodesCapacity *= 2;
+        MSX->Node = (Snode *) realloc(MSX->Node, (MSX->NodesCapacity+1) * sizeof(Snode));
+    }
+    //TODO important to have the species already in then
+    MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    MSX->Node[numNodes+1].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    MSX->Node[numNodes+1].rpt = 0;
+    MSX->Nobjects[NODE]++;
+    return err;
+}
+
+
+int DLLEXPORT MSXaddTank(MSXproject *MSX)
+/**
+**  Purpose:
+**    adds a tabk to the network.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    int err = 0;
+    int numTanks = MSX->Nobjects[TANK];
+    if (numTanks == 0) {
+        MSX->TanksCapacity = 10;
+        MSX->Tank = (Stank *) calloc(MSX->TanksCapacity+1, sizeof(Stank));
+    }
+    if (numTanks == MSX->TanksCapacity) {
+        MSX->TanksCapacity *= 2;
+        MSX->Tank = (Stank *) realloc(MSX->Tank, (MSX->TanksCapacity+1) * sizeof(Stank));
+    }
+    //TODO comeback to here
+    
+    
+    MSX->Nobjects[TANK]++;
+    return err;
+}
 
 
 
@@ -49,10 +130,10 @@ int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIES:   i = findObject(SPECIES, id);   break;
-        case MSX_CONSTANT:  i = findObject(CONSTANT, id);  break;
-        case MSX_PARAMETER: i = findObject(PARAMETER, id); break;
-        case MSX_PATTERN:   i = findObject(PATTERN, id);   break;
+        case SPECIES:   i = findObject(SPECIES, id);   break;
+        case CONSTANT:  i = findObject(CONSTANT, id);  break;
+        case PARAMETER: i = findObject(PARAMETER, id); break;
+        case PATTERN:   i = findObject(PATTERN, id);   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( i < 1 ) return ERR_UNDEFINED_OBJECT_ID;
@@ -84,10 +165,10 @@ int  DLLEXPORT  MSXgetIDlen(MSXproject *MSX, int type, int index, int *len)
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIES:   i = SPECIES;   break;
-        case MSX_CONSTANT:  i = CONSTANT;  break;
-        case MSX_PARAMETER: i = PARAMETER; break;
-        case MSX_PATTERN:   i = PATTERN;   break;
+        case SPECIES:   i = SPECIES;   break;
+        case CONSTANT:  i = CONSTANT;  break;
+        case PARAMETER: i = PARAMETER; break;
+        case PATTERN:   i = PATTERN;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
@@ -126,10 +207,10 @@ int  DLLEXPORT  MSXgetID(MSXproject *MSX, int type, int index, char *id, int len
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIES:   i = SPECIES;   break;
-        case MSX_CONSTANT:  i = CONSTANT;  break;
-        case MSX_PARAMETER: i = PARAMETER; break;
-        case MSX_PATTERN:   i = PATTERN;   break;
+        case SPECIES:   i = SPECIES;   break;
+        case CONSTANT:  i = CONSTANT;  break;
+        case PARAMETER: i = PARAMETER; break;
+        case PATTERN:   i = PATTERN;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
@@ -165,10 +246,10 @@ int DLLEXPORT  MSXgetcount(MSXproject *MSX, int type, int *count)
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
-        case MSX_SPECIES:   *count = MSX->Nobjects[SPECIES];   break;
-        case MSX_CONSTANT:  *count = MSX->Nobjects[CONSTANT];  break;
-        case MSX_PARAMETER: *count = MSX->Nobjects[PARAMETER]; break;
-        case MSX_PATTERN:   *count = MSX->Nobjects[PATTERN];   break;
+        case SPECIES:   *count = MSX->Nobjects[SPECIES];   break;
+        case CONSTANT:  *count = MSX->Nobjects[CONSTANT];  break;
+        case PARAMETER: *count = MSX->Nobjects[PARAMETER]; break;
+        case PATTERN:   *count = MSX->Nobjects[PATTERN];   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     return 0;
@@ -259,13 +340,13 @@ int DLLEXPORT MSXgetparameter(MSXproject *MSX, int type, int index, int param, d
     *value = 0.0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( type == MSX_NODE )
+    if ( type == NODE )
     {
         if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
         j = MSX->Node[index].tank;
         if ( j > 0 ) *value = MSX->Tank[j].param[param];
     }
-    else if ( type == MSX_LINK )
+    else if ( type == LINK )
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSX->Link[index].param[param];
@@ -412,12 +493,12 @@ int  DLLEXPORT  MSXgetinitqual(MSXproject *MSX, int type, int index, int species
     *value = 0.0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( type == MSX_NODE )
+    if ( type == NODE )
     {
         if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSX->Node[index].c0[species];
     }
-    else if ( type == MSX_LINK )
+    else if ( type == LINK )
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSX->Link[index].c0[species];
@@ -449,12 +530,12 @@ int  DLLEXPORT  MSXgetqual(MSXproject *MSX, int type, int index, int species, do
     *value = 0.0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( type == MSX_NODE )
+    if ( type == NODE )
     {
         if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSXqual_getNodeQual(MSX, index, species);
     }
-    else if ( type == MSX_LINK )
+    else if ( type == LINK )
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSXqual_getLinkQual(MSX, index, species);
@@ -511,13 +592,13 @@ int  DLLEXPORT  MSXsetparameter(MSXproject *MSX, int type, int index, int param,
     int j;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( type == MSX_NODE )
+    if ( type == NODE )
     {
         if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
         j = MSX->Node[index].tank;
         if ( j > 0 ) MSX->Tank[j].param[param] = value;
     }
-    else if ( type == MSX_LINK )
+    else if ( type == LINK )
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         MSX->Link[index].param[param] = value;
@@ -549,13 +630,13 @@ int  DLLEXPORT  MSXsetinitqual(MSXproject *MSX, int type, int index, int species
 {
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
-    if ( type == MSX_NODE )
+    if ( type == NODE )
     {
         if ( index < 1 || index > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
         if ( MSX->Species[species].type == BULK )
             MSX->Node[index].c0[species] = value;
     }
-    else if ( type == MSX_LINK )
+    else if ( type == LINK )
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         MSX->Link[index].c0[species] = value;

@@ -460,7 +460,9 @@ typedef struct                         // MSX PROJECT VARIABLES
           Nperiods,                    // Number of reporting periods
           ErrCode,                     // Error code
           ProjectOpened,               // Project opened flag
-          QualityOpened;               // Water quality system opened flag
+          QualityOpened,               // Water quality system opened flag
+          NodesCapacity,               // Size of space available in the Nodes array
+          TanksCapacity;               // Size of space available in the Tanks array
 
    long   HydOffset,                   // Hydraulics file byte offset
           Qstep,                       // Quality time step (sec)

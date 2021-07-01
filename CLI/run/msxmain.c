@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 {
     int err = 0;
     MSXproject MSX;
-    err = Proj_init(&MSX);
+    err = MSX_init(&MSX);
     //If legacy then
     err = runLegacy(&MSX, argc, argv);
 

@@ -23,6 +23,7 @@
 #include "mathexpr.h"
 #include "hash.h"
 #include "objects.h"
+#include "msxsetters.h"
 
 
 static char * Errmsg[] =
@@ -67,7 +68,6 @@ char * MSXproj_getErrmsg(int errcode);
 
 //  Local functions
 //-----------------
-static void   setDefaults(MSXproject *MSX);
 static int    convertUnits(MSXproject *MSX);
 static int    createObjects(MSXproject *MSX);
 static void   deleteObjects(MSXproject *MSX);
@@ -203,55 +203,55 @@ char * MSXproj_getErrmsg(int errcode)
 
 //=============================================================================
 
-void setDefaults(MSXproject *MSX)
-/**
-**  Purpose:
-**    assigns default values to project variables.
-**
-**  Input:
-**    none.
-*/
-{
-    int i;
-    MSX->RptFile.file = NULL;                                                   //(LR-11/20/07)
-    MSX->HydFile.file = NULL;
-    MSX->HydFile.mode = USED_FILE;
-    MSX->OutFile.file = NULL;
-    MSX->OutFile.mode = SCRATCH_FILE;
-    MSX->TmpOutFile.file = NULL;
-    MSXutils_getTempName(MSX->OutFile.name);                                    //1.1.00
-    MSXutils_getTempName(MSX->TmpOutFile.name);                                 //1.1.00
-    strcpy(MSX->RptFile.name, "");
-    strcpy(MSX->Title, "");
-    MSX->Rptflag = 0;
-    for (i=0; i<MAX_OBJECTS; i++) MSX->Nobjects[i] = 0;
-    MSX->Unitsflag = US;
-    MSX->Flowflag = GPM;
-    MSX->Statflag = SERIES;
-    MSX->DefRtol = 0.001;
-    MSX->DefAtol = 0.01;
-    MSX->Solver = EUL;
-    MSX->Coupling = NO_COUPLING;
-    MSX->Compiler = NO_COMPILER;                                                //1.1.00
-    MSX->AreaUnits = FT2;
-    MSX->RateUnits = DAYS;
-    MSX->Qstep = 300;
-    MSX->Rstep = 3600;
-    MSX->Rstart = 0;
-    MSX->Dur = 0;
-    MSX->Node = NULL;
-    MSX->Link = NULL;
-    MSX->Tank = NULL;
-    MSX->D = NULL;
-    MSX->Q = NULL;
-    MSX->H = NULL;
-    MSX->Species = NULL;
-    MSX->Term = NULL;
-    MSX->Const = NULL;
-    MSX->Pattern = NULL;
-    MSX->K = NULL;                                                              //1.1.00
-    MSX->Adjlist = NULL;
-}
+// void setDefaults(MSXproject *MSX)
+// /**
+// **  Purpose:
+// **    assigns default values to project variables.
+// **
+// **  Input:
+// **    MSX data struct.
+// */
+// {
+//     int i;
+//     MSX->RptFile.file = NULL;                                                   //(LR-11/20/07)
+//     MSX->HydFile.file = NULL;
+//     MSX->HydFile.mode = USED_FILE;
+//     MSX->OutFile.file = NULL;
+//     MSX->OutFile.mode = SCRATCH_FILE;
+//     MSX->TmpOutFile.file = NULL;
+//     MSXutils_getTempName(MSX->OutFile.name);                                    //1.1.00
+//     MSXutils_getTempName(MSX->TmpOutFile.name);                                 //1.1.00
+//     strcpy(MSX->RptFile.name, "");
+//     strcpy(MSX->Title, "");
+//     MSX->Rptflag = 0;
+//     for (i=0; i<MAX_OBJECTS; i++) MSX->Nobjects[i] = 0;
+//     MSX->Unitsflag = US;
+//     MSX->Flowflag = GPM;
+//     MSX->Statflag = SERIES;
+//     MSX->DefRtol = 0.001;
+//     MSX->DefAtol = 0.01;
+//     MSX->Solver = EUL;
+//     MSX->Coupling = NO_COUPLING;
+//     MSX->Compiler = NO_COMPILER;                                                //1.1.00
+//     MSX->AreaUnits = FT2;
+//     MSX->RateUnits = DAYS;
+//     MSX->Qstep = 300;
+//     MSX->Rstep = 3600;
+//     MSX->Rstart = 0;
+//     MSX->Dur = 0;
+//     MSX->Node = NULL;
+//     MSX->Link = NULL;
+//     MSX->Tank = NULL;
+//     MSX->D = NULL;
+//     MSX->Q = NULL;
+//     MSX->H = NULL;
+//     MSX->Species = NULL;
+//     MSX->Term = NULL;
+//     MSX->Const = NULL;
+//     MSX->Pattern = NULL;
+//     MSX->K = NULL;                                                              //1.1.00
+//     MSX->Adjlist = NULL;
+// }
 
 //=============================================================================
 
@@ -355,8 +355,10 @@ int createObjects(MSXproject *MSX)
 // --- create nodes, links, & tanks
 
     MSX->Node = (Snode *) calloc(MSX->Nobjects[NODE]+1, sizeof(Snode));
+    MSX->NodesCapacity = MSX->Nobjects[NODE]+1;
     MSX->Link = (Slink *) calloc(MSX->Nobjects[LINK]+1, sizeof(Slink));
     MSX->Tank = (Stank *) calloc(MSX->Nobjects[TANK]+1, sizeof(Stank));
+    MSX->TanksCapacity = MSX->Nobjects[TANK]+1;
 
 // --- create species, terms, parameters, constants & time patterns
 
