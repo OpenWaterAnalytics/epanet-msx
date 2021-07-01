@@ -55,3 +55,6 @@ void solve(double **a, int n, int *indx, double b[]);
 // Computes the Jacobian matrix of a set of functions
 void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **a,
               void (*func)(MSXproject*, double, double*, int, double*));
+
+// Checks for a valid ID
+int checkID(char *id);

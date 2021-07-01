@@ -65,8 +65,17 @@ int DLLEXPORT MSX_free(MSXproject *MSX);
 //setPatternStart()
 //setStatistic()
 
+int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
+int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value);
 int DLLEXPORT MSXaddNode(MSXproject *MSX);
-int DLLEXPORT MSXaddTank(MSXproject *MSX);
+int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double diameter, double length, double roughness);
+
+
+
+
+
 
 // add_species()
 

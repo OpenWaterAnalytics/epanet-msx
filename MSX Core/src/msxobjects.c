@@ -4,7 +4,7 @@
 
 #include "hash.h"
 #include "msxtypes.h"
-#include "objects.h"
+#include "msxobjects.h"
 
 //  Local variables
 //-----------------

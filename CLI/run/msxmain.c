@@ -33,6 +33,20 @@
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
 #include "coretoolkit.h"
 
+void call(int err)
+/**
+** Purpose: to easily check errors and print out error messages.
+** Input:
+**      err = errorcode
+** Returns:
+**      none
+*/
+{
+    if (err != 0) {
+        printf("Error occured, check EPANET or EPANET MSX documents for error codes, if not in either of those, then it will be in errors.dat.\nError code: %d\n", err);
+    }
+}
+
 int main(int argc, char *argv[])
 /**
 **  Purpose:
@@ -55,14 +69,38 @@ int main(int argc, char *argv[])
 **       contain water quality results in binary format.
 */
 {
-    int err = 0;
     MSXproject MSX;
-    err = MSX_init(&MSX);
+    call(MSX_init(&MSX));
+
+    // Builing the network from example.inp
+    call(MSXsetFlowFlag(&MSX, CMH));
+    call(MSXsetTimeParameter(&MSX, DURATION, 48*60));
+    call(MSXsetTimeParameter(&MSX, QUALSTEP, 5*60));
+    call(MSXsetTimeParameter(&MSX, REPORTSTEP, 2*60));
+    call(MSXsetTimeParameter(&MSX, REPORTSTART, 0));
+    // Add nodes
+    call(MSXaddNode(&MSX));
+    call(MSXaddNode(&MSX));
+    call(MSXaddNode(&MSX));
+    call(MSXaddNode(&MSX));
+    call(MSXaddReservoir(&MSX, 0,0,0));
+    // Add links
+    call(MSXaddLink(&MSX, 5, 1, 200, 1000, 100));
+    call(MSXaddLink(&MSX, 1, 2, 150, 800, 100));
+    call(MSXaddLink(&MSX, 1, 3, 200, 1200, 100));
+    call(MSXaddLink(&MSX, 2, 3, 150, 1000, 100));
+    call(MSXaddLink(&MSX, 3, 4, 150, 2000, 100));
+
+    //TODO
+
+
+
+    
     //If legacy then
-    err = runLegacy(&MSX, argc, argv);
+    // call(runLegacy(&MSX, argc, argv));
 
 
    // add_node()
     //Else then run the new API
-    return err;
+    return 0;
 }

@@ -121,7 +121,8 @@ typedef  float REAL4;
                  PARAMETER,
                  CONSTANT,
                  PATTERN,
-                 MAX_OBJECTS};
+                 MAX_OBJECTS,
+                 };
 
  enum SourceType                       // Type of source quality input
                 {CONCEN,               //    inflow concentration
@@ -276,6 +277,31 @@ typedef  float REAL4;
            ERR_COMPILED_LOAD,          // 523                                  //1.1.00
 		   ERR_ILLEGAL_MATH,           // 524                                  //1.1.00
            ERR_MAX};
+
+/// Time parameters (From EPANET)
+/**
+These time-related options are used with gettimeparam and settimeparam.
+All times are expressed in seconds The parameters marked as read only are
+computed values that can only be retrieved.
+*/
+typedef enum {
+  DURATION,  //!< Total simulation duration
+//   HYDSTEP,  //!< Hydraulic time step
+  QUALSTEP,  //!< Water quality time step
+  PATTERNSTEP,  //!< Time pattern period
+  PATTERNSTART,  //!< Time when time patterns begin
+  REPORTSTEP,  //!< Reporting time step
+  REPORTSTART,  //!< Time when reporting starts
+//   RULESTEP,  //!< Rule-based control evaluation time step
+  STATISTIC,  //!< Reporting statistic code
+//   PERIODS ,  //!< Number of reporting time periods (read only)
+//   STARTTIME, //!< Simulation starting time of day
+  HTIME, //!< Elapsed time of current hydraulic solution (read only)
+  QTIME, //!< Elapsed time of current quality solution (read only)
+//   HALTFLAG, //!< Flag indicating if the simulation was halted (read only)
+//   NEXTEVENT, //!< Shortest time until a tank becomes empty or full (read only)
+//   NEXTEVENTTANK  //!< Index of tank with shortest time to become empty or full (read only)
+} TimeParameter;
 
 
 //-----------------------------------------------------------------------------
@@ -462,7 +488,8 @@ typedef struct                         // MSX PROJECT VARIABLES
           ProjectOpened,               // Project opened flag
           QualityOpened,               // Water quality system opened flag
           NodesCapacity,               // Size of space available in the Nodes array
-          TanksCapacity;               // Size of space available in the Tanks array
+          TanksCapacity,               // Size of space available in the Tanks array
+          LinksCapacity;               // Size of space available in the Links array
 
    long   HydOffset,                   // Hydraulics file byte offset
           Qstep,                       // Quality time step (sec)

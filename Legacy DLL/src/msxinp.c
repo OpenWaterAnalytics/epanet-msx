@@ -23,7 +23,7 @@
 #include "msxdict.h"
 #include "epanet2.h"
 
-#include "objects.h"
+#include "msxobjects.h"
 
 //  Constants
 //-----------
@@ -79,7 +79,7 @@ static int    addSpecies(MSXproject *MSX, char *line);
 static int    addCoeff(MSXproject *MSX, char *line);
 static int    addTerm(MSXproject *MSX, char *id);
 static int    addPattern(MSXproject *MSX, char *id);
-static int    checkID(char *id);
+// static int    checkID(char *id);
 static int    parseLine(MSXproject *MSX, int sect, char *line);
 static int    parseOption(MSXproject *MSX);
 static int    parseSpecies(MSXproject *MSX);
@@ -535,37 +535,6 @@ int addPattern(MSXproject *MSX, char *id)
 
 //=============================================================================
 
-int checkID(char *id)
-/**
-**  Purpose:
-**    checks that an object's name is unique
-**
-**  Input:
-**    id = name of an object 
-**
-**  Returns:
-**    an error code (0 if successful)
-*/
-{
-// --- check that id name is not a reserved word
-   int i = 1;
-   while (HydVarWords[i] != NULL)
-   {
-      if (MSXutils_strcomp(id, HydVarWords[i])) return ERR_RESERVED_NAME;
-      i++;
-   }
-    
-// --- check that id name not used before
-
-    if ( findObject(SPECIES, id)   > 0 ||
-         findObject(TERM, id)      > 0 ||
-         findObject(PARAMETER, id) > 0 ||
-         findObject(CONSTANT, id)  > 0
-       ) return ERR_DUP_NAME;
-    return 0;
-}        
-
-//=============================================================================
 
 int parseLine(MSXproject *MSX, int sect, char *line)
 /**

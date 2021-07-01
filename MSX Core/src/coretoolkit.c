@@ -5,7 +5,7 @@
 
 
 #include "msxsetters.h"
-#include "objects.h"
+#include "msxobjects.h"
 #include "coretoolkit.h"
 
 // Imported Functions
@@ -28,7 +28,7 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
 **    an error code (or 0 for no error).
 */
 {
-    MSX->ProjectOpened = 0;
+    MSX->ProjectOpened = 1;
     setDefaults(MSX);
     return 0;
 }
@@ -39,6 +39,85 @@ int DLLEXPORT MSX_free(MSXproject *MSX)
     MSX = NULL;
     return 0;
 }
+
+int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
+/**
+**  Purpose:
+**      sets the flow flag and units flag.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      flag = the flag to set, for example CMH for cubic meters per hour.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
+    if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
+    MSX->Flowflag = flag;
+    if ( MSX->Flowflag >= LPS ) MSX->Unitsflag = SI;
+    else                          MSX->Unitsflag = US;
+    return 0;
+}
+
+int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
+/**
+**  Purpose:
+**      sets a specified time parameter.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      type = the type of time parameter
+**      value = that actual value to set.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
+    switch (type)
+    {
+    case DURATION:
+        MSX->Dur = value;
+        break;
+    case QUALSTEP:
+        MSX->Qstep = value;
+        break;
+    case PATTERNSTEP:
+        MSX->Pstep = value;
+        break;
+    case PATTERNSTART:
+        MSX->Pstart = value;
+        break;
+    case REPORTSTEP:
+        MSX->Rstep = value;
+        break;
+    case REPORTSTART:
+        MSX->Rstart = value;
+        break;
+    case STATISTIC:
+        MSX->Statflag = value;
+        break;
+    default:
+        return ERR_INVALID_OBJECT_TYPE;
+        break;
+    }
+    return 0;
+}
+
 
 
 int DLLEXPORT MSXaddNode(MSXproject *MSX)
@@ -57,6 +136,18 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX)
 */
 {
     int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
+    // Check if id name is valid
+    // if (!checkID(id)) return 252;
+
+
+
+
+    // Check if a node with same id already exists
+    // if (EN_getnodeindex(p, id, &i) == 0) return 215;
+
     int numNodes = MSX->Nobjects[NODE];
     if (numNodes == 0) {
         MSX->NodesCapacity = 10;
@@ -67,22 +158,26 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX)
         MSX->Node = (Snode *) realloc(MSX->Node, (MSX->NodesCapacity+1) * sizeof(Snode));
     }
     //TODO important to have the species already in then
-    MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-    MSX->Node[numNodes+1].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Node[numNodes+1].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     MSX->Node[numNodes+1].rpt = 0;
     MSX->Nobjects[NODE]++;
     return err;
+    
 }
 
 
-int DLLEXPORT MSXaddTank(MSXproject *MSX)
+int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix)
 /**
 **  Purpose:
-**    adds a tabk to the network.
+**    adds a tank to the network.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
-**    
+**    initialVolume = initial volume of the tank
+**    mixModel = Mix Model type of the tank
+**    volumeMix = The capacity of the mixing compartment
+**
 **  Output:
 **    None
 **
@@ -91,6 +186,9 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX)
 */
 {
     int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
     int numTanks = MSX->Nobjects[TANK];
     if (numTanks == 0) {
         MSX->TanksCapacity = 10;
@@ -100,13 +198,125 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX)
         MSX->TanksCapacity *= 2;
         MSX->Tank = (Stank *) realloc(MSX->Tank, (MSX->TanksCapacity+1) * sizeof(Stank));
     }
-    //TODO comeback to here
-    
+    MSX->Tank[numTanks+1].a = 1.0;
+    MSX->Tank[numTanks+1].v0 = initialVolume;
+    MSX->Tank[numTanks+1].mixModel = mixModel;
+    MSX->Tank[numTanks+1].vMix = volumeMix;
+    //TODO important to have the species already in then
+    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
     MSX->Nobjects[TANK]++;
     return err;
 }
 
+
+int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix)
+/**
+**  Purpose:
+**    adds a reservoir to the network.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    initialVolume = initial volume of the tank
+**    mixModel = Mix Model type of the tank
+**    volumeMix = The capacity of the mixing compartment
+**  
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    
+    int numTanks = MSX->Nobjects[TANK];
+    if (numTanks == 0) {
+        MSX->TanksCapacity = 10;
+        MSX->Tank = (Stank *) calloc(MSX->TanksCapacity+1, sizeof(Stank));
+    }
+    if (numTanks == MSX->TanksCapacity) {
+        MSX->TanksCapacity *= 2;
+        MSX->Tank = (Stank *) realloc(MSX->Tank, (MSX->TanksCapacity+1) * sizeof(Stank));
+    }
+    MSX->Tank[numTanks+1].a = 0.0;
+    MSX->Tank[numTanks+1].v0 = initialVolume;
+    MSX->Tank[numTanks+1].mixModel = mixModel;
+    MSX->Tank[numTanks+1].vMix = volumeMix;
+    //TODO important to have the species already in then
+    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    
+    MSX->Nobjects[TANK]++;
+    return err;
+}
+
+
+int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double diameter, double length, double roughness)
+/**
+**  Purpose:
+**    adds a link to the network.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    startNode = Start node index
+**    endNode = End node index
+**    diameter = Diameter of the pipe
+**    length = length of the pipe
+**    roughness = roughness of the pipe
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    
+    int numLinks = MSX->Nobjects[LINK];
+    if (numLinks == 0) {
+        MSX->LinksCapacity = 10;
+        MSX->Link = (Slink *) calloc(MSX->LinksCapacity+1, sizeof(Slink));
+    }
+    if (numLinks == MSX->TanksCapacity) {
+        MSX->LinksCapacity *= 2;
+        MSX->Link = (Slink *) realloc(MSX->Link, (MSX->LinksCapacity+1) * sizeof(Slink));
+    }
+    MSX->Link[numLinks+1].n1 = startNode;
+    MSX->Link[numLinks+1].n2 = endNode;
+    MSX->Link[numLinks+1].diam = diameter;
+    MSX->Link[numLinks+1].len = length;
+    MSX->Link[numLinks+1].roughness = roughness;
+
+    //TODO important to have the species already in then
+    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    
+    MSX->Nobjects[LINK]++;
+    return err;
+}
+
+
+
+
+
+//TODO go through the MSXinp_readMsxData next
+
+
+
+
+
+
+
+
+
+
+
+//TODO make a function that would go before the run project that will do the intializing of like node and tank qualities that are dependent on the number of species and such
+// Add tanks as nodes at the end of the nodes list just like in MSX_inp
 
 
 int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)

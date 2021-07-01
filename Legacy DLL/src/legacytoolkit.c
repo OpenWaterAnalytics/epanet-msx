@@ -58,7 +58,7 @@
 #include "epanet2.h"
 #include "legacytoolkit.h"
 #include "coretoolkit.h"
-#include "objects.h"
+#include "msxobjects.h"
 
 
 //  Imported functions
@@ -96,7 +96,7 @@ int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
         return err;
     }
     char *fname = argv[2];
-    if (MSX->ProjectOpened) return(ERR_MSX_OPENED); //TODO make a getter??
+    if (!MSX->ProjectOpened) return(ERR_MSX_OPENED); //TODO make a getter??
     CALL(err, MSXproj_open(MSX, fname));
     CALL(err, MSXqual_open(MSX));
 

@@ -20,6 +20,8 @@
 #include <float.h>
 
 #include "msxutils.h"
+#include "msxdict.h"
+#include "msxobjects.h"
 // --- define WINDOWS
 
 #undef WINDOWS
@@ -525,3 +527,35 @@ void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **
 */
 
 }
+
+int checkID(char *id)
+/**
+**  Purpose:
+**    checks that an object's name is unique
+**
+**  Input:
+**    id = name of an object 
+**
+**  Returns:
+**    an error code (0 if successful)
+*/
+{
+// --- check that id name is not a reserved word
+   int i = 1;
+   while (HydVarWords[i] != NULL)
+   {
+      if (MSXutils_strcomp(id, HydVarWords[i])) return 406;  //ERR_RESERVED_NAME
+      i++;
+   }
+    
+// --- check that id name not used before
+
+    if ( findObject(SPECIES, id)   > 0 ||
+         findObject(TERM, id)      > 0 ||
+         findObject(PARAMETER, id) > 0 ||
+         findObject(CONSTANT, id)  > 0
+       ) return 407;    //ERR_DUP_NAME
+    return 0;
+}        
+
+//=============================================================================
