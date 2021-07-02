@@ -91,16 +91,48 @@ int main(int argc, char *argv[])
     call(MSXaddLink(&MSX, 2, 3, 150, 1000, 100));
     call(MSXaddLink(&MSX, 3, 4, 150, 2000, 100));
 
-    //TODO
+    // Add Options
+    call(MSXaddOption(&MSX, AREA_UNITS_OPTION, "M2"));
+    call(MSXaddOption(&MSX, RATE_UNITS_OPTION, "HR"));
+    call(MSXaddOption(&MSX, SOLVER_OPTION, "RK5"));
+    call(MSXaddOption(&MSX, TIMESTEP_OPTION, "360"));
+    call(MSXaddOption(&MSX, RTOL_OPTION, "0.001"));
+    call(MSXaddOption(&MSX, ATOL_OPTION, "0.0001"));
 
+    // Add Species
+    call(MSXaddSpecies(&MSX, "AS3", BULK, UG, 0.0, 0.0));
+    call(MSXaddSpecies(&MSX, "AS5", BULK, UG, 0.0, 0.0));
+    call(MSXaddSpecies(&MSX, "AStot", BULK, UG, 0.0, 0.0));
+    call(MSXaddSpecies(&MSX, "AS5s", WALL, UG, 0.0, 0.0));
+    call(MSXaddSpecies(&MSX, "NH2CL", BULK, MG, 0.0, 0.0));
+    
+    //Add Coefficents
+    call(MSXaddCoefficeint(&MSX, CONSTANT, "Ka", 10.0));
+    call(MSXaddCoefficeint(&MSX, CONSTANT, "Kb", 0.1));
+    call(MSXaddCoefficeint(&MSX, CONSTANT, "K1", 5.0));
+    call(MSXaddCoefficeint(&MSX, CONSTANT, "K2", 1.0));
+    call(MSXaddCoefficeint(&MSX, CONSTANT, "Smax", 50));
+
+    //Add terms
+    call(MSXaddTerm(&MSX, "Ks", "K1/K2"));
+
+    //Add Expressions
+    call(MSXaddExpression(&MSX, LINK, RATE, "AS3", "-Ka*AS3*NH2CL"));
+    call(MSXaddExpression(&MSX, LINK, RATE, "AS5", "Ka*AS3*NH2CL - Av*(K1*(Smax-AS5s)*AS5 - K2*AS5s)"));
+    call(MSXaddExpression(&MSX, LINK, RATE, "NH2CL", "-Kb*NH2CL"));
+    call(MSXaddExpression(&MSX, LINK, RATE, "AS5s", "Ks*Smax*AS5/(1+Ks*AS5) - AS5s"));
+    call(MSXaddExpression(&MSX, LINK, RATE, "AStot", "AS3 + AS5"));
+
+    call(MSXaddExpression(&MSX, TANK, RATE, "AS3", "-Ka*AS3*NH2CL"));
+    call(MSXaddExpression(&MSX, TANK, RATE, "AS5", "Ka*AS3*NH2CL"));
+    call(MSXaddExpression(&MSX, TANK, RATE, "NH2CL", "-Kb*NH2CL"));
+    call(MSXaddExpression(&MSX, TANK, RATE, "AStot", "AS3 + AS5"));
+    
 
 
     
     //If legacy then
     // call(runLegacy(&MSX, argc, argv));
 
-
-   // add_node()
-    //Else then run the new API
     return 0;
 }

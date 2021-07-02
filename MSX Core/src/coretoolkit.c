@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 
@@ -7,6 +8,8 @@
 #include "msxsetters.h"
 #include "msxobjects.h"
 #include "coretoolkit.h"
+#include "msxdict.h"
+#include "msxutils.h"
 
 // Imported Functions
 double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);
@@ -30,6 +33,7 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
 {
     MSX->ProjectOpened = 1;
     setDefaults(MSX);
+    createHashTables();
     return 0;
 }
 
@@ -157,10 +161,11 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX)
         MSX->NodesCapacity *= 2;
         MSX->Node = (Snode *) realloc(MSX->Node, (MSX->NodesCapacity+1) * sizeof(Snode));
     }
+    int i = numNodes+1;
     //TODO important to have the species already in then
-    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-    // MSX->Node[numNodes+1].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-    MSX->Node[numNodes+1].rpt = 0;
+    // MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    MSX->Node[i].rpt = 0;
     MSX->Nobjects[NODE]++;
     return err;
     
@@ -198,12 +203,13 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, do
         MSX->TanksCapacity *= 2;
         MSX->Tank = (Stank *) realloc(MSX->Tank, (MSX->TanksCapacity+1) * sizeof(Stank));
     }
-    MSX->Tank[numTanks+1].a = 1.0;
-    MSX->Tank[numTanks+1].v0 = initialVolume;
-    MSX->Tank[numTanks+1].mixModel = mixModel;
-    MSX->Tank[numTanks+1].vMix = volumeMix;
+    int i = numTanks+1;
+    MSX->Tank[i].a = 1.0;
+    MSX->Tank[i].v0 = initialVolume;
+    MSX->Tank[i].mixModel = mixModel;
+    MSX->Tank[i].vMix = volumeMix;
     //TODO important to have the species already in then
-    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Tank[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
     MSX->Nobjects[TANK]++;
     return err;
@@ -241,12 +247,13 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixMode
         MSX->TanksCapacity *= 2;
         MSX->Tank = (Stank *) realloc(MSX->Tank, (MSX->TanksCapacity+1) * sizeof(Stank));
     }
-    MSX->Tank[numTanks+1].a = 0.0;
-    MSX->Tank[numTanks+1].v0 = initialVolume;
-    MSX->Tank[numTanks+1].mixModel = mixModel;
-    MSX->Tank[numTanks+1].vMix = volumeMix;
+    int i = numTanks+1;
+    MSX->Tank[i].a = 0.0;
+    MSX->Tank[i].v0 = initialVolume;
+    MSX->Tank[i].mixModel = mixModel;
+    MSX->Tank[i].vMix = volumeMix;
     //TODO important to have the species already in then
-    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Tank[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
     MSX->Nobjects[TANK]++;
     return err;
@@ -282,18 +289,19 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double dia
         MSX->LinksCapacity = 10;
         MSX->Link = (Slink *) calloc(MSX->LinksCapacity+1, sizeof(Slink));
     }
-    if (numLinks == MSX->TanksCapacity) {
+    if (numLinks == MSX->LinksCapacity) {
         MSX->LinksCapacity *= 2;
         MSX->Link = (Slink *) realloc(MSX->Link, (MSX->LinksCapacity+1) * sizeof(Slink));
     }
-    MSX->Link[numLinks+1].n1 = startNode;
-    MSX->Link[numLinks+1].n2 = endNode;
-    MSX->Link[numLinks+1].diam = diameter;
-    MSX->Link[numLinks+1].len = length;
-    MSX->Link[numLinks+1].roughness = roughness;
+    int i = numLinks+1;
+    MSX->Link[i].n1 = startNode;
+    MSX->Link[i].n2 = endNode;
+    MSX->Link[i].diam = diameter;
+    MSX->Link[i].len = length;
+    MSX->Link[i].roughness = roughness;
 
     //TODO important to have the species already in then
-    // MSX->Node[numNodes+1].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    // MSX->Link[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
     MSX->Nobjects[LINK]++;
     return err;
@@ -305,13 +313,315 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double dia
 
 //TODO go through the MSXinp_readMsxData next
 
+int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char * value)
+/**
+**  Purpose:
+**    adds an option to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    optionType = the type of option
+**    value = the value to set the option to
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int k;
+    switch (optionType)
+    {
+    case AREA_UNITS_OPTION:
+        k = MSXutils_findmatch(value, AreaUnitsWords);
+        if ( k < 0 ) return ERR_KEYWORD;
+        MSX->AreaUnits = k;
+        break;
+
+    case RATE_UNITS_OPTION:
+        k = MSXutils_findmatch(value, TimeUnitsWords);
+        if ( k < 0 ) return ERR_KEYWORD;
+        MSX->RateUnits = k;
+        break;
+
+    case SOLVER_OPTION:
+        k = MSXutils_findmatch(value, SolverTypeWords);
+        if ( k < 0 ) return ERR_KEYWORD;
+        MSX->Solver = k;
+        break;
+
+    case COUPLING_OPTION:
+        k = MSXutils_findmatch(value, CouplingWords);
+        if ( k < 0 ) return ERR_KEYWORD;
+        MSX->Coupling = k;
+        break;
+
+    case TIMESTEP_OPTION:
+        k = atoi(value);
+        if ( k <= 0 ) return ERR_NUMBER;
+        MSX->Qstep = k;
+        break;
+
+    case RTOL_OPTION:
+        if ( !MSXutils_getDouble(value, &MSX->DefRtol) ) return ERR_NUMBER;
+        break;
+
+    case ATOL_OPTION:
+        if ( !MSXutils_getDouble(value, &MSX->DefAtol) ) return ERR_NUMBER;
+        break;
+
+    case COMPILER_OPTION:
+        k = MSXutils_findmatch(value, CompilerWords);
+        if ( k < 0 ) return ERR_KEYWORD;
+        MSX->Compiler = k;
+    default:
+        return ERR_INVALID_OBJECT_TYPE;
+        break;
+    }
+    return err;
+}
 
 
+int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, double aTol, double rTol)
+/**
+**  Purpose:
+**    adds a species to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    id = the species id
+**    type = the species type, this will be BULK or WALL
+**    units = The species units code
+**    aTol = Absolute Tolerance
+**    rTol = relative Tolerance
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if (!(type == BULK || type == WALL)) return ERR_KEYWORD;
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    if ( findObject(SPECIES, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+
+    int err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(SPECIES, id, MSX->Nobjects[SPECIES]+1) < 0 )
+        err = 101;  // Insufficient memory
+    else MSX->Nobjects[SPECIES]++;
+    int numSpecies = MSX->Nobjects[SPECIES];
+    if (numSpecies == 0) {
+        MSX->SpeciesCapacity = 10;
+        MSX->Species = (Sspecies *) calloc(MSX->SpeciesCapacity+1, sizeof(Sspecies));
+    }
+    if (numSpecies == MSX->SpeciesCapacity) {
+        MSX->SpeciesCapacity *= 2;
+        MSX->Species = (Sspecies *) realloc(MSX->Species, (MSX->SpeciesCapacity+1) * sizeof(Sspecies));
+    }
+
+    int i = numSpecies+1;
+    MSX->Species[i].id = id;
+    MSX->Species[i].type = type;
+    switch (units)
+    {
+    case MG:
+        strncpy(MSX->Species[i].units, "MG", MAXUNITS);
+        break;
+    case UG:
+        strncpy(MSX->Species[i].units, "UG", MAXUNITS);
+        break;
+    case MOLE:
+        strncpy(MSX->Species[i].units, "MOLE", MAXUNITS);
+        break;
+    case MMOLE:
+        strncpy(MSX->Species[i].units, "MMOLE", MAXUNITS);
+        break;
+    default:
+        return ERR_KEYWORD;
+        break;
+    }
+    
+    MSX->Species[i].aTol = aTol;
+    MSX->Species[i].rTol = rTol;
+    return err;
+}
 
 
+int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double value)
+/**
+**  Purpose:
+**    adds a coefficient to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    type = the species type, this will be PARAMETER or CONSTANT
+**    id = the coefficient id
+**    value = the coefficient value
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    if (type == PARAMETER) {
+        if ( findObject(PATTERN, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+        err = checkID(id);
+        if ( err ) return err;
+        if ( addObject(PARAMETER, id, MSX->Nobjects[PARAMETER]+1) < 0 )
+            err = 101;  // Insufficient memory
+        else MSX->Nobjects[PARAMETER]++;
+        int numParams = MSX->Nobjects[PARAMETER];
+        if (numParams == 0) {
+            MSX->ParamCapacity = 10;
+            MSX->Param = (Sparam *) calloc(MSX->ParamCapacity+1, sizeof(Sparam));
+        }
+        if (numParams == MSX->ParamCapacity) {
+            MSX->ParamCapacity *= 2;
+            MSX->Param = (Sparam *) realloc(MSX->Param, (MSX->ParamCapacity+1) * sizeof(Sparam));
+        }
+        int i = numParams+1;
+        MSX->Param[i].id = id;
+		MSX->Param[i].value = value;
+        //TODO add this in the init proj
+        // for (j=1; j<=MSX->Nobjects[LINK]; j++) MSX->Link[j].param[i] = x;
+        //     for (j=1; j<=MSX->Nobjects[TANK]; j++) MSX->Tank[j].param[i] = x;
+    }
+    else if (type == CONSTANT) {
+        if ( findObject(CONSTANT, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+        err = checkID(id);
+        if ( err ) return err;
+        if ( addObject(CONSTANT, id, MSX->Nobjects[CONSTANT]+1) < 0 )
+            err = 101;  // Insufficient memory
+        else MSX->Nobjects[CONSTANT]++;
+        int numConsts = MSX->Nobjects[CONSTANT];
+        if (numConsts == 0) {
+            MSX->ConstCapacity = 10;
+            MSX->Const = (Sconst *) calloc(MSX->ConstCapacity+1, sizeof(Sconst));
+        }
+        if (numConsts == MSX->ConstCapacity) {
+            MSX->ConstCapacity *= 2;
+            MSX->Const = (Sconst *) realloc(MSX->Const, (MSX->ConstCapacity+1) * sizeof(Sconst));
+        }
+        int i = numConsts+1;
+        MSX->Const[i].id = id;
+		MSX->Const[i].value = value;
+    }
+    else err = ERR_KEYWORD;
+    return err;
+}
+
+int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    id = the term id
+**    equation = the term's equation
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    if ( findObject(TERM, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+    int err = 0;
+    err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(TERM, id, MSX->Nobjects[TERM]+1) < 0 )
+        err = 101;  // Insufficient memory
+    else MSX->Nobjects[TERM]++;
+    int numTerms = MSX->Nobjects[TERM];
+    if (numTerms == 0) {
+        MSX->TermCapacity = 10;
+        MSX->Term = (Sterm *) calloc(MSX->TermCapacity+1, sizeof(Sterm));
+    }
+    if (numTerms == MSX->TermCapacity) {
+        MSX->TermCapacity *= 2;
+        MSX->Term = (Sterm *) realloc(MSX->Term, (MSX->TermCapacity+1) * sizeof(Sterm));
+    }
+    int i = numTerms+1;
+    MSX->Term[i].id = id;
+    MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
+    if ( expr == NULL ) return ERR_MATH_EXPR;
+    MSX->Term[i].expr = expr;
+    //TODO check cycles and add to term array in the project run init function
+
+    return err;
+}
+
+int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionType, char *species, char *equation)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    classType = either LINK or TANK
+**    expressionType = one of the types from the ExpressionType enum
+**    species = the expression species
+**    equation = the equation
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    // --- determine expression type 
+    if ( expressionType < 0 || expressionType > 3 ) return ERR_KEYWORD;
+
+    // --- determine species associated with expression
+
+    int i = findObject(SPECIES, species);
+    if ( i < 1 ) return ERR_NAME;
+
+    // --- check that species does not already have an expression
+
+    if ( classType == LINK )
+    {
+        if ( MSX->Species[i].pipeExprType != NO_EXPR ) return ERR_DUP_EXPR;
+    }
+    else if ( classType == TANK )
+    {
+        if ( MSX->Species[i].tankExprType != NO_EXPR ) return ERR_DUP_EXPR;
+    }
+    else return ERR_INVALID_OBJECT_PARAMS;
+    MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
+    if ( expr == NULL ) return ERR_MATH_EXPR;
+    switch (classType)
+    {
+    case LINK:
+        MSX->Species[i].pipeExpr = expr;
+        MSX->Species[i].pipeExprType = expressionType;
+        break;
+    case TANK:
+        MSX->Species[i].tankExpr = expr;
+        MSX->Species[i].tankExprType = expressionType;
+        break;
+    }
+    return err;
+}
 
 
-
+//TODO go to parse source in msxinp.c and continue from there
 
 
 

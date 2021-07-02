@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "hash.h"
-#include "msxtypes.h"
 #include "msxobjects.h"
+#include "msxdict.h"
 
 //  Local variables
 //-----------------
@@ -133,4 +133,38 @@ void deleteHashTables()
         AllocSetPool(HashPool);
         AllocFreePool();
     }
+}
+
+//=============================================================================
+
+int getVariableCode(MSXproject *MSX, char *id)
+/**
+**  Purpose:
+**    finds the index assigned to a species, intermediate term,
+**    parameter, or constant that appears in a math expression.
+**
+**  Input:
+**    id = ID name being sought
+**
+**  Returns:
+**    index of the symbolic variable or term named id.
+**
+**  Note:
+**    Variables are assigned consecutive code numbers starting from 1 
+**    and proceeding through each Species, Term, Parameter and Constant.
+*/
+{
+    int j = findObject(SPECIES, id);
+    if ( j >= 1 ) return j;
+    j = findObject(TERM, id);
+    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + j;
+    j = findObject(PARAMETER, id);
+    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + j;
+    j = findObject(CONSTANT, id);
+    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + 
+                         MSX->Nobjects[PARAMETER] + j;
+    j = MSXutils_findmatch(id, HydVarWords);
+    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + 
+                         MSX->Nobjects[PARAMETER] + MSX->Nobjects[CONSTANT] + j;
+    return -1;
 }

@@ -38,18 +38,6 @@ static char *Tok[MAXTOKS];             // String tokens from line of input
 static int  Ntokens;                   // Number of tokens in line of input
 static double **TermArray;             // Incidence array used to check Terms  //1.1.00
 
-enum InpErrorCodes {                   // Error codes (401 - 409)
-    INP_ERR_FIRST        = 400,
-    ERR_LINE_LENGTH,
-    ERR_ITEMS, 
-    ERR_KEYWORD,
-    ERR_NUMBER,
-    ERR_NAME,
-    ERR_RESERVED_NAME,
-    ERR_DUP_NAME,
-    ERR_DUP_EXPR, 
-    ERR_MATH_EXPR,
-    INP_ERR_LAST};
 
 static char  *InpErrorTxt[INP_ERR_LAST-INP_ERR_FIRST] = {
     "",
@@ -79,7 +67,6 @@ static int    addSpecies(MSXproject *MSX, char *line);
 static int    addCoeff(MSXproject *MSX, char *line);
 static int    addTerm(MSXproject *MSX, char *id);
 static int    addPattern(MSXproject *MSX, char *id);
-// static int    checkID(char *id);
 static int    parseLine(MSXproject *MSX, int sect, char *line);
 static int    parseOption(MSXproject *MSX);
 static int    parseSpecies(MSXproject *MSX);
@@ -92,7 +79,6 @@ static int    parseParameter(MSXproject *MSX);
 static int    parseSource(MSXproject *MSX);
 static int    parsePattern(MSXproject *MSX);
 static int    parseReport(MSXproject *MSX);
-static int    getVariableCode(MSXproject *MSX, char *id);
 static int    getTokens(char *s);
 static void   writeInpErrMsg(int errcode, char *sect, char *line, int lineCount);
 
@@ -1225,39 +1211,6 @@ int parseReport(MSXproject *MSX)
     return 0;
 }
 
-//=============================================================================
-
-int getVariableCode(MSXproject *MSX, char *id)
-/**
-**  Purpose:
-**    finds the index assigned to a species, intermediate term,
-**    parameter, or constant that appears in a math expression.
-**
-**  Input:
-**    id = ID name being sought
-**
-**  Returns:
-**    index of the symbolic variable or term named id.
-**
-**  Note:
-**    Variables are assigned consecutive code numbers starting from 1 
-**    and proceeding through each Species, Term, Parameter and Constant.
-*/
-{
-    int j = findObject(SPECIES, id);
-    if ( j >= 1 ) return j;
-    j = findObject(TERM, id);
-    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + j;
-    j = findObject(PARAMETER, id);
-    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + j;
-    j = findObject(CONSTANT, id);
-    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + 
-                         MSX->Nobjects[PARAMETER] + j;
-    j = MSXutils_findmatch(id, HydVarWords);
-    if ( j >= 1 ) return MSX->Nobjects[SPECIES] + MSX->Nobjects[TERM] + 
-                         MSX->Nobjects[PARAMETER] + MSX->Nobjects[CONSTANT] + j;
-    return -1;
-}
 
 //=============================================================================
 

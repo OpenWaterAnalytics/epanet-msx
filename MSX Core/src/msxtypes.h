@@ -250,6 +250,20 @@ typedef  float REAL4;
                   s_OPTION,
                   s_REPORT};
 
+ enum InpErrorCodes {                   // Error codes (401 - 409)
+        INP_ERR_FIRST        = 400,
+        ERR_LINE_LENGTH,
+        ERR_ITEMS, 
+        ERR_KEYWORD,
+        ERR_NUMBER,
+        ERR_NAME,
+        ERR_RESERVED_NAME,
+        ERR_DUP_NAME,
+        ERR_DUP_EXPR, 
+        ERR_MATH_EXPR,
+        INP_ERR_LAST};
+ 
+ 
  enum ErrorCodeType                    // Error codes (501-524)
           {ERR_FIRST = 500,
            ERR_MEMORY,                 // 501
@@ -489,7 +503,11 @@ typedef struct                         // MSX PROJECT VARIABLES
           QualityOpened,               // Water quality system opened flag
           NodesCapacity,               // Size of space available in the Nodes array
           TanksCapacity,               // Size of space available in the Tanks array
-          LinksCapacity;               // Size of space available in the Links array
+          LinksCapacity,               // Size of space available in the Links array
+          SpeciesCapacity,             // Size of space available in the Species array
+          ParamCapacity,               // Size of space available in the Parameter array
+          ConstCapacity,               // Size of space available in the Constants array
+          TermCapacity;                // Size of space available in the Terms array
 
    long   HydOffset,                   // Hydraulics file byte offset
           Qstep,                       // Quality time step (sec)
