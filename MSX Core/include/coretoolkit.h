@@ -53,9 +53,12 @@
 #define MSX_FLOWPACED  3
 
 
-int DLLEXPORT MSX_init(MSXproject *MSX);
+int DLLEXPORT MSX_open(MSXproject *MSX);
 
-int DLLEXPORT MSX_free(MSXproject *MSX);
+int DLLEXPORT MSX_close(MSXproject *MSX);
+
+int DLLEXPORT MSXrun(MSXproject *MSX);
+
 
 //setFlowUnits()
 //setQualityTimestep()
@@ -77,20 +80,17 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNo
 
 //Species/Chemistry option functions
 int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char * value);
-int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, char *type, char *units, double aTol, double rTol);
+int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, double aTol, double rTol);
 int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double value);
 int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation);
 int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionType, char *species, char *equation);
-int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, int nodeIndex, char *speciesId, double strength, char *timePattern);
-int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, int index);
-int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *name, double value, int index);
+int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, char *nodeId, char *speciesId, double strength, char *timePattern);
+int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, char *id);
+int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *paramId, double value, char *id);
 int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int precision);
 
 
-
-
-
-// add_species()
+// Below is from the legacy epanetmsx.h
 
 int  DLLEXPORT MSXgetindex(MSXproject *MSX, int type, char *id, int *index);
 int  DLLEXPORT MSXgetIDlen(MSXproject *MSX, int type, int index, int *len);

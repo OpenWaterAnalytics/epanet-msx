@@ -1,15 +1,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 #include "hash.h"
 #include "msxobjects.h"
 #include "msxdict.h"
+#include "msxutils.h"
+#include "mathexpr.h"
 
 //  Local variables
 //-----------------
-static alloc_handle_t  *HashPool;           // Memory pool for hash tables
-static HTtable  *Htable[MAX_OBJECTS];       // Hash tables for object ID names
+alloc_handle_t  *HashPool;           // Memory pool for hash tables
+HTtable  *Htable[MAX_OBJECTS];       // Hash tables for object ID names
 
 int addObject(int type, char *id, int n)
 /**
@@ -248,4 +251,358 @@ void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting
         }
     }
     free(MSX->Adjlist);
+}
+
+
+//=============================================================================
+
+int convertUnits(MSXproject *MSX)
+/**
+**  Purpose:
+**    converts user's units to internal EPANET units.
+**
+**  Input:
+**    none.
+**
+**  Returns:
+**    an error code (0 if no error).
+*/
+{
+// --- flow conversion factors (to cfs)
+    double fcf[] = {1.0, GPMperCFS, MGDperCFS, IMGDperCFS, AFDperCFS,
+                    LPSperCFS, LPMperCFS, MLDperCFS, CMHperCFS, CMDperCFS};
+
+// --- rate time units conversion factors (to sec)
+    double rcf[] = {1.0, 60.0, 3600.0, 86400.0};
+
+    int i, m, errcode = 0;
+
+// --- conversions for length & tank volume
+
+    if ( MSX->Unitsflag == US )
+    {
+        MSX->Ucf[LENGTH_UNITS] = 1.0;
+        MSX->Ucf[DIAM_UNITS]   = 12.0;
+        MSX->Ucf[VOL_UNITS]    = 1.0;
+    }
+    else
+    {
+        MSX->Ucf[LENGTH_UNITS] = MperFT;
+        MSX->Ucf[DIAM_UNITS]   = 1000.0*MperFT;
+        MSX->Ucf[VOL_UNITS]    = M3perFT3;
+    }
+
+// --- conversion for surface area
+
+    MSX->Ucf[AREA_UNITS] = 1.0;
+    switch (MSX->AreaUnits)
+    {
+        case M2:  MSX->Ucf[AREA_UNITS] = M2perFT2;  break;
+        case CM2: MSX->Ucf[AREA_UNITS] = CM2perFT2; break;
+    }
+
+// --- conversion for flow rate
+
+    MSX->Ucf[FLOW_UNITS] = fcf[MSX->Flowflag];
+    MSX->Ucf[CONC_UNITS] = LperFT3;
+
+// --- conversion for reaction rate time
+
+    MSX->Ucf[RATE_UNITS] = rcf[MSX->RateUnits];
+
+// --- convert pipe diameter & length
+
+    for (i=1; i<=MSX->Nobjects[LINK]; i++)
+    {
+        MSX->Link[i].diam /= MSX->Ucf[DIAM_UNITS];
+        MSX->Link[i].len /=  MSX->Ucf[LENGTH_UNITS];
+    }
+
+// --- convert initial tank volumes
+
+    for (i=1; i<=MSX->Nobjects[TANK]; i++)
+    {
+        MSX->Tank[i].v0 /= MSX->Ucf[VOL_UNITS];
+        MSX->Tank[i].vMix /= MSX->Ucf[VOL_UNITS];
+    }
+
+// --- assign default tolerances to species
+
+    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
+    {
+        if ( MSX->Species[m].rTol == 0.0 ) MSX->Species[m].rTol = MSX->DefRtol;
+        if ( MSX->Species[m].aTol == 0.0 ) MSX->Species[m].aTol = MSX->DefAtol;
+    }
+    return errcode;
+}
+
+//=============================================================================
+
+void deleteObjects(MSXproject *MSX)
+/**
+**  Purpose:
+**    deletes multi-species data objects.
+**
+**  Input:
+**    none.
+*/
+{
+    int i;
+    SnumList *listItem;
+    Psource  source;                                                           //ttaxon - 9/7/10
+
+// --- free memory used by nodes, links, and tanks
+
+    if (MSX->Node) for (i=1; i<=MSX->Nobjects[NODE]; i++)
+    {
+        FREE(MSX->Node[i].c);
+        FREE(MSX->Node[i].c0);
+
+        // --- free memory used by water quality sources                       //ttaxon - 9/7/10
+
+	if(MSX->Node[i].sources)
+	{ 
+            source = MSX->Node[i].sources; 
+            while (source != NULL)
+	    { 
+                MSX->Node[i].sources = source->next; 
+                FREE(source); 
+                source = MSX->Node[i].sources; 
+            } 
+        }
+
+    }
+    if (MSX->Link) for (i=1; i<=MSX->Nobjects[LINK]; i++)
+    {
+        FREE(MSX->Link[i].c0);
+        FREE(MSX->Link[i].param);
+        FREE(MSX->Link[i].reacted);
+    }
+    if (MSX->Tank) for (i=1; i<=MSX->Nobjects[TANK]; i++)
+    {
+        FREE(MSX->Tank[i].param);
+        FREE(MSX->Tank[i].c);
+        FREE(MSX->Tank[i].reacted);
+    }
+
+// --- free memory used by time patterns
+
+    if (MSX->Pattern) for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
+    {
+        listItem = MSX->Pattern[i].first;
+        while (listItem)
+        {
+            MSX->Pattern[i].first = listItem->next;
+            free(listItem);
+            listItem = MSX->Pattern[i].first;
+        }
+    }
+    FREE(MSX->Pattern);
+
+// --- free memory used for hydraulics results
+
+    FREE(MSX->D);
+    FREE(MSX->H);
+    FREE(MSX->Q);
+    FREE(MSX->C0);
+
+// --- delete all nodes, links, and tanks
+
+    FREE(MSX->Node);
+    FREE(MSX->Link);
+    FREE(MSX->Tank);
+
+// --- free memory used by reaction rate & equilibrium expressions
+
+    if (MSX->Species) for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
+    {
+    // --- free the species tank expression only if it doesn't
+    //     already point to the species pipe expression
+        if ( MSX->Species[i].tankExpr != MSX->Species[i].pipeExpr )
+        {
+            mathexpr_delete(MSX->Species[i].tankExpr);
+        }
+        mathexpr_delete(MSX->Species[i].pipeExpr);
+    }
+
+// --- delete all species, parameters, and constants
+
+    FREE(MSX->Species);
+    FREE(MSX->Param);
+    FREE(MSX->Const);
+    FREE(MSX->K);                                                               //1.1.00
+
+// --- free memory used by intermediate terms
+
+    if (MSX->Term) for (i=1; i<=MSX->Nobjects[TERM]; i++)
+        mathexpr_delete(MSX->Term[i].expr);
+    FREE(MSX->Term);
+}
+
+//=============================================================================
+
+int checkCyclicTerms(MSXproject *MSX, double **TermArray)                                                         //1.1.00
+/**
+**  Purpose:
+**    checks for cyclic references in Term expressions (e.g., T1 = T2 + T3
+**    and T3 = T2/T1)
+**
+**  Input:
+**    none
+**
+**  Returns:
+**    1 if cyclic reference found or 0 if none found.
+*/
+{
+    int i, j, n;
+    char msg[MAXMSG+1];
+
+    n = MSX->Nobjects[TERM];
+    for (i=1; i<n; i++)
+    {
+        for (j=1; j<=n; j++) TermArray[0][j] = 0.0;
+        if ( traceTermPath(i, i, n, TermArray) )
+        {
+            sprintf(msg, "Error 410 - term %s contains a cyclic reference.",
+                         MSX->Term[i].id);
+           // ENwriteline(msg);
+            printf("%s\n", msg);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+//=============================================================================
+
+int traceTermPath(int i, int istar, int n, double **TermArray)                                     //1.1.00
+/**
+**  Purpose:
+**    checks if Term[istar] is in the path of terms that appear when evaluating
+**    Term[i]
+**
+**  Input:
+**    i = index of term whose expressions are to be traced
+**    istar = index of term being searched for
+**    n = total number of terms
+**
+**  Returns:
+**    1 if term istar found; 0 if not found.
+*/
+{
+    int j;
+    if ( TermArray[0][i] == 1.0 ) return 0;
+    TermArray[0][i] = 1.0;
+    for (j=1; j<=n; j++)
+    {
+        if ( TermArray[i][j] == 0.0 ) continue;
+        if ( j == istar ) return 1;
+        else if ( traceTermPath(j, istar, n, TermArray) ) return 1;
+    }
+    return 0;
+}
+
+//=============================================================================
+
+int finishInit(MSXproject *MSX)
+/**
+**  Purpose:
+**    finishes setting up the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    int i;
+    for (i=1; i=MSX->Nobjects[NODE]; i++) {
+        MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+    }
+    for (i=1; i=MSX->Nobjects[TANK]; i++) {
+        MSX->Tank[i].param = (double *)
+            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+        MSX->Tank[i].c = (double *)
+            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Tank[i].reacted = (double*)
+            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
+    }
+    for (i=1; i=MSX->Nobjects[LINK]; i++) {
+        MSX->Link[i].c0 = (double *)
+            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        MSX->Link[i].reacted = (double *)
+            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
+        MSX->Link[i].param = (double *)
+            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+    }
+    for (i=1; i=MSX->Nobjects[PARAMETER]; i++) {
+        double x = MSX->Param[i].value;
+        int j;
+        for (j=1; j<=MSX->Nobjects[LINK]; j++) MSX->Link[j].param[i] = x;
+        for (j=1; j<=MSX->Nobjects[TANK]; j++) MSX->Tank[j].param[i] = x;
+    }
+
+    // --- create the TermArray for checking circular references in Terms          //1.1.00
+    double **TermArray;             // Incidence array used to check Terms  //1.1.00
+	TermArray = createMatrix(MSX->Nobjects[TERM]+1, MSX->Nobjects[TERM]+1);      //1.1.00
+	if ( TermArray == NULL ) return ERR_MEMORY;
+
+    int k;
+    for (i=1; i=MSX->Nobjects[TERM]; i++) {
+        char *Tokens[100];
+        char *s = MSX->Term[i].equation;
+        int len = (int)strlen(s);
+        int m;
+        int n = 0;
+        while (len > 0)
+        {
+            m = (int)strcspn(s," \t\n\r");              // find token length 
+            if (m == 0) s++;                    // no token found
+            else
+            {
+                if (*s == '"')                  // token begins with quote
+                {
+                    s++;                        // start token after quote
+                    len--;                      // reduce length of s
+                    m = (int)strcspn(s,"\"\n"); // find end quote or new line
+                }
+                s[m] = '\0';                    // null-terminate the token
+                Tokens[n] = s;                     // save pointer to token 
+                n++;                            // update token count
+                s += m+1;                       // begin next token
+            }
+            len -= m+1;                         // update length of s
+        }
+        for (int j=0; j<n; j++)
+        {                                                                          //1.1.00
+            k = findObject(TERM, Tokens[j]);                                  //1.1.00
+            if ( k > 0 ) TermArray[i][k] = 1.0;                                    //1.1.00
+        }
+    }
+
+
+    if ( checkCyclicTerms(MSX, TermArray) ) return ERR_MSX_INPUT;                                        //1.1.00
+    freeMatrix(TermArray);
+
+
+
+    // --- convert user's units to internal units
+
+    err = convertUnits(MSX);
+    if (err) return err;
+
+    // Build nodal adjacency lists 
+    if (MSX->Adjlist == NULL)
+    {
+        err = buildadjlists(MSX);
+        if (err) return err;
+    }
+    return err;
 }

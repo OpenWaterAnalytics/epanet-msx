@@ -426,6 +426,7 @@ typedef struct                         // INTERMEDIATE TERM OBJECT
 {
     char      *id;                     // name
     MathExpr  *expr;                   // math expression for term
+    char      *equation;               // String of the equation
 }   Sterm;
 
 

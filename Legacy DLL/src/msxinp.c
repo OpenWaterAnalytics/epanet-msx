@@ -82,9 +82,6 @@ static int    parseReport(MSXproject *MSX);
 static int    getTokens(char *s);
 static void   writeInpErrMsg(int errcode, char *sect, char *line, int lineCount);
 
-static int    checkCyclicTerms(MSXproject *MSX);                                          //1.1.00
-static int    traceTermPath(int i, int istar, int n);                          //1.1.00
-
 //=============================================================================
 
 int MSXinp_countMsxObjects(MSXproject *MSX)
@@ -323,7 +320,7 @@ int  MSXinp_readMsxData(MSXproject *MSX)
 
 // --- check for errors
 
-    if ( checkCyclicTerms(MSX) ) errsum++;                                        //1.1.00
+    if ( checkCyclicTerms(MSX, TermArray) ) errsum++;                                        //1.1.00
     freeMatrix(TermArray);                                                     //1.1.00
     if (errsum > 0) return ERR_MSX_INPUT;                                      //1.1.00
     return 0;
@@ -1287,66 +1284,4 @@ void writeInpErrMsg(int errcode, char *sect, char *line, int lineCount)
     ENwriteline("");
     ENwriteline(msg);
     ENwriteline(line);
-}
-
-//=============================================================================
-
-int checkCyclicTerms(MSXproject *MSX)                                                         //1.1.00
-/**
-**  Purpose:
-**    checks for cyclic references in Term expressions (e.g., T1 = T2 + T3
-**    and T3 = T2/T1)
-**
-**  Input:
-**    none
-**
-**  Returns:
-**    1 if cyclic reference found or 0 if none found.
-*/
-{
-    int i, j, n;
-    char msg[MAXMSG+1];
-
-    n = MSX->Nobjects[TERM];
-    for (i=1; i<n; i++)
-    {
-        for (j=1; j<=n; j++) TermArray[0][j] = 0.0;
-        if ( traceTermPath(i, i, n) )
-        {
-            sprintf(msg, "Error 410 - term %s contains a cyclic reference.",
-                         MSX->Term[i].id);
-            ENwriteline(msg);
-            return 1;
-        }
-    }
-    return 0;
-}
-
-//=============================================================================
-
-int traceTermPath(int i, int istar, int n)                                     //1.1.00
-/**
-**  Purpose:
-**    checks if Term[istar] is in the path of terms that appear when evaluating
-**    Term[i]
-**
-**  Input:
-**    i = index of term whose expressions are to be traced
-**    istar = index of term being searched for
-**    n = total number of terms
-**
-**  Returns:
-**    1 if term istar found; 0 if not found.
-*/
-{
-    int j;
-    if ( TermArray[0][i] == 1.0 ) return 0;
-    TermArray[0][i] = 1.0;
-    for (j=1; j<=n; j++)
-    {
-        if ( TermArray[i][j] == 0.0 ) continue;
-        if ( j == istar ) return 1;
-        else if ( traceTermPath(j, istar, n) ) return 1;
-    }
-    return 0;
 }

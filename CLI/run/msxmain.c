@@ -70,8 +70,9 @@ int main(int argc, char *argv[])
 */
 {
     MSXproject MSX;
-    call(MSX_init(&MSX));
-
+    call(MSX_open(&MSX));
+    
+    
     // Builing the network from example.inp
     call(MSXsetFlowFlag(&MSX, CMH));
     call(MSXsetTimeParameter(&MSX, DURATION, 48*60));
@@ -79,17 +80,17 @@ int main(int argc, char *argv[])
     call(MSXsetTimeParameter(&MSX, REPORTSTEP, 2*60));
     call(MSXsetTimeParameter(&MSX, REPORTSTART, 0));
     // Add nodes
-    call(MSXaddNode(&MSX, "A"));
-    call(MSXaddNode(&MSX, "B"));
-    call(MSXaddNode(&MSX, "C"));
-    call(MSXaddNode(&MSX, "D"));
-    call(MSXaddReservoir(&MSX, "Source", 0,0,0));
+    call(MSXaddNode(&MSX, "a"));
+    call(MSXaddNode(&MSX, "b"));
+    call(MSXaddNode(&MSX, "c"));
+    call(MSXaddNode(&MSX, "e"));
+    call(MSXaddReservoir(&MSX, "source", 0,0,0));
     // Add links
-    call(MSXaddLink(&MSX, "1", "Source", "A", 200, 1000, 100));
-    call(MSXaddLink(&MSX, "2", "A", "B", 150, 800, 100));
-    call(MSXaddLink(&MSX, "3", "A", "C", 200, 1200, 100));
-    call(MSXaddLink(&MSX, "4", "B", "C", 150, 1000, 100));
-    call(MSXaddLink(&MSX, "5", "C", "D", 150, 2000, 100));
+    call(MSXaddLink(&MSX, "1", "source", "a", 200, 1000, 100));
+    call(MSXaddLink(&MSX, "2", "a", "b", 150, 800, 100));
+    call(MSXaddLink(&MSX, "3", "a", "c", 200, 1200, 100));
+    call(MSXaddLink(&MSX, "4", "b", "c", 150, 1000, 100));
+    call(MSXaddLink(&MSX, "5", "c", "e", 150, 2000, 100));
 
     // Add Options
     call(MSXaddOption(&MSX, AREA_UNITS_OPTION, "M2"));
@@ -129,19 +130,25 @@ int main(int argc, char *argv[])
     call(MSXaddExpression(&MSX, TANK, RATE, "AStot", "AS3 + AS5"));
     
     //Add Quality
-    call(MSXaddQuality(&MSX, "NODE", "AS3", 10.0, 5));
-    call(MSXaddQuality(&MSX, "NODE", "NH2CL", 2.5, 5));
+    call(MSXaddQuality(&MSX, "NODE", "AS3", 10.0, "source"));
+    call(MSXaddQuality(&MSX, "NODE", "NH2CL", 2.5, "source"));
 
     //Setup Report
-    call(MSXsetReport(&MSX, "NODE", "C", 0));
-    call(MSXsetReport(&MSX, "NODE", "D", 0));
+    call(MSXsetReport(&MSX, "NODE", "c", 0));
+    call(MSXsetReport(&MSX, "NODE", "e", 0));
     call(MSXsetReport(&MSX, "LINK", "5", 0));
     call(MSXsetReport(&MSX, "SPECIE", "AStot", 0));
     call(MSXsetReport(&MSX, "SPECIE", "AS5", 0));
     call(MSXsetReport(&MSX, "SPECIE", "AS5s", 0));
     call(MSXsetReport(&MSX, "SPECIE", "NH2CL", 0));
 
+    call(MSXsolveH(&MSX));
 
+    // Run
+    call(MSXrun(&MSX));
+
+    // Close
+    call(MSX_close(&MSX));
     
     //If legacy then
     // call(runLegacy(&MSX, argc, argv));

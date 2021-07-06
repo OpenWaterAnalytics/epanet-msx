@@ -68,14 +68,10 @@ char * MSXproj_getErrmsg(int errcode);
 
 //  Local functions
 //-----------------
-static int    convertUnits(MSXproject *MSX);
 static int    createObjects(MSXproject *MSX);
-static void   deleteObjects(MSXproject *MSX);
 
 static int    openRptFile(MSXproject *MSX);                                               //(LR-11/20/07)
 
-static int  buildadjlists(MSXproject *MSX);
-static void freeadjlists(MSXproject *MSX);
 
 
 //=============================================================================
@@ -201,90 +197,6 @@ char * MSXproj_getErrmsg(int errcode)
     else return Errmsg[errcode - ERR_FIRST];
 }
 
-
-//=============================================================================
-
-int convertUnits(MSXproject *MSX)
-/**
-**  Purpose:
-**    converts user's units to internal EPANET units.
-**
-**  Input:
-**    none.
-**
-**  Returns:
-**    an error code (0 if no error).
-*/
-{
-// --- flow conversion factors (to cfs)
-    double fcf[] = {1.0, GPMperCFS, MGDperCFS, IMGDperCFS, AFDperCFS,
-                    LPSperCFS, LPMperCFS, MLDperCFS, CMHperCFS, CMDperCFS};
-
-// --- rate time units conversion factors (to sec)
-    double rcf[] = {1.0, 60.0, 3600.0, 86400.0};
-
-    int i, m, errcode = 0;
-
-// --- conversions for length & tank volume
-
-    if ( MSX->Unitsflag == US )
-    {
-        MSX->Ucf[LENGTH_UNITS] = 1.0;
-        MSX->Ucf[DIAM_UNITS]   = 12.0;
-        MSX->Ucf[VOL_UNITS]    = 1.0;
-    }
-    else
-    {
-        MSX->Ucf[LENGTH_UNITS] = MperFT;
-        MSX->Ucf[DIAM_UNITS]   = 1000.0*MperFT;
-        MSX->Ucf[VOL_UNITS]    = M3perFT3;
-    }
-
-// --- conversion for surface area
-
-    MSX->Ucf[AREA_UNITS] = 1.0;
-    switch (MSX->AreaUnits)
-    {
-        case M2:  MSX->Ucf[AREA_UNITS] = M2perFT2;  break;
-        case CM2: MSX->Ucf[AREA_UNITS] = CM2perFT2; break;
-    }
-
-// --- conversion for flow rate
-
-    MSX->Ucf[FLOW_UNITS] = fcf[MSX->Flowflag];
-    MSX->Ucf[CONC_UNITS] = LperFT3;
-
-// --- conversion for reaction rate time
-
-    MSX->Ucf[RATE_UNITS] = rcf[MSX->RateUnits];
-
-// --- convert pipe diameter & length
-
-    for (i=1; i<=MSX->Nobjects[LINK]; i++)
-    {
-        MSX->Link[i].diam /= MSX->Ucf[DIAM_UNITS];
-        MSX->Link[i].len /=  MSX->Ucf[LENGTH_UNITS];
-    }
-
-// --- convert initial tank volumes
-
-    for (i=1; i<=MSX->Nobjects[TANK]; i++)
-    {
-        MSX->Tank[i].v0 /= MSX->Ucf[VOL_UNITS];
-        MSX->Tank[i].vMix /= MSX->Ucf[VOL_UNITS];
-    }
-
-// --- assign default tolerances to species
-
-    for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
-    {
-        if ( MSX->Species[m].rTol == 0.0 ) MSX->Species[m].rTol = MSX->DefRtol;
-        if ( MSX->Species[m].aTol == 0.0 ) MSX->Species[m].aTol = MSX->DefAtol;
-    }
-    return errcode;
-}
-
-
 //=============================================================================
 
 int createObjects(MSXproject *MSX)
@@ -384,109 +296,6 @@ int createObjects(MSXproject *MSX)
 
     for (i=1; i<=MSX->Nobjects[TERM]; i++) MSX->Term[i].expr = NULL;
     return 0;
-}
-
-//=============================================================================
-
-void deleteObjects(MSXproject *MSX)
-/**
-**  Purpose:
-**    deletes multi-species data objects.
-**
-**  Input:
-**    none.
-*/
-{
-    int i;
-    SnumList *listItem;
-    Psource  source;                                                           //ttaxon - 9/7/10
-
-// --- free memory used by nodes, links, and tanks
-
-    if (MSX->Node) for (i=1; i<=MSX->Nobjects[NODE]; i++)
-    {
-        FREE(MSX->Node[i].c);
-        FREE(MSX->Node[i].c0);
-
-        // --- free memory used by water quality sources                       //ttaxon - 9/7/10
-
-	if(MSX->Node[i].sources)
-	{ 
-            source = MSX->Node[i].sources; 
-            while (source != NULL)
-	    { 
-                MSX->Node[i].sources = source->next; 
-                FREE(source); 
-                source = MSX->Node[i].sources; 
-            } 
-        }
-
-    }
-    if (MSX->Link) for (i=1; i<=MSX->Nobjects[LINK]; i++)
-    {
-        FREE(MSX->Link[i].c0);
-        FREE(MSX->Link[i].param);
-        FREE(MSX->Link[i].reacted);
-    }
-    if (MSX->Tank) for (i=1; i<=MSX->Nobjects[TANK]; i++)
-    {
-        FREE(MSX->Tank[i].param);
-        FREE(MSX->Tank[i].c);
-        FREE(MSX->Tank[i].reacted);
-    }
-
-// --- free memory used by time patterns
-
-    if (MSX->Pattern) for (i=1; i<=MSX->Nobjects[PATTERN]; i++)
-    {
-        listItem = MSX->Pattern[i].first;
-        while (listItem)
-        {
-            MSX->Pattern[i].first = listItem->next;
-            free(listItem);
-            listItem = MSX->Pattern[i].first;
-        }
-    }
-    FREE(MSX->Pattern);
-
-// --- free memory used for hydraulics results
-
-    FREE(MSX->D);
-    FREE(MSX->H);
-    FREE(MSX->Q);
-    FREE(MSX->C0);
-
-// --- delete all nodes, links, and tanks
-
-    FREE(MSX->Node);
-    FREE(MSX->Link);
-    FREE(MSX->Tank);
-
-// --- free memory used by reaction rate & equilibrium expressions
-
-    if (MSX->Species) for (i=1; i<=MSX->Nobjects[SPECIES]; i++)
-    {
-    // --- free the species tank expression only if it doesn't
-    //     already point to the species pipe expression
-        if ( MSX->Species[i].tankExpr != MSX->Species[i].pipeExpr )
-        {
-            mathexpr_delete(MSX->Species[i].tankExpr);
-        }
-        mathexpr_delete(MSX->Species[i].pipeExpr);
-    }
-
-// --- delete all species, parameters, and constants
-
-    FREE(MSX->Species);
-    FREE(MSX->Param);
-    FREE(MSX->Const);
-    FREE(MSX->K);                                                               //1.1.00
-
-// --- free memory used by intermediate terms
-
-    if (MSX->Term) for (i=1; i<=MSX->Nobjects[TERM]; i++)
-        mathexpr_delete(MSX->Term[i].expr);
-    FREE(MSX->Term);
 }
 
 //=============================================================================
