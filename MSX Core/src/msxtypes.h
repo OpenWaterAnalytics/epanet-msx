@@ -358,6 +358,7 @@ typedef struct                         // NODE OBJECT
    double  *c0;                        // initial species concentrations
    int     tank;                       // tank index
    char    rpt;                        // reporting flag
+   char    *id;                        // id
 }  Snode;
 
 
@@ -371,7 +372,8 @@ typedef struct                         // LINK OBJECT
    double *c0;                         // initial species concentrations
    double *reacted;
    double *param;                      // kinetic parameter values
-   double roughness;		       // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
+   double roughness;		           // roughness  /*Feng Shang, Bug ID 8,  01/29/2008*/
+   char   *id;                         // id
 }  Slink;
 
 
@@ -386,6 +388,7 @@ typedef struct                         // TANK OBJECT
    double vMix;                        // mixing compartment size
    double *param;                      // kinetic parameter values
    double *c;                          // current species concentrations
+   char   *id;                         // id
    double *reacted;
 }  Stank;
 

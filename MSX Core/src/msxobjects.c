@@ -168,3 +168,84 @@ int getVariableCode(MSXproject *MSX, char *id)
                          MSX->Nobjects[PARAMETER] + MSX->Nobjects[CONSTANT] + j;
     return -1;
 }
+
+//=============================================================================
+
+int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ routing
+/**
+**--------------------------------------------------------------
+** Input:   none
+** Output:  returns error code
+** Purpose: builds linked list of links adjacent to each node
+**--------------------------------------------------------------
+*/
+{
+    int       i, j, k;
+    int       errcode = 0;
+    Padjlist  alink;
+
+    // Create an array of adjacency lists
+    freeadjlists(MSX);
+    MSX->Adjlist = (Padjlist*)calloc(MSX->Nobjects[NODE]+1, sizeof(Padjlist));
+    if (MSX->Adjlist == NULL) return 101;
+    for (i = 0; i <= MSX->Nobjects[NODE]; i++) 
+        MSX->Adjlist[i] = NULL;
+
+    // For each link, update adjacency lists of its end nodes
+    for (k = 1; k <= MSX->Nobjects[LINK]; k++)
+    {
+        i = MSX->Link[k].n1;
+        j = MSX->Link[k].n2;
+
+        // Include link in start node i's list
+        alink = (struct Sadjlist*) malloc(sizeof(struct Sadjlist));
+        if (alink == NULL)
+        {
+            errcode = 101;
+            break;
+        }
+        alink->node = j;
+        alink->link = k;
+        alink->next = MSX->Adjlist[i];
+        MSX->Adjlist[i] = alink;
+
+        // Include link in end node j's list
+        alink = (struct Sadjlist*) malloc(sizeof(struct Sadjlist));
+        if (alink == NULL)
+        {
+            errcode = 101;
+            break;
+        }
+        alink->node = i;
+        alink->link = k;
+        alink->next = MSX->Adjlist[j];
+        MSX->Adjlist[j] = alink;
+    }
+    if (errcode) freeadjlists(MSX);
+    return errcode;
+}
+
+
+void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting in WQ routing
+/**
+**--------------------------------------------------------------
+** Input:   none
+** Output:  none
+** Purpose: frees memory used for nodal adjacency lists
+**--------------------------------------------------------------
+*/
+{
+    int   i;
+    Padjlist alink;
+
+    if (MSX->Adjlist == NULL) return;
+    for (i = 0; i <= MSX->Nobjects[NODE]; i++)
+    {
+        for (alink = MSX->Adjlist[i]; alink != NULL; alink = MSX->Adjlist[i])
+        {
+            MSX->Adjlist[i] = alink->next;
+            free(alink);
+        }
+    }
+    free(MSX->Adjlist);
+}

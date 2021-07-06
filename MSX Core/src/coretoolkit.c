@@ -124,13 +124,14 @@ int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
 
 
 
-int DLLEXPORT MSXaddNode(MSXproject *MSX)
+int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id)
 /**
 **  Purpose:
 **    adds a node to the network.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
+**    id = The id
 **    
 **  Output:
 **    None
@@ -142,15 +143,11 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX)
     int err = 0;
     // Cannot modify network structure while solvers are active
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
-
-    // Check if id name is valid
-    // if (!checkID(id)) return 252;
-
-
-
-
-    // Check if a node with same id already exists
-    // if (EN_getnodeindex(p, id, &i) == 0) return 215;
+    if ( findObject(NODE, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+    int err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(NODE, id, MSX->Nobjects[NODE]+1) < 0 )
+        err = 101;  // Insufficient memory
 
     int numNodes = MSX->Nobjects[NODE];
     if (numNodes == 0) {
@@ -162,23 +159,26 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX)
         MSX->Node = (Snode *) realloc(MSX->Node, (MSX->NodesCapacity+1) * sizeof(Snode));
     }
     int i = numNodes+1;
+    MSX->Node[i].rpt = 0;
+    MSX->Node[i].id = id;
     //TODO important to have the species already in then
     // MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     // MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-    MSX->Node[i].rpt = 0;
+
     MSX->Nobjects[NODE]++;
     return err;
     
 }
 
 
-int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix)
+int DLLEXPORT MSXaddTank(MSXproject *MSX,char *id, double initialVolume, int mixModel, double volumeMix)
 /**
 **  Purpose:
 **    adds a tank to the network.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
+**    id = The id
 **    initialVolume = initial volume of the tank
 **    mixModel = Mix Model type of the tank
 **    volumeMix = The capacity of the mixing compartment
@@ -193,7 +193,12 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, do
     int err = 0;
     // Cannot modify network structure while solvers are active
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
-
+    if ( findObject(TANK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+    int err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(TANK, id, MSX->Nobjects[TANK]+1) < 0 )
+        err = 101;  // Insufficient memory
+    
     int numTanks = MSX->Nobjects[TANK];
     if (numTanks == 0) {
         MSX->TanksCapacity = 10;
@@ -208,6 +213,7 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, do
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
     MSX->Tank[i].vMix = volumeMix;
+    MSX->Tank[i].id = id;
     //TODO important to have the species already in then
     // MSX->Tank[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
@@ -216,13 +222,14 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, do
 }
 
 
-int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix)
+int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix)
 /**
 **  Purpose:
 **    adds a reservoir to the network.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
+**    id = The id
 **    initialVolume = initial volume of the tank
 **    mixModel = Mix Model type of the tank
 **    volumeMix = The capacity of the mixing compartment
@@ -237,7 +244,12 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixMode
     int err = 0;
     // Cannot modify network structure while solvers are active
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
-    
+    if ( findObject(TANK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+    int err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(TANK, id, MSX->Nobjects[TANK]+1) < 0 )
+        err = 101;  // Insufficient memory
+
     int numTanks = MSX->Nobjects[TANK];
     if (numTanks == 0) {
         MSX->TanksCapacity = 10;
@@ -252,6 +264,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixMode
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
     MSX->Tank[i].vMix = volumeMix;
+    MSX->Tank[i].id = id;
     //TODO important to have the species already in then
     // MSX->Tank[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
@@ -260,15 +273,16 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixMode
 }
 
 
-int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double diameter, double length, double roughness)
+int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double diameter, double length, double roughness)
 /**
 **  Purpose:
 **    adds a link to the network.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
-**    startNode = Start node index
-**    endNode = End node index
+**    id = The id
+**    startNode = Start node id
+**    endNode = End node id
 **    diameter = Diameter of the pipe
 **    length = length of the pipe
 **    roughness = roughness of the pipe
@@ -284,6 +298,17 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double dia
     // Cannot modify network structure while solvers are active
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
     
+    if ( findObject(LINK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
+    int err = checkID(id);
+    if ( err ) return err;
+    if ( addObject(LINK, id, MSX->Nobjects[LINK]+1) < 0 )
+        err = 101;  // Insufficient memory
+
+    // Check that the start and end nodes exist
+    int x = findObject(NODE, startNode);
+    if ( x <= 0 ) return ERR_NAME;
+    int y = findObject(NODE, startNode);
+    if ( y <= 0 ) return ERR_NAME;
     int numLinks = MSX->Nobjects[LINK];
     if (numLinks == 0) {
         MSX->LinksCapacity = 10;
@@ -294,12 +319,12 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double dia
         MSX->Link = (Slink *) realloc(MSX->Link, (MSX->LinksCapacity+1) * sizeof(Slink));
     }
     int i = numLinks+1;
-    MSX->Link[i].n1 = startNode;
-    MSX->Link[i].n2 = endNode;
+    MSX->Link[i].n1 = x;
+    MSX->Link[i].n2 = y;
     MSX->Link[i].diam = diameter;
     MSX->Link[i].len = length;
     MSX->Link[i].roughness = roughness;
-
+    MSX->Link[i].id = id;
     //TODO important to have the species already in then
     // MSX->Link[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     
@@ -313,7 +338,7 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double dia
 
 //TODO go through the MSXinp_readMsxData next
 
-int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char * value)
+int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char *value)
 /**
 **  Purpose:
 **    adds an option to the MSX data struct.
@@ -621,7 +646,225 @@ int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionTyp
 }
 
 
-//TODO go to parse source in msxinp.c and continue from there
+int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, char *nodeId, char *speciesId, double strength, char *timePattern)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    sourceType = The type of source
+**    nodeId = Id of the node specifed
+**    speciesId = Id of the species specified
+**    strength = The strength of the source
+**    timePattern = The time pattern of the source
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    // --- determine source type 
+    if ( sourceType < 0 || sourceType > 3 ) return ERR_KEYWORD;
+    int j = findObject(NODE, nodeId);
+    if ( j <= 0 ) return ERR_NAME;
+    int m = findObject(SPECIES, speciesId);
+    if ( m <= 0 ) return ERR_NAME;
+    // --- check that species is a BULK species
+    if ( MSX->Species[m].type != BULK ) return 0;
+    // --- check if a source for this species already exists
+    Psource source = MSX->Node[j].sources;
+    while ( source )
+    {
+        if ( source->species == m ) break;
+        source = source->next;
+    }
+    // --- otherwise create a new source object
+    if ( source == NULL )
+    {
+        source = (struct Ssource *) malloc(sizeof(struct Ssource));
+        if ( source == NULL ) return 101;
+        source->next = MSX->Node[j].sources;
+        MSX->Node[j].sources = source;
+    }
+    source->type = (char)sourceType;
+    source->species = m;
+    source->c0 = strength;
+    int i = 0;
+    i = findObject(PATTERN, timePattern);
+    source->pat = i;
+    return err;
+}
+
+int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, char *id)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    type = The type of quality
+**    speciesId = Id of the species specified
+**    value = The value to be assigned
+**    id = To be used for either the node or link id, if it is global, then this field doesn't matter.
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    int i = 0;
+    if      ( MSXutils_match(type, "GLOBAL") ) i = 1;
+    else if ( MSXutils_match(type, "NODE") )   i = 2;
+    else if ( MSXutils_match(type, "LINK") )   i = 3;
+    else return ERR_KEYWORD;
+
+    // --- find species index
+    int m = findObject(SPECIES, speciesId);
+    if ( m <= 0 ) return ERR_NAME;
+
+    // --- for global specification, set initial quality either for
+    //     all nodes or links depending on type of species
+
+    if ( i == 1)
+    {
+        int j;
+		MSX->C0[m] = value;
+        if ( MSX->Species[m].type == BULK )
+        {
+            for (j=1; j<=MSX->Nobjects[NODE]; j++) MSX->Node[j].c0[m] = value;
+        }
+        for (j=1; j<=MSX->Nobjects[LINK]; j++) MSX->Link[j].c0[m] = value;
+    }
+    // --- for a specific node, get its index & set its initial quality
+    else if ( i == 2 )
+    {
+        int j = findObject(NODE, id);
+        if ( j <= 0 ) return ERR_NAME;
+        if ( MSX->Species[m].type == BULK ) MSX->Node[j].c0[m] = value;
+    }
+    // --- for a specific link, get its index & set its initial quality
+    else if ( i == 3 )
+    {
+        int j = findObject(LINK, id);
+        if ( j <= 0 ) return ERR_NAME;
+        MSX->Link[j].c0[m] = value;
+    }
+
+    return err;
+}
+
+int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *paramId, double value, char *id)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    type = Should be either PIPE or TANK
+**    paramId = Name for the parameter
+**    value = The value to be assigned
+**    id = The id of either the pipe or the tank
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+
+    // --- get parameter name
+    int i = findObject(PARAMETER, paramId);
+
+    // --- for pipe parameter, get pipe index and update parameter's value
+    if ( MSXutils_match(type, "PIPE") )
+    {
+        int j = findObject(LINK, id);
+        if ( j <= 0 ) return ERR_NAME;
+        MSX->Link[j].param[i] = value;
+    }
+    // --- for tank parameter, get tank index and update parameter's value
+    else if ( MSXutils_match(type, "TANK") )
+    {
+        int j = findObject(TANK, id);
+        if ( j <= 0 ) return ERR_NAME;
+        int j = MSX->Node[j].tank;
+        if ( j > 0 ) MSX->Tank[j].param[i] = value;
+    }
+    else return ERR_KEYWORD;
+    return err;
+}
+
+int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int precision)
+/**
+**  Purpose:
+**    adds a term to the MSX data struct.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    reportType = Specifies what is being set in the report
+**    id = Name for the object being set in the report
+**    precision = Only used with SPECIES, and if none then just put 0
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    int k = MSXutils_findmatch(reportType, ReportWords);
+    if ( k < 0 ) return ERR_KEYWORD;
+    switch(k)
+    {
+        // --- keyword is NODE; parse ID names of reported nodes
+        case 0:
+            int j = findObject(NODE, id);
+            if ( j <= 0 ) return ERR_NAME;
+            MSX->Node[j].rpt = 1;
+            break;
+
+        // --- keyword is LINK: parse ID names of reported links
+        case 1:
+            int j = findObject(LINK, id);
+            if ( j <= 0 ) return ERR_NAME;
+            MSX->Link[j].rpt = 1;
+            break;
+        // --- keyword is SPECIES; get YES/NO & precision
+        case 2:
+            int j = findObject(SPECIES, id);
+            if ( j <= 0 ) return ERR_NAME;
+            MSX->Species[j].rpt = 1;
+            MSX->Species[j].precision = precision;
+            break;
+        // --- keyword is FILE: get name of report file
+        case 3:
+            strcpy(MSX->RptFile.name, id);
+            break;
+        // --- keyword is PAGESIZE;
+        case 4:
+            if ( !MSXutils_getInt(id, &MSX->PageSize) ) return ERR_NUMBER;
+            break;
+    }
+    return err;
+}
+
+
+
+
 
 
 

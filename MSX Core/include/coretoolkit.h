@@ -70,10 +70,10 @@ int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
 int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value);
 
 //Network building functions
-int DLLEXPORT MSXaddNode(MSXproject *MSX);
-int DLLEXPORT MSXaddTank(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix);
-int DLLEXPORT MSXaddReservoir(MSXproject *MSX, double initialVolume, int mixModel, double volumeMix);
-int DLLEXPORT MSXaddLink(MSXproject *MSX, int startNode, int endNode, double diameter, double length, double roughness);
+int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id);
+int DLLEXPORT MSXaddTank(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double diameter, double length, double roughness);
 
 //Species/Chemistry option functions
 int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char * value);
@@ -81,6 +81,12 @@ int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, char *type, char *units, 
 int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double value);
 int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation);
 int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionType, char *species, char *equation);
+int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, int nodeIndex, char *speciesId, double strength, char *timePattern);
+int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, int index);
+int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *name, double value, int index);
+int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int precision);
+
+
 
 
 
