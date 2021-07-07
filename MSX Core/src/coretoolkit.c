@@ -486,7 +486,6 @@ int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, doub
     if ( err ) return err;
     if ( addObject(SPECIES, id, MSX->Nobjects[SPECIES]+1) < 0 )
         err = 101;  // Insufficient memory
-    else MSX->Nobjects[SPECIES]++;
     int numSpecies = MSX->Nobjects[SPECIES];
     if (numSpecies == 0) {
         MSX->SpeciesCapacity = 10;
@@ -527,6 +526,46 @@ int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, doub
     MSX->Species[i].tankExprType = NO_EXPR;
     MSX->Species[i].precision    = 2;
     MSX->Species[i].rpt = 0;
+    MSX->Nobjects[SPECIES]++;
+
+    // Allocate space in Node, Link, and Tank objects
+    if (MSX->Nobjects[SPECIES] == 1) {
+        for (i=1; i<=MSX->Nobjects[NODE]; i++) {
+            MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+            MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+            
+        }
+        for (i=1; i<=MSX->Nobjects[TANK]; i++) {
+            MSX->Tank[i].c = (double *)
+                calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+            MSX->Tank[i].reacted = (double*)
+                calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
+        }
+        for (i=1; i<=MSX->Nobjects[LINK]; i++) {
+            MSX->Link[i].c0 = (double *)
+                calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+            MSX->Link[i].reacted = (double *)
+                calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
+        }
+    }
+    else {
+        for (i=1; i<=MSX->Nobjects[NODE]; i++) {
+            MSX->Node[i].c = (double *) realloc(MSX->Node[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+            MSX->Node[i].c0 = (double *) realloc(MSX->Node[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+        }
+        for (i=1; i<=MSX->Nobjects[TANK]; i++) {
+            MSX->Tank[i].c = (double *)
+                realloc(MSX->Tank[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+            MSX->Tank[i].reacted = (double*)
+                realloc(MSX->Tank[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+        }
+        for (i=1; i<=MSX->Nobjects[LINK]; i++) {
+            MSX->Link[i].c0 = (double *)
+                realloc(MSX->Link[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+            MSX->Link[i].reacted = (double *)
+                realloc(MSX->Link[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
+        }
+    }
     return err;
 }
 
@@ -557,7 +596,6 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         if ( err ) return err;
         if ( addObject(PARAMETER, id, MSX->Nobjects[PARAMETER]+1) < 0 )
             err = 101;  // Insufficient memory
-        else MSX->Nobjects[PARAMETER]++;
         int numParams = MSX->Nobjects[PARAMETER];
         if (numParams == 0) {
             MSX->ParamCapacity = 10;
@@ -570,6 +608,28 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         int i = numParams+1;
         MSX->Param[i].id = id;
 		MSX->Param[i].value = value;
+        MSX->Nobjects[PARAMETER]++;
+        // Allocate space in Node, Link, and Tank objects
+        if (MSX->Nobjects[PARAMETER] == 1) {
+            for (i=1; i<=MSX->Nobjects[TANK]; i++) {
+                MSX->Tank[i].param = (double *)
+                    calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+            }
+            for (i=1; i<=MSX->Nobjects[LINK]; i++) {
+                MSX->Link[i].param = (double *)
+                    calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+            }
+        }
+        else {
+            for (i=1; i<=MSX->Nobjects[TANK]; i++) {
+                MSX->Tank[i].param = (double *)
+                    calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+            }
+            for (i=1; i<=MSX->Nobjects[LINK]; i++) {
+                MSX->Link[i].param = (double *)
+                    calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
+            }
+        }
     }
     else if (type == CONSTANT) {
         if ( findObject(CONSTANT, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
@@ -577,7 +637,6 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         if ( err ) return err;
         if ( addObject(CONSTANT, id, MSX->Nobjects[CONSTANT]+1) < 0 )
             err = 101;  // Insufficient memory
-        else MSX->Nobjects[CONSTANT]++;
         int numConsts = MSX->Nobjects[CONSTANT];
         if (numConsts == 0) {
             MSX->ConstCapacity = 10;
@@ -590,6 +649,7 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         int i = numConsts+1;
         MSX->Const[i].id = id;
 		MSX->Const[i].value = value;
+        MSX->Nobjects[CONSTANT]++;
     }
     else err = ERR_KEYWORD;
     return err;
@@ -619,7 +679,6 @@ int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
     if ( err ) return err;
     if ( addObject(TERM, id, MSX->Nobjects[TERM]+1) < 0 )
         err = 101;  // Insufficient memory
-    else MSX->Nobjects[TERM]++;
     int numTerms = MSX->Nobjects[TERM];
     if (numTerms == 0) {
         MSX->TermCapacity = 10;
@@ -635,6 +694,7 @@ int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
     if ( expr == NULL ) return ERR_MATH_EXPR;
     MSX->Term[i].expr = expr;
     MSX->Term[i].equation = equation;
+    MSX->Nobjects[TERM]++;
     return err;
 }
 

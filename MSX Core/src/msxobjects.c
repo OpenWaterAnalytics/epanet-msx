@@ -521,28 +521,16 @@ int finishInit(MSXproject *MSX)
 {
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
     int err = 0;
+
+    MSX->K       = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
+    // --- create arrays for demands, heads, & flows
+    MSX->D = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
+    MSX->H = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
+    MSX->Q = (float *) calloc(MSX->Nobjects[LINK]+1, sizeof(float));
+    MSX->C0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     int i;
-    for (i=1; i=MSX->Nobjects[NODE]; i++) {
-        MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-        MSX->Node[i].c0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-    }
-    for (i=1; i=MSX->Nobjects[TANK]; i++) {
-        MSX->Tank[i].param = (double *)
-            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
-        MSX->Tank[i].c = (double *)
-            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-        MSX->Tank[i].reacted = (double*)
-            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
-    }
-    for (i=1; i=MSX->Nobjects[LINK]; i++) {
-        MSX->Link[i].c0 = (double *)
-            calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
-        MSX->Link[i].reacted = (double *)
-            calloc(MSX->Nobjects[SPECIES] + 1, sizeof(double));
-        MSX->Link[i].param = (double *)
-            calloc(MSX->Nobjects[PARAMETER]+1, sizeof(double));
-    }
-    for (i=1; i=MSX->Nobjects[PARAMETER]; i++) {
+    // Set parameters
+    for (i=1; i<=MSX->Nobjects[PARAMETER]; i++) {
         double x = MSX->Param[i].value;
         int j;
         for (j=1; j<=MSX->Nobjects[LINK]; j++) MSX->Link[j].param[i] = x;
@@ -555,7 +543,7 @@ int finishInit(MSXproject *MSX)
 	if ( TermArray == NULL ) return ERR_MEMORY;
 
     int k;
-    for (i=1; i=MSX->Nobjects[TERM]; i++) {
+    for (i=1; i<=MSX->Nobjects[TERM]; i++) {
         char *Tokens[100];
         char *s = MSX->Term[i].equation;
         int len = (int)strlen(s);

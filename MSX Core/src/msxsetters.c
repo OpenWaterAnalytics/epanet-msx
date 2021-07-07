@@ -45,7 +45,6 @@ int setDefaults(MSXproject *MSX)
     MSX->Rstart = 0;
     MSX->Dur = 0;
     MSX->Node = NULL;
-    MSX->NodesCapacity = 0;
     MSX->Link = NULL;
     MSX->Tank = NULL;
     MSX->D = NULL;
@@ -56,7 +55,17 @@ int setDefaults(MSXproject *MSX)
     MSX->Const = NULL;
     MSX->Pattern = NULL;
     MSX->K = NULL;                                                              //1.1.00
+    MSX->C0 = NULL;                                                              //1.1.00
+    MSX->C1 = NULL;                                                              //1.1.00
     MSX->Adjlist = NULL;
+    MSX->Param = NULL;
+    MSX->NodesCapacity = 0;
+    MSX->TanksCapacity = 0;
+    MSX->LinksCapacity = 0;
+    MSX->SpeciesCapacity = 0;
+    MSX->ParamCapacity = 0;
+    MSX->ConstCapacity = 0;
+    MSX->TermCapacity = 0;
     return 0;
 }
 

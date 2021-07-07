@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 **       contain water quality results in binary format.
 */
 {
+    int err = 0;
     MSXproject MSX;
     call(MSX_open(&MSX));
     
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
     call(MSXsetReport(&MSX, "SPECIE", "AS5s", 0));
     call(MSXsetReport(&MSX, "SPECIE", "NH2CL", 0));
 
-    call(MSXsolveH(&MSX));
+    // call(MSXsolveH(&MSX));
 
     // Run
     call(MSXrun(&MSX));
@@ -152,6 +153,5 @@ int main(int argc, char *argv[])
     
     //If legacy then
     // call(runLegacy(&MSX, argc, argv));
-
-    return 0;
+    return err;
 }
