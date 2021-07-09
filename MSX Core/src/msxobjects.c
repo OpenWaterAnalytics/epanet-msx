@@ -140,6 +140,72 @@ void deleteHashTables()
 
 //=============================================================================
 
+int setDefaults(MSXproject *MSX)
+/**
+**  Purpose:
+**    assigns default values to project variables.
+**
+**  Input:
+**    MSX data struct.
+*/
+{
+    int i;
+    MSX->RptFile.file = NULL;                                                   //(LR-11/20/07)
+    MSX->HydFile.file = NULL;
+    MSX->HydFile.mode = USED_FILE;
+    MSX->OutFile.file = NULL;
+    MSX->OutFile.mode = SCRATCH_FILE;
+    MSX->TmpOutFile.file = NULL;
+    MSXutils_getTempName(MSX->OutFile.name);                                    //1.1.00
+    MSXutils_getTempName(MSX->TmpOutFile.name);                                 //1.1.00
+    strcpy(MSX->RptFile.name, "");
+    strcpy(MSX->Title, "");
+    MSX->Rptflag = 0;
+    for (i=0; i<MAX_OBJECTS; i++) MSX->Nobjects[i] = 0;
+    MSX->Unitsflag = US;
+    MSX->Flowflag = GPM;
+    MSX->Statflag = SERIES;
+    MSX->DefRtol = 0.001;
+    MSX->DefAtol = 0.01;
+    MSX->Solver = EUL;
+    MSX->Coupling = NO_COUPLING;
+    MSX->Compiler = NO_COMPILER;                                                //1.1.00
+    MSX->AreaUnits = FT2;
+    MSX->RateUnits = DAYS;
+    MSX->Qstep = 300;
+    MSX->Rstep = 3600;
+    MSX->Rstart = 0;
+    MSX->Dur = 0;
+    MSX->Node = NULL;
+    MSX->Link = NULL;
+    MSX->Tank = NULL;
+    MSX->D = NULL;
+    MSX->Q = NULL;
+    MSX->H = NULL;
+    MSX->Species = NULL;
+    MSX->Term = NULL;
+    MSX->Const = NULL;
+    MSX->Pattern = NULL;
+    MSX->K = NULL;                                                              //1.1.00
+    MSX->C0 = NULL;                                                              //1.1.00
+    MSX->C1 = NULL;                                                              //1.1.00
+    MSX->Adjlist = NULL;
+    MSX->Param = NULL;
+    MSX->NodesCapacity = 0;
+    MSX->TanksCapacity = 0;
+    MSX->LinksCapacity = 0;
+    MSX->SpeciesCapacity = 0;
+    MSX->ParamCapacity = 0;
+    MSX->ConstCapacity = 0;
+    MSX->TermCapacity = 0;
+    MSX->Pstart = 0;
+    MSX->Pstep = 0;
+    return 0;
+}
+
+//=============================================================================
+
+
 int getVariableCode(MSXproject *MSX, char *id)
 /**
 **  Purpose:

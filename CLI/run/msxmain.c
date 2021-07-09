@@ -47,7 +47,7 @@ void call(int err)
     }
 }
 
-int main(int argc, char *argv[])
+void main(int argc, char *argv[])
 /**
 **  Purpose:
 **    main function for the console version of EPANET-MSX.
@@ -69,16 +69,17 @@ int main(int argc, char *argv[])
 **       contain water quality results in binary format.
 */
 {
-    int err = 0;
     MSXproject MSX;
     call(MSX_open(&MSX));
     
-    
+    int minute = 60;
+    int hour = 60*minute;
     // Builing the network from example.inp
     call(MSXsetFlowFlag(&MSX, CMH));
-    call(MSXsetTimeParameter(&MSX, DURATION, 48*60));
-    call(MSXsetTimeParameter(&MSX, QUALSTEP, 5*60));
-    call(MSXsetTimeParameter(&MSX, REPORTSTEP, 2*60));
+    call(MSXsetTimeParameter(&MSX, DURATION, 80*hour));
+    call(MSXsetTimeParameter(&MSX, HYDSTEP, 1*hour));
+    call(MSXsetTimeParameter(&MSX, QUALSTEP, 8*hour));
+    call(MSXsetTimeParameter(&MSX, REPORTSTEP, 8*hour));
     call(MSXsetTimeParameter(&MSX, REPORTSTART, 0));
     // Add nodes
     call(MSXaddNode(&MSX, "a"));
@@ -87,17 +88,17 @@ int main(int argc, char *argv[])
     call(MSXaddNode(&MSX, "e"));
     call(MSXaddReservoir(&MSX, "source", 0,0,0));
     // Add links
-    call(MSXaddLink(&MSX, "1", "source", "a", 200, 1000, 100));
-    call(MSXaddLink(&MSX, "2", "a", "b", 150, 800, 100));
-    call(MSXaddLink(&MSX, "3", "a", "c", 200, 1200, 100));
-    call(MSXaddLink(&MSX, "4", "b", "c", 150, 1000, 100));
-    call(MSXaddLink(&MSX, "5", "c", "e", 150, 2000, 100));
+    call(MSXaddLink(&MSX, "1", "source", "a", 1000, 200, 100));
+    call(MSXaddLink(&MSX, "2", "a", "b", 800, 150, 100));
+    call(MSXaddLink(&MSX, "3", "a", "c", 1200, 200, 100));
+    call(MSXaddLink(&MSX, "4", "b", "c", 1000, 150, 100));
+    call(MSXaddLink(&MSX, "5", "c", "e", 2000, 150, 100));
 
     // Add Options
     call(MSXaddOption(&MSX, AREA_UNITS_OPTION, "M2"));
     call(MSXaddOption(&MSX, RATE_UNITS_OPTION, "HR"));
     call(MSXaddOption(&MSX, SOLVER_OPTION, "RK5"));
-    call(MSXaddOption(&MSX, TIMESTEP_OPTION, "360"));
+    call(MSXaddOption(&MSX, TIMESTEP_OPTION, "28800"));
     call(MSXaddOption(&MSX, RTOL_OPTION, "0.001"));
     call(MSXaddOption(&MSX, ATOL_OPTION, "0.0001"));
 
@@ -120,38 +121,52 @@ int main(int argc, char *argv[])
 
     //Add Expressions
     call(MSXaddExpression(&MSX, LINK, RATE, "AS3", "-Ka*AS3*NH2CL"));
-    call(MSXaddExpression(&MSX, LINK, RATE, "AS5", "Ka*AS3*NH2CL - Av*(K1*(Smax-AS5s)*AS5 - K2*AS5s)"));
+    call(MSXaddExpression(&MSX, LINK, RATE, "AS5", "Ka*AS3*NH2CL-Av*(K1*(Smax-AS5s)*AS5-K2*AS5s)"));
     call(MSXaddExpression(&MSX, LINK, RATE, "NH2CL", "-Kb*NH2CL"));
-    call(MSXaddExpression(&MSX, LINK, RATE, "AS5s", "Ks*Smax*AS5/(1+Ks*AS5) - AS5s"));
-    call(MSXaddExpression(&MSX, LINK, RATE, "AStot", "AS3 + AS5"));
+    call(MSXaddExpression(&MSX, LINK, EQUIL, "AS5s", "Ks*Smax*AS5/(1+Ks*AS5)-AS5s"));
+    call(MSXaddExpression(&MSX, LINK, FORMULA, "AStot", "AS3 + AS5"));
 
     call(MSXaddExpression(&MSX, TANK, RATE, "AS3", "-Ka*AS3*NH2CL"));
     call(MSXaddExpression(&MSX, TANK, RATE, "AS5", "Ka*AS3*NH2CL"));
     call(MSXaddExpression(&MSX, TANK, RATE, "NH2CL", "-Kb*NH2CL"));
-    call(MSXaddExpression(&MSX, TANK, RATE, "AStot", "AS3 + AS5"));
+    call(MSXaddExpression(&MSX, TANK, FORMULA, "AStot", "AS3+AS5"));
     
     //Add Quality
     call(MSXaddQuality(&MSX, "NODE", "AS3", 10.0, "source"));
     call(MSXaddQuality(&MSX, "NODE", "NH2CL", 2.5, "source"));
 
     //Setup Report
-    call(MSXsetReport(&MSX, "NODE", "c", 0));
-    call(MSXsetReport(&MSX, "NODE", "e", 0));
-    call(MSXsetReport(&MSX, "LINK", "5", 0));
-    call(MSXsetReport(&MSX, "SPECIE", "AStot", 0));
-    call(MSXsetReport(&MSX, "SPECIE", "AS5", 0));
-    call(MSXsetReport(&MSX, "SPECIE", "AS5s", 0));
-    call(MSXsetReport(&MSX, "SPECIE", "NH2CL", 0));
+    call(MSXsetReport(&MSX, "NODE", "c", 2));
+    call(MSXsetReport(&MSX, "NODE", "e", 2));
+    call(MSXsetReport(&MSX, "LINK", "5", 2));
+    call(MSXsetReport(&MSX, "SPECIE", "AStot", 2));
+    call(MSXsetReport(&MSX, "SPECIE", "AS3", 2));
+    call(MSXsetReport(&MSX, "SPECIE", "AS5", 2));
+    call(MSXsetReport(&MSX, "SPECIE", "AS5s", 2));
+    call(MSXsetReport(&MSX, "SPECIE", "NH2CL", 2));
 
-    // call(MSXsolveH(&MSX));
+    // Finish Setup
+    call(MSX_init(&MSX));
+    MSX.Saveflag = 1;
+
 
     // Run
-    call(MSXrun(&MSX));
+    REAL4 demands[] = {0.040220, 0.033353, 0.053953, 0.022562, -0.150088};
+    REAL4 heads[] = {327.371979, 327.172974, 327.164185, 326.991211, 328.083984};
+    REAL4 flows[] = {0.150088, 0.039916, 0.069952, 0.006563, 0.022562};
+    MSXsetHydraulics(&MSX, demands, heads, flows);
+    long t, tleft;
+    for (int i = 0; i < 10; i++) {
+        MSXstep(&MSX, &t, &tleft);
+    }
+
+    
+
+    call(MSX_report(&MSX));
 
     // Close
     call(MSX_close(&MSX));
     
     //If legacy then
-    // call(runLegacy(&MSX, argc, argv));
-    return err;
+    // call(MSXrunLegacy(&MSX, argc, argv));
 }

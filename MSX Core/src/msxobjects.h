@@ -8,6 +8,7 @@ int findObject(int type, char *id);
 char * findID(int type, char *id);
 int createHashTables();
 void deleteHashTables();
+int setDefaults(MSXproject *MSX);
 int getVariableCode(MSXproject *MSX, char *id);
 int  buildadjlists(MSXproject *MSX);
 void  freeadjlists(MSXproject *MSX);

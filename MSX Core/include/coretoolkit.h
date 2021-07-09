@@ -52,21 +52,11 @@
 #define MSX_SETPOINT   2
 #define MSX_FLOWPACED  3
 
-
+//Project Functions
 int DLLEXPORT MSX_open(MSXproject *MSX);
-
 int DLLEXPORT MSX_close(MSXproject *MSX);
-
-int DLLEXPORT MSXrun(MSXproject *MSX);
-
-
-//setFlowUnits()
-//setQualityTimestep()
-//setReportTimestep()
-//setReportStart()
-//setPatternTimestep()
-//setPatternStart()
-//setStatistic()
+int DLLEXPORT MSX_init(MSXproject *MSX);
+// int DLLEXPORT MSX_step(MSXproject *MSX);
 
 //Simulation Options
 int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
@@ -76,7 +66,7 @@ int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value);
 int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id);
 int DLLEXPORT MSXaddTank(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix);
 int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix);
-int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double diameter, double length, double roughness);
+int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double length, double diameter, double roughness);
 
 //Species/Chemistry option functions
 int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char * value);
@@ -88,6 +78,10 @@ int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, char *nodeId, char *
 int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, char *id);
 int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *paramId, double value, char *id);
 int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int precision);
+
+//Hydraulic Functions
+int DLLEXPORT MSXsetHydraulics(MSXproject *MSX, REAL4 *demands, REAL4 *heads, REAL4 *flows);
+
 
 
 // Below is from the legacy epanetmsx.h
@@ -114,3 +108,7 @@ int  DLLEXPORT MSXsetsource(MSXproject *MSX, int node, int species, int type, do
 int  DLLEXPORT MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double value);
 int  DLLEXPORT MSXaddpattern(MSXproject *MSX, char *id);
 int  DLLEXPORT MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len);
+
+int  DLLEXPORT MSX_report(MSXproject *MSX);
+int DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
+

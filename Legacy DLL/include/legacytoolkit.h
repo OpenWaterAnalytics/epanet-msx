@@ -54,7 +54,7 @@ int  DLLEXPORT MSXsolveH(MSXproject *MSX);
 int  DLLEXPORT MSXusehydfile(MSXproject *MSX);
 int  DLLEXPORT MSXsolveQ(MSXproject *MSX);
 int  DLLEXPORT MSXinit(MSXproject *MSX, int saveFlag);
-int  DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
+// int  DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
 int  DLLEXPORT MSXsaveoutfile(MSXproject *MSX, char *fname);
 int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname);
 int  DLLEXPORT MSXreport(MSXproject *MSX);
@@ -62,7 +62,7 @@ int  DLLEXPORT MSXclose(MSXproject *MSX);
 
 int  DLLEXPORT MSXgeterror(MSXproject *MSX, int code, char *msg, int len);
 
-int DLLEXPORT runLegacy(MSXproject *MSX, int argc, char *argv[]);
+int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[]);
 
 
 #endif

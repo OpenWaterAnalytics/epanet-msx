@@ -5,7 +5,6 @@
 #include <malloc.h>
 
 
-#include "msxsetters.h"
 #include "msxobjects.h"
 #include "coretoolkit.h"
 #include "msxdict.h"
@@ -19,6 +18,8 @@ int    MSXqual_open(MSXproject *MSX);
 int    MSXqual_init(MSXproject *MSX);
 int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
 int    MSXqual_close(MSXproject *MSX);
+int    MSXrptwrite(MSXproject *MSX);
+
 
 // Local Functions
 
@@ -26,7 +27,7 @@ int    MSXqual_close(MSXproject *MSX);
 int DLLEXPORT MSX_open(MSXproject *MSX)
 /**
 **  Purpose:
-**    initializes the MSX data struct.
+**    opens the MSX data struct.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
@@ -46,6 +47,27 @@ int DLLEXPORT MSX_open(MSXproject *MSX)
 
 int DLLEXPORT MSX_close(MSXproject *MSX)
 {
+
+    // --- close all files
+
+    // if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);                          //(LR-11/20/07, to fix bug 08)
+    // if ( MSX->HydFile.file ) fclose(MSX->HydFile.file);
+    if ( MSX->TmpOutFile.file && MSX->TmpOutFile.file != MSX->OutFile.file )
+        fclose(MSX->TmpOutFile.file);
+    if ( MSX->OutFile.file ) fclose(MSX->OutFile.file);
+
+    // --- delete all temporary files
+
+    // if ( MSX->HydFile.mode == SCRATCH_FILE ) remove(MSX->HydFile.name);
+    if ( MSX->OutFile.mode == SCRATCH_FILE ) remove(MSX->OutFile.name);
+    remove(MSX->TmpOutFile.name);
+
+    // --- free all allocated memory
+
+    MSX->RptFile.file = NULL;                                                   //(LR-11/20/07, to fix bug 08)
+    MSX->HydFile.file = NULL;
+    MSX->OutFile.file = NULL;
+    MSX->TmpOutFile.file = NULL;
     MSXqual_close(MSX);
     deleteObjects(MSX);
     deleteHashTables();
@@ -53,10 +75,10 @@ int DLLEXPORT MSX_close(MSXproject *MSX)
     return 0;
 }
 
-int DLLEXPORT MSXrun(MSXproject *MSX)
+int DLLEXPORT MSX_init(MSXproject *MSX)
 /**
 **  Purpose:
-**    Runs the MSX project.
+**    Initializes the MSX project.
 **
 **  Input:
 **    MSX = the underlying MSXproject data struct.
@@ -130,6 +152,9 @@ int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
     {
     case DURATION:
         MSX->Dur = value;
+        break;
+    case HYDSTEP:
+        MSX->Hstep = value;
         break;
     case QUALSTEP:
         MSX->Qstep = value;
@@ -328,7 +353,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, i
 }
 
 
-int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double diameter, double length, double roughness)
+int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double length, double diameter, double roughness)
 /**
 **  Purpose:
 **    adds a link to the network.
@@ -338,8 +363,8 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNo
 **    id = The id
 **    startNode = Start node id
 **    endNode = End node id
-**    diameter = Diameter of the pipe
 **    length = length of the pipe
+**    diameter = Diameter of the pipe
 **    roughness = roughness of the pipe
 **
 **  Output:
@@ -690,11 +715,11 @@ int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
     }
     int i = numTerms+1;
     MSX->Term[i].id = id;
+    MSX->Nobjects[TERM]++;
     MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
     if ( expr == NULL ) return ERR_MATH_EXPR;
     MSX->Term[i].expr = expr;
     MSX->Term[i].equation = equation;
-    MSX->Nobjects[TERM]++;
     return err;
 }
 
@@ -924,7 +949,7 @@ int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int prec
 **    MSX = the underlying MSXproject data struct.
 **    reportType = Specifies what is being set in the report
 **    id = Name for the object being set in the report
-**    precision = Only used with SPECIES, and if none then just put 0
+**    precision = Only used with SPECIES, and if none then just put 2
 **
 **  Output:
 **    None
@@ -972,18 +997,42 @@ int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int prec
     return err;
 }
 
+int DLLEXPORT MSXsetHydraulics(MSXproject *MSX, REAL4 *demands, REAL4 *heads, REAL4 *flows)
+/**
+**  Purpose:
+**    sets the demands, heads, and flows of in the data structure.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    demands = An array of the demands, one for each node
+**    heads = An array of the heads, one for each node
+**    flows = An array of the flows, one for each link
+**
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    int err = 0;    
+    int nNodes = MSX->Nobjects[NODE];
+    int nLinks = MSX->Nobjects[LINK];
+    int i;
+    //Since arrays are 0 to n-1 and the MSX arrays are indexed 1 to n
+    for (i=0; i<nNodes; i++) {
+        MSX->D[i+1] = demands[i];
+        MSX->H[i+1] = heads[i];
+    }
+    for (i=0; i<nLinks; i++) MSX->Q[i+1] = flows[i];
+    return err;
+}
 
 
 
 
 
-
-
-
-
-
-//TODO make a function that would go before the run project that will do the intializing of like node and tank qualities that are dependent on the number of species and such
-// Add tanks as nodes at the end of the nodes list just like in MSX_inp
 
 
 
@@ -1777,3 +1826,47 @@ int  DLLEXPORT  MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len)
 
 //=============================================================================
 
+
+int  DLLEXPORT  MSX_report(MSXproject *MSX)
+/**
+**  Purpose:
+**    writes requested WQ simulation results to a text file.
+**
+**  Input:
+**    none
+**
+**  Returns:
+**    an error code (or 0 for no error).
+**
+**  Notes:
+**    Results are written to the EPANET report file unless a specific
+**    water quality report file is named in the [REPORT] section of
+**    the MSX input file.
+*/
+{
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( MSX->Rptflag ) return MSXrptwrite(MSX);
+    else return 0;
+}
+
+//=============================================================================
+
+int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
+/**
+**  Purpose:
+**    advances the WQ simulation over a single time step.
+**
+**  Input:
+**    none
+**
+**  Output:
+**    *t = current simulation time at the end of the step (sec)
+**    *tleft = time left in the simulation (sec)
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    return MSXqual_step(MSX, t, tleft);
+}

@@ -251,27 +251,27 @@ int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
     return err;
 }
 
-//=============================================================================
+// //=============================================================================
 
-int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
-/**
-**  Purpose:
-**    advances the WQ simulation over a single time step.
-**
-**  Input:
-**    none
-**
-**  Output:
-**    *t = current simulation time at the end of the step (sec)
-**    *tleft = time left in the simulation (sec)
-**
-**  Returns:
-**    an error code (or 0 for no error).
-*/
-{
-    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    return MSXqual_step(MSX, t, tleft);
-}
+// int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
+// /**
+// **  Purpose:
+// **    advances the WQ simulation over a single time step.
+// **
+// **  Input:
+// **    none
+// **
+// **  Output:
+// **    *t = current simulation time at the end of the step (sec)
+// **    *tleft = time left in the simulation (sec)
+// **
+// **  Returns:
+// **    an error code (or 0 for no error).
+// */
+// {
+//     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+//     return MSXqual_step(MSX, t, tleft);
+// }
 
 //=============================================================================
 
@@ -382,7 +382,7 @@ int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
 }
 
 
-int DLLEXPORT runLegacy(MSXproject *MSX, int argc, char *argv[])
+int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
 {
     int err = 0;
     int done = 1;

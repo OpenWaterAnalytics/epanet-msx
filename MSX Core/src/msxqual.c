@@ -275,7 +275,8 @@ int  MSXqual_init(MSXproject *MSX)
 
 // --- re-position hydraulics file
 
-    fseek(MSX->HydFile.file, MSX->HydOffset, SEEK_SET);
+    if (MSX->HydFile.file != NULL) 
+        fseek(MSX->HydFile.file, MSX->HydOffset, SEEK_SET);
 
 // --- set elapsed times to zero
 
@@ -354,7 +355,8 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
         // --- retrieve new hydraulic solution
             if (MSX->Qtime == MSX->Htime)
             {
-                CALL(errcode, getHydVars(MSX));
+                if (MSX->HydFile.file != NULL) CALL(errcode, getHydVars(MSX));
+                else MSX->Htime = MSX->Htime + MSX->Hstep;
                 if (MSX->Qtime < MSX->Dur)
                 {
                     // --- initialize pipe segments (at time 0) or else re-orient segments
@@ -449,8 +451,6 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
                 MSX->MassBalance.ratio[m] = 1.0;
             else
                 MSX->MassBalance.ratio[m] = smassout / smassin;
-
-        //    printf("SPECIES %s: %f %f %f\n", MSX->Species[m].id, smassout, smassin, MSX->MassBalance.ratio[m]);
 
         }
         CALL(errcode, MSXout_saveFinalResults(MSX));
@@ -1461,7 +1461,6 @@ void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double v
             noflowqual(MSX, n);
 
         MSXchem_equil(MSX, NODE, MSX->Node[n].c);
-
     }
     else
     {
@@ -1473,7 +1472,7 @@ void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double v
             {
                 MSX->Node[n].c[m] = MSX->Node[n].c0[m];
             }
-            MSXchem_equil(MSX, NODE, MSX->Node[n].c);
+            MSXchem_equil(MSX, NODE, MSX->Node[n].c);  
             for (m = 1; m <= MSX->Nobjects[SPECIES]; m++)
             {
                

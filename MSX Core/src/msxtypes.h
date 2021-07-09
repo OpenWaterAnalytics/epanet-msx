@@ -300,7 +300,7 @@ computed values that can only be retrieved.
 */
 typedef enum {
   DURATION,  //!< Total simulation duration
-//   HYDSTEP,  //!< Hydraulic time step
+  HYDSTEP,  //!< Hydraulic time step
   QUALSTEP,  //!< Water quality time step
   PATTERNSTEP,  //!< Time pattern period
   PATTERNSTART,  //!< Time when time patterns begin
@@ -521,6 +521,7 @@ typedef struct                         // MSX PROJECT VARIABLES
           Rstart,                      // Time when reporting starts
           Rtime,                       // Next reporting time (sec)
           Htime,                       // Current hydraulic time (sec)
+          Hstep,                       // Hydrualic step (sec)
           Qtime,                       // Current quality time (sec)
           Statflag,                    // Reporting statistic flag
           Dur;                         // Duration of simulation (sec)

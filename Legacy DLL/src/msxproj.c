@@ -23,7 +23,6 @@
 #include "mathexpr.h"
 #include "hash.h"
 #include "msxobjects.h"
-#include "msxsetters.h"
 
 
 static char * Errmsg[] =

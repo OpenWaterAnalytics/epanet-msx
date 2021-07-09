@@ -33,8 +33,9 @@ cmake --build . --config Debug
 
 cd ../..
 
-# Copy epanetmsx.dll
+# Copy legacy.dll and epanet2.dll
 cp "Legacy DLL"/build/bin/*/legacy.dll CLI/build/bin/*/
+cp ../EPANET/build/bin/*/epanet2.dll CLI/build/bin/*/
 
 # Copy core.dll
 cp MSX\ Core/build/bin/*/core.dll CLI/build/bin/*/

@@ -10,6 +10,7 @@ include_directories(
 include_directories(
   ../MSX\ Core/include
 )
+# msxtypes.h is needed in the coretoolkit.h so this is required
 include_directories(
   ../MSX\ Core/src
 )
@@ -50,7 +51,4 @@ endif(OPENMP_FOUND)
 find_library(LEGACY_LIB legacy NAMES legacy PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
 find_library(CORE_LIB core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 
-
-
-#target_include_directories(cli PUBLIC ${PROJECT_SOURCE_DIR}/../MSX\ Core/include)
 
