@@ -21,9 +21,6 @@ int    MSXqual_close(MSXproject *MSX);
 int    MSXrptwrite(MSXproject *MSX, char *fname);
 
 
-// Local Functions
-
-
 int DLLEXPORT MSX_open(MSXproject *MSX)
 /**
 **  Purpose:
@@ -50,8 +47,8 @@ int DLLEXPORT MSX_close(MSXproject *MSX)
 
     // --- close all files
 
-    // if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);                          //(LR-11/20/07, to fix bug 08)
-    // if ( MSX->HydFile.file ) fclose(MSX->HydFile.file);
+    if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);                          //(LR-11/20/07, to fix bug 08)
+    if ( MSX->HydFile.file ) fclose(MSX->HydFile.file);
     if ( MSX->TmpOutFile.file && MSX->TmpOutFile.file != MSX->OutFile.file )
         fclose(MSX->TmpOutFile.file);
     if ( MSX->OutFile.file ) fclose(MSX->OutFile.file);
@@ -146,7 +143,7 @@ int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
     if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
     MSX->Flowflag = flag;
     if ( MSX->Flowflag >= LPS ) MSX->Unitsflag = SI;
-    else                          MSX->Unitsflag = US;
+    else                        MSX->Unitsflag = US;
     return 0;
 }
 
@@ -231,11 +228,13 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id)
         err = 101;  // Insufficient memory
 
     int nNodes = MSX->Nobjects[NODE];
-    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+1, sizeof(Snode));
-    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+1) * sizeof(Snode));
+    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+2, sizeof(Snode));
+    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+2) * sizeof(Snode));
     int i = nNodes+1;
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
+    MSX->Node[i].tank = 0;
+    MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
     return err;
     
@@ -272,13 +271,11 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX,char *id, double initialVolume, int mix
         err = 101;  // Insufficient memory
     
     int nTanks = MSX->Nobjects[TANK];
-    if (nTanks == 0) MSX->Tank = (Stank *) calloc(nTanks+1, sizeof(Stank));
-    else {
-        MSX->Tank = (Stank *) realloc(MSX->Tank, (nTanks+1) * sizeof(Stank));
-    }
+    if (nTanks == 0) MSX->Tank = (Stank *) calloc(nTanks+2, sizeof(Stank));
+    else MSX->Tank = (Stank *) realloc(MSX->Tank, (nTanks+2) * sizeof(Stank));
     int nNodes = MSX->Nobjects[NODE];
-    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+1, sizeof(Snode));
-    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+1) * sizeof(Snode));
+    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+2, sizeof(Snode));
+    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+2) * sizeof(Snode));
     int i = nTanks+1;
     MSX->Tank[i].a = 1.0;
     MSX->Tank[i].v0 = initialVolume;
@@ -290,6 +287,7 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX,char *id, double initialVolume, int mix
     MSX->Node[i].tank = nTanks+1;
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
+    MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
     MSX->Nobjects[TANK]++;
     return err;
@@ -326,13 +324,11 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, i
         err = 101;  // Insufficient memory
     
     int nTanks = MSX->Nobjects[TANK];
-    if (nTanks == 0) MSX->Tank = (Stank *) calloc(nTanks+1, sizeof(Stank));
-    else {
-        MSX->Tank = (Stank *) realloc(MSX->Tank, (nTanks+1) * sizeof(Stank));
-    }
+    if (nTanks == 0) MSX->Tank = (Stank *) calloc(nTanks+2, sizeof(Stank));
+    else MSX->Tank = (Stank *) realloc(MSX->Tank, (nTanks+2) * sizeof(Stank));
     int nNodes = MSX->Nobjects[NODE];
-    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+1, sizeof(Snode));
-    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+1) * sizeof(Snode));
+    if (nNodes == 0) MSX->Node = (Snode *) calloc(nNodes+2, sizeof(Snode));
+    else MSX->Node = (Snode *) realloc(MSX->Node, (nNodes+2) * sizeof(Snode));
     int i = nTanks+1;
     MSX->Tank[i].a = 0.0;
     MSX->Tank[i].v0 = initialVolume;
@@ -344,6 +340,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, i
     MSX->Node[i].tank = nTanks+1;
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
+    MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
     MSX->Nobjects[TANK]++;
     return err;
@@ -386,8 +383,8 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNo
     int y = findObject(NODE, endNode);
     if ( y <= 0 ) return ERR_NAME;
     int nLinks = MSX->Nobjects[LINK];
-    if (nLinks == 0) MSX->Link = (Slink *) calloc(nLinks+1, sizeof(Slink));
-    else MSX->Link = (Slink *) realloc(MSX->Link, (nLinks+1) * sizeof(Slink));
+    if (nLinks == 0) MSX->Link = (Slink *) calloc(nLinks+2, sizeof(Slink));
+    else MSX->Link = (Slink *) realloc(MSX->Link, (nLinks+2) * sizeof(Slink));
     int i = nLinks+1;
     MSX->Link[i].n1 = x;
     MSX->Link[i].n2 = y;
@@ -395,6 +392,7 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNo
     MSX->Link[i].len = length;
     MSX->Link[i].roughness = roughness;
     MSX->Link[i].rpt = 0;
+    MSX->Link[i].param = NULL;    
     MSX->Link[i].id = id;    
     MSX->Nobjects[LINK]++;
     return err;
@@ -503,8 +501,8 @@ int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, doub
     if ( addObject(SPECIES, id, MSX->Nobjects[SPECIES]+1) < 0 )
         err = 101;  // Insufficient memory
     int nSpecies = MSX->Nobjects[SPECIES];
-    if (nSpecies == 0) MSX->Species = (Sspecies *) calloc(nSpecies+1, sizeof(Sspecies));
-    else MSX->Species = (Sspecies *) realloc(MSX->Species, (nSpecies+1) * sizeof(Sspecies));
+    if (nSpecies == 0) MSX->Species = (Sspecies *) calloc(nSpecies+2, sizeof(Sspecies));
+    else MSX->Species = (Sspecies *) realloc(MSX->Species, (nSpecies+2) * sizeof(Sspecies));
 
     int i = nSpecies+1;
     MSX->Species[i].id = id;
@@ -607,8 +605,8 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         if ( addObject(PARAMETER, id, MSX->Nobjects[PARAMETER]+1) < 0 )
             err = 101;  // Insufficient memory
         int nParams = MSX->Nobjects[PARAMETER];
-        if (nParams == 0) MSX->Param = (Sparam *) calloc(nParams+1, sizeof(Sparam));
-        else MSX->Param = (Sparam *) realloc(MSX->Param, (nParams+1) * sizeof(Sparam));
+        if (nParams == 0) MSX->Param = (Sparam *) calloc(nParams+2, sizeof(Sparam));
+        else MSX->Param = (Sparam *) realloc(MSX->Param, (nParams+2) * sizeof(Sparam));
         int i = nParams+1;
         MSX->Param[i].id = id;
 		MSX->Param[i].value = value;
@@ -642,8 +640,8 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
         if ( addObject(CONSTANT, id, MSX->Nobjects[CONSTANT]+1) < 0 )
             err = 101;  // Insufficient memory
         int nConsts = MSX->Nobjects[CONSTANT];
-        if (nConsts == 0) MSX->Const = (Sconst *) calloc(nConsts+1, sizeof(Sconst));
-        else MSX->Const = (Sconst *) realloc(MSX->Const, (nConsts+1) * sizeof(Sconst));
+        if (nConsts == 0) MSX->Const = (Sconst *) calloc(nConsts+2, sizeof(Sconst));
+        else MSX->Const = (Sconst *) realloc(MSX->Const, (nConsts+2) * sizeof(Sconst));
         int i = nConsts+1;
         MSX->Const[i].id = id;
 		MSX->Const[i].value = value;
@@ -678,8 +676,8 @@ int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
     if ( addObject(TERM, id, MSX->Nobjects[TERM]+1) < 0 )
         err = 101;  // Insufficient memory
     int nTerms = MSX->Nobjects[TERM];
-    if (nTerms == 0) MSX->Term = (Sterm *) calloc(nTerms+1, sizeof(Sterm));
-    else MSX->Term = (Sterm *) realloc(MSX->Term, (nTerms+1) * sizeof(Sterm));
+    if (nTerms == 0) MSX->Term = (Sterm *) calloc(nTerms+2, sizeof(Sterm));
+    else MSX->Term = (Sterm *) realloc(MSX->Term, (nTerms+2) * sizeof(Sterm));
     int i = nTerms+1;
     MSX->Term[i].id = id;
     MSX->Nobjects[TERM]++;

@@ -214,10 +214,8 @@ int createObjects(MSXproject *MSX)
 // --- create nodes, links, & tanks
 
     MSX->Node = (Snode *) calloc(MSX->Nobjects[NODE]+1, sizeof(Snode));
-    MSX->NodesCapacity = MSX->Nobjects[NODE]+1;
     MSX->Link = (Slink *) calloc(MSX->Nobjects[LINK]+1, sizeof(Slink));
     MSX->Tank = (Stank *) calloc(MSX->Nobjects[TANK]+1, sizeof(Stank));
-    MSX->TanksCapacity = MSX->Nobjects[TANK]+1;
 
 // --- create species, terms, parameters, constants & time patterns
 

@@ -191,15 +191,8 @@ int setDefaults(MSXproject *MSX)
     MSX->C1 = NULL;                                                              //1.1.00
     MSX->Adjlist = NULL;
     MSX->Param = NULL;
-    MSX->NodesCapacity = 0;
-    MSX->TanksCapacity = 0;
-    MSX->LinksCapacity = 0;
-    MSX->SpeciesCapacity = 0;
-    MSX->ParamCapacity = 0;
-    MSX->ConstCapacity = 0;
-    MSX->TermCapacity = 0;
-    MSX->Pstart = 0;
-    MSX->Pstep = 0;
+    // MSX->Pstart = 0;
+    // MSX->Pstep = 0;
     return 0;
 }
 
