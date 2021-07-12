@@ -56,7 +56,8 @@
 int DLLEXPORT MSX_open(MSXproject *MSX);
 int DLLEXPORT MSX_close(MSXproject *MSX);
 int DLLEXPORT MSX_init(MSXproject *MSX);
-// int DLLEXPORT MSX_step(MSXproject *MSX);
+int DLLEXPORT MSXresults(MSXproject *MSX, char *fname);
+
 
 //Simulation Options
 int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
@@ -109,6 +110,5 @@ int  DLLEXPORT MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double v
 int  DLLEXPORT MSXaddpattern(MSXproject *MSX, char *id);
 int  DLLEXPORT MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len);
 
-int  DLLEXPORT MSX_report(MSXproject *MSX);
 int DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
 

@@ -90,13 +90,13 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 // --- initialize data to default values
 
     int errcode = 0;
-    MSX->ProjectOpened = FALSE; //TODO make getters??
+    MSX->ProjectOpened = FALSE;
     MSX->QualityOpened = FALSE;
     setDefaults(MSX);
 
 // --- open the MSX input file
 
-    strcpy(MSX->MsxFile.name, fname); //TODO setter and getter?
+    strcpy(MSX->MsxFile.name, fname);
     if ((MSX->MsxFile.file = fopen(fname,"rt")) == NULL) return ERR_OPEN_MSX_FILE;
 
 // --- create hash tables to look up object ID names
@@ -114,7 +114,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
     CALL(errcode, MSXinp_readNetData(MSX));
     CALL(errcode, MSXinp_readMsxData(MSX));
 
-    //TODO getter?
+
     if (strcmp(MSX->RptFile.name, ""))                                          //(FS-01/07/2008, to fix bug 08)
 	CALL(errcode, openRptFile(MSX));                                              //(LR-11/20/07, to fix bug 08)
 
@@ -125,7 +125,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 
 
     // Build nodal adjacency lists 
-    if (MSX->Adjlist == NULL) //TODO getter?
+    if (MSX->Adjlist == NULL)
     {
         errcode = buildadjlists(MSX);
         if (errcode) return errcode;
@@ -135,7 +135,6 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 
 // --- close input file
 
-    //TODO getters and setters?
     if ( MSX->MsxFile.file ) fclose(MSX->MsxFile.file);
     MSX->MsxFile.file = NULL;
     if ( !errcode ) MSX->ProjectOpened = TRUE;

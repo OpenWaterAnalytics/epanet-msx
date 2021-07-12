@@ -18,7 +18,7 @@ int    MSXqual_open(MSXproject *MSX);
 int    MSXqual_init(MSXproject *MSX);
 int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
 int    MSXqual_close(MSXproject *MSX);
-int    MSXrptwrite(MSXproject *MSX);
+int    MSXrptwrite(MSXproject *MSX, char *fname);
 
 
 // Local Functions
@@ -97,6 +97,29 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
     if (!err) err = MSXqual_open(MSX);
     if (!err) err = MSXqual_init(MSX);
     return err;
+}
+
+
+int  DLLEXPORT  MSXresults(MSXproject *MSX, char *fname)
+/**
+**  Purpose:
+**    writes requested WQ simulation results to a text file.
+**
+**  Input:
+**    none
+**
+**  Returns:
+**    an error code (or 0 for no error).
+**
+**  Notes:
+**    Results are written to the EPANET report file unless a specific
+**    water quality report file is named in the [REPORT] section of
+**    the MSX input file.
+*/
+{
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( MSX->Rptflag ) return MSXrptwrite(MSX, fname);
+    else return 0;
 }
 
 
@@ -1822,31 +1845,6 @@ int  DLLEXPORT  MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len)
     MSX->Pattern[pat].interval = 0;			  //Feng Shang   04/17/2008
     MSX->Pattern[pat].current = MSX->Pattern[pat].first;    //Feng Shang   04/17/2008
     return 0;
-}
-
-//=============================================================================
-
-
-int  DLLEXPORT  MSX_report(MSXproject *MSX)
-/**
-**  Purpose:
-**    writes requested WQ simulation results to a text file.
-**
-**  Input:
-**    none
-**
-**  Returns:
-**    an error code (or 0 for no error).
-**
-**  Notes:
-**    Results are written to the EPANET report file unless a specific
-**    water quality report file is named in the [REPORT] section of
-**    the MSX input file.
-*/
-{
-    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( MSX->Rptflag ) return MSXrptwrite(MSX);
-    else return 0;
 }
 
 //=============================================================================

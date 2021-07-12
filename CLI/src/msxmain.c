@@ -33,6 +33,8 @@
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
 #include "coretoolkit.h"
 
+void example1(char *fname);
+
 void call(int err)
 /**
 ** Purpose: to easily check errors and print out error messages.
@@ -43,7 +45,7 @@ void call(int err)
 */
 {
     if (err != 0) {
-        printf("Error occured, check EPANET or EPANET MSX documents for error codes, if not in either of those, then it will be in errors.dat.\nError code: %d\n", err);
+        printf("Error occured!\nError code: %d\n", err);
     }
 }
 
@@ -69,6 +71,13 @@ void main(int argc, char *argv[])
 **       contain water quality results in binary format.
 */
 {
+    example1(argv[1]);
+    //If legacy then
+    // MSXproject MSX;
+    // call(MSXrunLegacy(&MSX, argc, argv));
+}
+
+void example1(char *fname) {
     MSXproject MSX;
     call(MSX_open(&MSX));
     
@@ -158,15 +167,15 @@ void main(int argc, char *argv[])
     long t, tleft;
     for (int i = 0; i < 10; i++) {
         MSXstep(&MSX, &t, &tleft);
+        //MSXgetquality(&MSX, species, node);
     }
 
     
 
-    call(MSX_report(&MSX));
+    call(MSXresults(&MSX, fname));
 
     // Close
     call(MSX_close(&MSX));
-    
-    //If legacy then
-    // call(MSXrunLegacy(&MSX, argc, argv));
+
+    printf("Simulation successfully completed.\nReport written to: %s\n", fname);
 }
