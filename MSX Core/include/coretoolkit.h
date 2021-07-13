@@ -56,7 +56,7 @@
 int DLLEXPORT MSX_open(MSXproject *MSX);
 int DLLEXPORT MSX_close(MSXproject *MSX);
 int DLLEXPORT MSX_init(MSXproject *MSX);
-int DLLEXPORT MSXresults(MSXproject *MSX, char *fname);
+int DLLEXPORT MSXprintQuality(MSXproject *MSX, int type, char *id, char *species, char *fname);
 
 
 //Network building functions
@@ -96,7 +96,8 @@ int  DLLEXPORT MSXgetsource(MSXproject *MSX, int node, int species, int *type, d
 int  DLLEXPORT MSXgetpatternlen(MSXproject *MSX, int pat, int *len);
 int  DLLEXPORT MSXgetpatternvalue(MSXproject *MSX, int pat, int period, double *value);
 int  DLLEXPORT MSXgetinitqual(MSXproject *MSX, int type, int index, int species, double *value);
-int  DLLEXPORT MSXgetqual(MSXproject *MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSXgetQualityByIndex(MSXproject *MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSXgetQualityByID(MSXproject *MSX, int type, char *id, char *species, double *value);
 int  DLLEXPORT MSXsetconstant(MSXproject *MSX, int index, double value);
 int  DLLEXPORT MSXsetparameter(MSXproject *MSX, int type, int index, int param, double value);
 int  DLLEXPORT MSXsetinitqual(MSXproject *MSX, int type, int index, int species, double value);

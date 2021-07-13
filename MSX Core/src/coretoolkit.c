@@ -97,27 +97,44 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
 }
 
 
-// int  DLLEXPORT  MSXresults(MSXproject *MSX, char *fname)
-// /**
-// **  Purpose:
-// **    writes requested WQ simulation results to a text file.
-// **
-// **  Input:
-// **    none
-// **
-// **  Returns:
-// **    an error code (or 0 for no error).
-// **
-// **  Notes:
-// **    Results are written to the EPANET report file unless a specific
-// **    water quality report file is named in the [REPORT] section of
-// **    the MSX input file.
-// */
-// {
-//     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-//     if ( MSX->Rptflag ) return MSXrptwrite(MSX, fname);
-//     else return 0;
-// }
+int DLLEXPORT MSXprintQuality(MSXproject *MSX, int type, char *id, char *species, char *fname)
+/**
+**  Purpose:
+**    writes requested WQ simulation results to a text file or to the command line if no file given.
+**
+**  Input:
+**    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link.
+**    id = id of the node or link of interest.
+**    species = id of the species of interest.
+**    fname = filename to write or blank if supposed to print to the command line.
+**
+**  Returns:
+**    an error code (or 0 for no error).
+**
+*/
+{
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+    double value = 0.0;
+    err = MSXgetQualityByID(MSX, type, id, species, &value);
+    if (err != 0) return err;
+    FILE *f = NULL;
+    if (strcmp(fname, "")) f = fopen(fname, "a");
+    int hrs = MSX->Qtime / 3600;
+    int mins = MSX->Qtime % 3600;
+    if (type == NODE) {
+        if (f != NULL) fprintf(f, "Node: %s     Species: %s     Time: %4d:%02d     Concentration: %f\n", id, species, hrs, mins, value);
+        else printf("Node: %s     Species: %s     Time: %4d:%02d     Concentration: %f\n", id, species, hrs, mins, value);
+    }
+    else if (type == LINK) {
+        if (f != NULL) fprintf(f, "Link: %s     Species: %s     Time: %4d:%02d     Concentration: %f\n", id, species, hrs, mins, value);
+        else printf("Link: %s     Species: %s     Time: %4d:%02d     Concentration: %f\n", id, species, hrs, mins, value);
+    }
+    else return ERR_INVALID_OBJECT_TYPE;
+    if (f != NULL) fclose(f);
+    f = NULL;
+    return err;
+}
 
 
 
@@ -949,6 +966,8 @@ int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)
         case CONSTANT:  i = findObject(CONSTANT, id);  break;
         case PARAMETER: i = findObject(PARAMETER, id); break;
         case PATTERN:   i = findObject(PATTERN, id);   break;
+        case NODE:      i = findObject(NODE, id);      break;
+        case LINK:      i = findObject(LINK, id);      break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( i < 1 ) return ERR_UNDEFINED_OBJECT_ID;
@@ -1324,7 +1343,7 @@ int  DLLEXPORT  MSXgetinitqual(MSXproject *MSX, int type, int index, int species
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgetqual(MSXproject *MSX, int type, int index, int species, double *value)
+int  DLLEXPORT  MSXgetQualityByIndex(MSXproject *MSX, int type, int index, int species, double *value)
 /**
 **  Purpose:
 **    retrieves the current concentration of a species at a particular node
@@ -1354,6 +1373,54 @@ int  DLLEXPORT  MSXgetqual(MSXproject *MSX, int type, int index, int species, do
     {
         if ( index < 1 || index > MSX->Nobjects[LINK] ) return ERR_INVALID_OBJECT_INDEX;
         *value = MSXqual_getLinkQual(MSX, index, species);
+    }
+    else return ERR_INVALID_OBJECT_TYPE;
+    return 0;
+}
+
+//=============================================================================
+
+int  DLLEXPORT  MSXgetQualityByID(MSXproject *MSX, int type, char *id, char *species, double *value)
+/**
+**  Purpose:
+**    retrieves the current concentration of a species at a particular node
+**    or link of the pipe network.
+**
+**  Input:
+**    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
+**    id = id of the node or link of interest;.
+**    species = id of the species of interest.
+**
+**  Output:
+**    value = species concentration at the node or link.
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    *value = 0.0;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if ( type == NODE )
+    {
+        int err = 0;
+        int index = 0;
+        int speciesIndex = 0;
+        err = MSXgetindex(MSX, type, id, &index);
+        if (err != 0) return err;
+        err = MSXgetindex(MSX, SPECIES, species, &speciesIndex);
+        if (err != 0) return err;
+        *value = MSXqual_getNodeQual(MSX, index, speciesIndex);
+    }
+    else if ( type == LINK )
+    {
+        int err = 0;
+        int index = 0;
+        int speciesIndex = 0;
+        err = MSXgetindex(MSX, type, id, &index);
+        if (err != 0) return err;
+        err = MSXgetindex(MSX, SPECIES, species, &speciesIndex);
+        if (err != 0) return err;
+        *value = MSXqual_getLinkQual(MSX, index, speciesIndex);
     }
     else return ERR_INVALID_OBJECT_TYPE;
     return 0;
