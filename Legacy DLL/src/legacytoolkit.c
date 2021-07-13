@@ -70,8 +70,11 @@ int    MSXqual_open(MSXproject *MSX);
 int    MSXqual_init(MSXproject *MSX);
 int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
 int    MSXqual_close(MSXproject *MSX);
-int    MSXrpt_write(MSXproject *MSX);
+int    MSXrpt_write(MSXproject *MSX, char *fname);
 int    MSXfile_save(MSXproject *MSX, FILE *f);
+int    MSXout_open(MSXproject *MSX);
+int    MSXout_saveResults(MSXproject *MSX);
+int    MSXout_saveFinalResults(MSXproject *MSX);
 
 //=============================================================================
 
@@ -301,13 +304,13 @@ int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXreport(MSXproject *MSX)
+int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
 /**
 **  Purpose:
 **    writes requested WQ simulation results to a text file.
 **
 **  Input:
-**    none
+**    fname = filename to report to , leave empty if using EPANET to write
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -319,7 +322,7 @@ int  DLLEXPORT  MSXreport(MSXproject *MSX)
 */
 {
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( MSX->Rptflag ) return MSXrpt_write(MSX);
+    if ( MSX->Rptflag ) return MSXrpt_write(MSX, fname);
     else return 0;
 }
 
@@ -381,6 +384,29 @@ int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
     return errcode;
 }
 
+
+//=============================================================================
+
+int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
+{
+    int errcode;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if (MSX->OutFile.file == NULL) errcode = MSXout_open(MSX);
+    errcode = MSXout_saveResults(MSX);
+    return errcode;
+}
+
+//=============================================================================
+
+int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
+{
+    int errcode;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    errcode = MSXout_saveFinalResults(MSX);
+    return errcode;
+}
+
+//=============================================================================
 
 int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
 {
@@ -444,6 +470,7 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
                 printf("\r  o Computing water quality at hour %-4d", newHour);
                 oldHour = newHour;
             }
+            err = MSXsaveResults(MSX);
             err = MSXstep(MSX, &t, &tleft);
             newHour = t / 3600;
 
@@ -455,11 +482,15 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
         }
         else 
             printf("\r  o Computing water quality at hour %-4d", t/3600);
+        
+        err = MSXsaveResults(MSX);
+        err = MSXsaveFinalResults(MSX);
+        //TODO test this!!
 
     // --- report results
 
         printf("\n  o Reporting water quality results");
-        err = MSXreport(MSX);
+        err = MSXreport(MSX, "");
         if (err)
         {
             printf("\n\n... EPANET-MSX report writer error; error code = %d\n", err);

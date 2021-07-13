@@ -117,6 +117,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 
     if (strcmp(MSX->RptFile.name, ""))                                          //(FS-01/07/2008, to fix bug 08)
 	CALL(errcode, openRptFile(MSX));                                              //(LR-11/20/07, to fix bug 08)
+    else strcpy(MSX->RptFile.name, "EPA");     // Just a placeholder so that the program knows that EPANET is handling the report file
 
 // --- convert user's units to internal units
 

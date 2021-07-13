@@ -97,27 +97,27 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
 }
 
 
-int  DLLEXPORT  MSXresults(MSXproject *MSX, char *fname)
-/**
-**  Purpose:
-**    writes requested WQ simulation results to a text file.
-**
-**  Input:
-**    none
-**
-**  Returns:
-**    an error code (or 0 for no error).
-**
-**  Notes:
-**    Results are written to the EPANET report file unless a specific
-**    water quality report file is named in the [REPORT] section of
-**    the MSX input file.
-*/
-{
-    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if ( MSX->Rptflag ) return MSXrptwrite(MSX, fname);
-    else return 0;
-}
+// int  DLLEXPORT  MSXresults(MSXproject *MSX, char *fname)
+// /**
+// **  Purpose:
+// **    writes requested WQ simulation results to a text file.
+// **
+// **  Input:
+// **    none
+// **
+// **  Returns:
+// **    an error code (or 0 for no error).
+// **
+// **  Notes:
+// **    Results are written to the EPANET report file unless a specific
+// **    water quality report file is named in the [REPORT] section of
+// **    the MSX input file.
+// */
+// {
+//     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+//     if ( MSX->Rptflag ) return MSXrptwrite(MSX, fname);
+//     else return 0;
+// }
 
 
 int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)

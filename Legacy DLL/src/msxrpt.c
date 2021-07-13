@@ -20,6 +20,7 @@
 
 #include "msxtypes.h"
 #include "epanet2.h"
+#include "msxdict.h"
 
 // Constants
 //----------
@@ -31,10 +32,9 @@
 //-----------------
 static char *Logo[] =
     {"******************************************************************",
-     "*                      E P A N E T  -  M S X                     *",
+     "*                          New MSX API                           *",
      "*                   Multi-Species Water Quality                  *",
      "*                   Analysis for Pipe  Networks                  *",
-     "*                           Version 1.1                          *",     //1.1.00
      "******************************************************************"};
 
 static char PageHdr[] = "  Page %d                                    ";
@@ -57,14 +57,9 @@ static char IDname[MAXLINE+1];
 
 //  Imported functions
 //--------------------
-void  MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units);
 float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
 float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
 
-//  Exported functions
-//--------------------
-int   MSXrpt_write(MSXproject *MSX);
-void  MSXrpt_writeLine(MSXproject *MSX, char *line);                                            //1.1.00
 
 //  Local functions
 //-----------------
@@ -82,11 +77,17 @@ static void writemassbalance(MSXproject *MSX);
 
 //=============================================================================
 
-int  MSXrpt_write(MSXproject *MSX)
+int  MSXrpt_write(MSXproject *MSX, char *fname)
 {
     INT4  magic = 0;
     int  j;
     int recordsize = sizeof(INT4);
+
+    if (strcmp(MSX->RptFile.name, "") == 0) {
+        strcpy(MSX->RptFile.name, fname);
+        MSX->RptFile.file = fopen(MSX->RptFile.name, "wt");
+        if ( MSX->RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
+    }
 
 // --- check that results are available
 
@@ -106,7 +107,7 @@ int  MSXrpt_write(MSXproject *MSX)
     writeLine(MSX, MSX->Title);
 
 // --- generate the appropriate type of table
-
+   
     if ( MSX->Statflag == SERIES ) createSeriesTables(MSX);
     else createStatsTables(MSX);
 
@@ -118,7 +119,7 @@ int  MSXrpt_write(MSXproject *MSX)
 
 //=============================================================================
 
-void  MSXrpt_writeLine(MSXproject *MSX, char *line)                                             //1.1.00
+void  MSXrptwriteLine(MSXproject *MSX, char *line)                                             //1.1.00
 {                                                                              //1.1.00
     writeLine(MSX, line);                                                           //1.1.00
 }                                                                              //1.1.00
@@ -134,7 +135,8 @@ void createSeriesTables(MSXproject *MSX)
     for (j=1; j<=MSX->Nobjects[NODE]; j++)
     {
         if ( !(MSX->Node[j].rpt) ) continue;
-        ENgetnodeid(j, IDname);
+        if (strcmp(MSX->RptFile.name, "EPA") == 0) ENgetnodeid(j, IDname);
+        else strcpy(IDname, MSX->Node[j].id);
         createTableHdr(MSX, NODE, SERIES_TABLE);
         writeNodeTable(MSX, j, SERIES_TABLE);
     }
@@ -144,7 +146,8 @@ void createSeriesTables(MSXproject *MSX)
     for (j=1; j<=MSX->Nobjects[LINK]; j++)
     {
         if ( !MSX->Link[j].rpt ) continue;
-        ENgetlinkid(j, IDname);
+        if (strcmp(MSX->RptFile.name, "EPA") == 0) ENgetlinkid(j, IDname);
+        else strcpy(IDname, MSX->Link[j].id);
         createTableHdr(MSX, LINK, SERIES_TABLE);
         writeLinkTable(MSX, j, SERIES_TABLE);
     }
@@ -223,7 +226,10 @@ void createTableHdr(MSXproject *MSX, int objType, int tableType)
         sprintf(s1, "  %10s", MSX->Species[m].id);
         strcat(TableHdr.Line2, s1);
         strcat(TableHdr.Line4, "  ----------");
-        MSXinp_getSpeciesUnits(MSX, m, s1);
+        strcpy(s1, MSX->Species[m].units);
+        strcat(s1, "/");
+        if ( MSX->Species[m].type == BULK ) strcat(s1, "L");
+        else strcat(s1, AreaUnitsWords[MSX->AreaUnits]);
         sprintf(s2, "  %10s", s1);
         strcat(TableHdr.Line3, s2);
     }
@@ -261,7 +267,8 @@ void  writeNodeTable(MSXproject *MSX, int j, int tableType)
         }
         if ( tableType == STATS_TABLE )
         {
-            ENgetnodeid(j, IDname);
+            if (strcmp(MSX->RptFile.name, "EPA") == 0) ENgetnodeid(j, IDname);
+            else strcpy(IDname, MSX->Node[j].id);
             sprintf(Line, "%-16s", IDname);
         }
         for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
@@ -293,7 +300,8 @@ void  writeLinkTable(MSXproject *MSX, int j, int tableType)
         }
         if ( tableType == STATS_TABLE )
         {
-            ENgetlinkid(j, IDname);
+            if (strcmp(MSX->RptFile.name, "EPA") == 0) ENgetlinkid(j, IDname);
+            else strcpy(IDname, MSX->Link[j].id);
             sprintf(Line, "%-16s", IDname);
         }
         for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
@@ -389,11 +397,5 @@ void writemassbalance(MSXproject *MSX)
         writeLine(MSX, s1);
     }
 }
-
-
-
-
-
-
 
 

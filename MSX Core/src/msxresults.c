@@ -56,8 +56,8 @@ static char IDname[MAXLINE+1];
 
 //  Imported functions
 //--------------------
-float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
-float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
+// float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
+// float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
 
 
 //  Local functions
@@ -271,7 +271,8 @@ void  writeNodeTable(MSXproject *MSX, int j, int tableType)
         {
             if ( !MSX->Species[m].rpt ) continue;
             if ( MSX->Species[m].type == WALL ) continue;
-            c = MSXout_getNodeQual(MSX, k, j, m);
+            // c = MSXout_getNodeQual(MSX, k, j, m);
+            //TODO
             sprintf(s, "  %10.*f", MSX->Species[m].precision, c);
             strcat(Line, s);
         }
@@ -302,7 +303,8 @@ void  writeLinkTable(MSXproject *MSX, int j, int tableType)
         for (m=1; m<=MSX->Nobjects[SPECIES]; m++)
         {
             if ( !MSX->Species[m].rpt ) continue;
-            c = MSXout_getLinkQual(MSX, k, j, m);
+            // c = MSXout_getLinkQual(MSX, k, j, m);
+            //TODO
             sprintf(s, "  %10.*f", MSX->Species[m].precision, c);
             strcat(Line, s);
         }

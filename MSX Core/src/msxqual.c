@@ -52,9 +52,6 @@ extern void   MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, d
 extern void   MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vnet);
 extern void   MSXtank_mix4(MSXproject *MSX, int i, double vIn, double *massin, double vnet);
 
-int    MSXout_open(MSXproject *MSX);
-int    MSXout_saveResults(MSXproject *MSX);
-int    MSXout_saveFinalResults(MSXproject *MSX);
 
 void   MSXerr_clearMathError(void);                                            //1.1.00
 int    MSXerr_mathError(void);                                                 //1.1.00
@@ -294,9 +291,6 @@ int  MSXqual_init(MSXproject *MSX)
         MSX->MassBalance.reacted[m] = 0.0;
         MSX->MassBalance.ratio[m] = 0.0;
     }
-// --- open binary output file if results are to be saved
-
-    if ( MSX->Saveflag ) errcode = MSXout_open(MSX);
     return errcode;
 }
 
@@ -379,7 +373,6 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
         // --- report results if its time to do so
             if (MSX->Saveflag && MSX->Qtime == MSX->Rtime)
             {
-                CALL(errcode, MSXout_saveResults(MSX));
                 MSX->Rtime += MSX->Rstep;
                 MSX->Nperiods++;
             }
@@ -453,7 +446,6 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
                 MSX->MassBalance.ratio[m] = smassout / smassin;
 
         }
-        CALL(errcode, MSXout_saveFinalResults(MSX));
     }
     return errcode;
 }
