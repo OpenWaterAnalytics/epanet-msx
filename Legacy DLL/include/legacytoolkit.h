@@ -54,7 +54,6 @@ int  DLLEXPORT MSXsolveH(MSXproject *MSX);
 int  DLLEXPORT MSXusehydfile(MSXproject *MSX);
 int  DLLEXPORT MSXsolveQ(MSXproject *MSX);
 int  DLLEXPORT MSXinit(MSXproject *MSX, int saveFlag);
-// int  DLLEXPORT MSXstep(MSXproject *MSX, long *t, long *tleft);
 int  DLLEXPORT MSXsaveoutfile(MSXproject *MSX, char *fname);
 int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname);
 int  DLLEXPORT MSXreport(MSXproject *MSX, char *fname);
@@ -66,5 +65,9 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX);
 
 int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[]);
 
+// Below are functions to setup the simulation
+//Simulation Options
+int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
+int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value);
 
 #endif

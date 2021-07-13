@@ -59,10 +59,6 @@ int DLLEXPORT MSX_init(MSXproject *MSX);
 int DLLEXPORT MSXresults(MSXproject *MSX, char *fname);
 
 
-//Simulation Options
-int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag);
-int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value);
-
 //Network building functions
 int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id);
 int DLLEXPORT MSXaddTank(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix);

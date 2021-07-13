@@ -518,3 +518,85 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
     printf("\n");
     return err;
 }
+
+
+int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
+/**
+**  Purpose:
+**      sets the flow flag and units flag.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      flag = the flag to set, for example CMH for cubic meters per hour.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
+    if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
+    MSX->Flowflag = flag;
+    if ( MSX->Flowflag >= LPS ) MSX->Unitsflag = SI;
+    else                        MSX->Unitsflag = US;
+    return 0;
+}
+
+int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
+/**
+**  Purpose:
+**      sets a specified time parameter.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      type = the type of time parameter
+**      value = that actual value to set.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
+{
+    int err = 0;
+    // Cannot modify network structure while solvers are active
+    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+
+    switch (type)
+    {
+    case DURATION:
+        MSX->Dur = value;
+        break;
+    case HYDSTEP:
+        MSX->Hstep = value;
+        break;
+    case QUALSTEP:
+        MSX->Qstep = value;
+        break;
+    case PATTERNSTEP:
+        MSX->Pstep = value;
+        break;
+    case PATTERNSTART:
+        MSX->Pstart = value;
+        break;
+    case REPORTSTEP:
+        MSX->Rstep = value;
+        break;
+    case REPORTSTART:
+        MSX->Rstart = value;
+        break;
+    case STATISTIC:
+        MSX->Statflag = value;
+        break;
+    default:
+        return ERR_INVALID_OBJECT_TYPE;
+        break;
+    }
+    return 0;
+}
