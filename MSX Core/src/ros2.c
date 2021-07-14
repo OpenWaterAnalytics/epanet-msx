@@ -5,7 +5,7 @@
 **                 ordinary differential equations.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.1.00
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   Refer to git history
 **
 **  This code is based on material presented in:
 **    Verwer, J.G., Spee, E.J., Blom, J.G. and Hundsdorfer, W.H.,

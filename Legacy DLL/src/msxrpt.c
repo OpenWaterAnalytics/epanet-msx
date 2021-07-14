@@ -8,7 +8,8 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
-**  VERSION:       1.1.00
+**                 K. Arrowood, Xylem intern
+**  VERSION:       Refer to git history
 **  LAST UPDATE:   2/8/11
 **  BUG FIX: Bug ID 08 Feng Shang 01/07/08
 ******************************************************************************/
@@ -358,7 +359,8 @@ void  writeLine(MSXproject *MSX, char *line)
 void writemassbalance(MSXproject *MSX)
 /**
 **-------------------------------------------------------------
-**   Input:   none
+**   Input:
+**      MSX = the underlying MSXproject data struct.
 **   Output:  none
 **   Purpose: writes water quality mass balance ratio
 **            (Outflow + Final Storage) / Inflow + Initial Storage)

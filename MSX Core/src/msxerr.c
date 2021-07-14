@@ -7,15 +7,15 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
 
 #include "msxtypes.h"
-// #include "epanet2.h"
 
 
 //  Local variables
@@ -56,11 +56,9 @@ int  MSXerr_mathError()
 void MSXerr_writeMathErrorMsg()
 /**
 **  Purpose:
-**    writes math error message to EPANET report file.
+**    writes math error message to the screen.
 */
 {
-	// ENwriteline(mathErrorMsg);
-	// ENwriteline("");
 	printf("%s\n", mathErrorMsg);
 }
 

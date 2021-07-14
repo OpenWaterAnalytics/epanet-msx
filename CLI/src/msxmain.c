@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **
 **  EPANET-MSX is an extension of the EPANET program for modeling the fate
 **  and transport of multiple interacting chemical species within a water
@@ -156,25 +157,26 @@ int example1(char *fname) {
     MSXsetHydraulics(&MSX, demands, heads, flows);
     long t = 0;
     long tleft = 1;
-    CALL(err, MSXsaveResults(&MSX));
+    // CALL(err, MSXsaveResults(&MSX));
+    CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", ""));
     while (tleft > 0) {
-        MSXstep(&MSX, &t, &tleft);
-        //MSXgetquality(&MSX, species, node);
-        if (MSX.Saveflag) {
-            CALL(err, MSXsaveResults(&MSX));
-        }
+        CALL(err, MSXstep(&MSX, &t, &tleft));
+        CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", ""));
+        // if (MSX.Saveflag) {
+        //     CALL(err, MSXsaveResults(&MSX));
+        // }
     }
-    if (MSX.Saveflag) {
-        CALL(err, MSXsaveFinalResults(&MSX));
-    }
+    // if (MSX.Saveflag) {
+    //     CALL(err, MSXsaveFinalResults(&MSX));
+    // }
 
 
     
 
-    CALL(err, MSXreport(&MSX, fname));
+    // CALL(err, MSXreport(&MSX, fname));
 
     // Close
     CALL(err, MSX_close(&MSX));
-    if (err == 0) printf("Simulation successfully completed.\nReport written to: %s\n", fname);
+    //if (err == 0) printf("Simulation successfully completed.\nReport written to: %s\n", fname);
     return err;
 }

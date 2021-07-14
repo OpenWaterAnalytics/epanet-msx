@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
 #include <stdio.h>
@@ -43,6 +44,7 @@ void  MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vn
 **    (after contents have been reacted).
 **                     
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    i   = tank index
 **    vin = volume of inflow to tank (ft3)
 **    massin = massinflow
@@ -89,6 +91,7 @@ void  MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vn
 **   Purpose: 2-compartment tank model                      
 **
 **   Input:   i = tank index
+**            MSX = the underlying MSXproject data struct.
 **            vIn = volume of inflow to tank (ft3)
 **            massin = massinflow
 **            vnet  = inflow - outflow
@@ -198,6 +201,7 @@ void  MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vn
 **            first-in-first-out (FIFO) tank model.
 **                    
 **   Input:   i   = tank index
+**            MSX = the underlying MSXproject data struct.
 **            vIn = volume of inflow to tank (ft3)
 **            massin = mass inflow
 **            vnet = inflow - outflow    
@@ -300,6 +304,7 @@ void  MSXtank_mix4(MSXproject *MSX, int i, double vin, double *massin, double vn
 /**
 **----------------------------------------------------------
 **   Input:   i = tank index
+**            MSX = the underlying MSXproject data struct.
 **            vin = volume of inflow to tank (ft3)
 **            massin = mass inflow
 **            vnet = vin - vout     

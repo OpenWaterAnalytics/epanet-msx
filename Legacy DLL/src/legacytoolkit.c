@@ -1,5 +1,5 @@
 /*******************************************************************************
-**  MODULE:        MSXTOOLKIT.C
+**  MODULE:        LEGACYTOOLKIT.C
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   Contains the exportable set of functions that comprise the
 **                 EPANET Multi-Species Extension toolkit.
@@ -8,8 +8,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **  BUG FIXES:     BUG ID 22. MSXsetpattern, Feng Shang, 04/17/2008
 **                 File mode bug in MSXsolveH & MSXusehydfile, L. Rossman 10/05/2008
 **                 Possible unterminated string copy, L. Rossman 11/01/10
@@ -17,7 +18,7 @@
 **  These functions can be used in conjunction with the original EPANET
 **  toolkit functions to model water quality fate and transport of
 **  multiple interacting chemcial species within piping networks. See the
-**  MSXMAIN.C module for an example of how these functions were used to
+**  MSXrunLegacy function below for an example of how these functions were used to
 **  extend the original command line version of EPANET to include multiple
 **  chemical species. Consult the EPANET and EPANET-MSX Users Manuals for
 **  detailed descriptions of the input data file formats required by both
@@ -84,7 +85,8 @@ int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
 **    opens the EPANET-MSX toolkit system.
 **
 **  Input:
-**    fname = name of an MSX input file.
+**    MSX = the underlying MSXproject data struct.
+**    argv = the arguments given in the main function.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -120,7 +122,7 @@ int   DLLEXPORT  MSXsolveH(MSXproject *MSX)
 **    solves for system hydraulics which are written to a temporary file.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -162,7 +164,7 @@ int   DLLEXPORT  MSXusehydfile(MSXproject *MSX)
 **    registers a hydraulics solution file with the MSX system.
 **
 **  Input:
-**    fname = name of binary hydraulics results file.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -218,7 +220,7 @@ int  DLLEXPORT  MSXsolveQ(MSXproject *MSX)
 **    runs a MSX water quality analysis over the entire simulation period.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -241,6 +243,7 @@ int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
 **    initializes a MSX water quality analysis.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    saveFlag = 1 if results saved to binary file, 0 if not.
 **
 **  Returns:
@@ -254,28 +257,6 @@ int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
     return err;
 }
 
-// //=============================================================================
-
-// int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
-// /**
-// **  Purpose:
-// **    advances the WQ simulation over a single time step.
-// **
-// **  Input:
-// **    none
-// **
-// **  Output:
-// **    *t = current simulation time at the end of the step (sec)
-// **    *tleft = time left in the simulation (sec)
-// **
-// **  Returns:
-// **    an error code (or 0 for no error).
-// */
-// {
-//     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-//     return MSXqual_step(MSX, t, tleft);
-// }
-
 //=============================================================================
 
 int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
@@ -284,6 +265,7 @@ int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
 **    saves all results of the WQ simulation to a binary file.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    fname = name of the binary results file.
 **
 **  Returns:
@@ -310,6 +292,7 @@ int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
 **    writes requested WQ simulation results to a text file.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    fname = filename to report to , leave empty if using EPANET to write
 **
 **  Returns:
@@ -334,7 +317,7 @@ int  DLLEXPORT  MSXclose(MSXproject *MSX)
 **    closes the EPANET-MSX toolkit system.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 for no error).
@@ -346,7 +329,6 @@ int  DLLEXPORT  MSXclose(MSXproject *MSX)
     return 0;
 }
 
-
 //=============================================================================
 
 int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
@@ -355,6 +337,7 @@ int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
 **    retrieves text of an error message.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    code = error code number
 **    len = maximum length of string errmsg.
 **
@@ -371,9 +354,21 @@ int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
 
 //=============================================================================
 
-
-
 int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
+/**
+**  Purpose:
+**      saves msx file.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      fname = name of the msx file
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
 {
     int errcode;
     FILE *f;
@@ -384,10 +379,22 @@ int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
     return errcode;
 }
 
-
 //=============================================================================
 
 int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
+/**
+**  Purpose:
+**      saves results to the binary out file.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
 {
     int errcode;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
@@ -399,6 +406,19 @@ int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
 //=============================================================================
 
 int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
+/**
+**  Purpose:
+**      saves final results to the binary out file.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
 {
     int errcode;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
@@ -409,6 +429,21 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
 //=============================================================================
 
 int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
+/**
+**  Purpose:
+**      runs the legacy main method.
+**
+**  Input:
+**      MSX = the underlying MSXproject data struct.
+**      argc = number of arguments
+**      argv = arguments.
+** 
+**  Output:
+**    None
+**
+**  Returns:
+**    an error code (or 0 for no error).
+ */
 {
     int err = 0;
     int done = 1;
@@ -485,7 +520,6 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
         
         err = MSXsaveResults(MSX);
         err = MSXsaveFinalResults(MSX);
-        //TODO test this!!
 
     // --- report results
 
@@ -519,6 +553,7 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
 /**
@@ -546,6 +581,8 @@ int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
     else                        MSX->Unitsflag = US;
     return 0;
 }
+
+//=============================================================================
 
 int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
 /**
@@ -600,3 +637,5 @@ int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
     }
     return 0;
 }
+
+//=============================================================================

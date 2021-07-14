@@ -1,3 +1,16 @@
+/******************************************************************************
+**  MODULE:        MSXBJECTS.H
+**  PROJECT:       EPANET-MSX
+**  DESCRIPTION:   C/C++ header file for the MSXOBJECTS functions.         
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
+**  AUTHORS:       L. Rossman, US EPA - NRMRL
+**                 F. Shang, University of Cincinnati
+**                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
+**  VERSION:       1.1.00
+**  LAST UPDATE:   Refer to git history
+******************************************************************************/
 
 #ifndef MAGICNUMBER
 #include "msxtypes.h"

@@ -8,8 +8,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   7/31/07
+**  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
 #include <stdio.h>
@@ -55,7 +56,7 @@ int MSXout_open(MSXproject *MSX)
 **    opens an MSX binary output file.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no error).
@@ -95,7 +96,7 @@ int MSXout_saveInitialResults(MSXproject *MSX)
 **    saves general information to beginning of MSX binary output file.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no error).
@@ -133,7 +134,6 @@ int MSXout_saveInitialResults(MSXproject *MSX)
     LinkBytesPerPeriod = MSX->Nobjects[LINK]*MSX->Nobjects[SPECIES]*sizeof(REAL4);
     return 0;
 }
-    
 
 //=============================================================================
 
@@ -147,7 +147,7 @@ int MSXout_saveResults(MSXproject *MSX)
 **    default case).
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no error).
@@ -188,7 +188,7 @@ int MSXout_saveFinalResults(MSXproject *MSX)
 **    - the Magic Number to indicate that the file is complete.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no error).
@@ -223,6 +223,7 @@ float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m)
 **    retrieves a result for a specific node from the MSX binary output file.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = time period index
 **    j = node index
 **    m = species index.
@@ -247,6 +248,7 @@ float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m)
 **    retrieves a result for a specific link from the MSX binary output file.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = time period index
 **    j = link index
 **    m = species index.
@@ -272,7 +274,7 @@ int  saveStatResults(MSXproject *MSX)
 **    node and link to the permanent binary output file.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no error).
@@ -328,6 +330,7 @@ void getStatResults(MSXproject *MSX, int objType, int m, double * stats1, double
 **    min., max., or range) for each object.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    objType = type of object (nodes or links)
 **    m = species index
 **    stats1, stats2 = work arrays used to hold intermediate values
@@ -399,3 +402,5 @@ void getStatResults(MSXproject *MSX, int objType, int m, double * stats1, double
     }
     for (j = 1; j <= n; j++) x[j] = (REAL4)stats1[j];
 }
+
+//=============================================================================

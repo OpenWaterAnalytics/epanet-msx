@@ -1,3 +1,17 @@
+/******************************************************************************
+**  MODULE:        CORETOOLKIT.C
+**  PROJECT:       EPANET-MSX
+**  DESCRIPTION:   Contains the exportable set of functions that comprise the
+**                 new core MSX toolkit. 
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
+**  AUTHORS:       L. Rossman, US EPA - NRMRL
+**                 F. Shang, University of Cincinnati
+**                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
+**  VERSION:       1.1 
+**  LAST UPDATE:   Refer to git history
+*******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +32,8 @@ int    MSXqual_open(MSXproject *MSX);
 int    MSXqual_init(MSXproject *MSX);
 int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
 int    MSXqual_close(MSXproject *MSX);
-int    MSXrptwrite(MSXproject *MSX, char *fname);
 
+//=============================================================================
 
 int DLLEXPORT MSX_open(MSXproject *MSX)
 /**
@@ -41,6 +55,8 @@ int DLLEXPORT MSX_open(MSXproject *MSX)
     createHashTables();
     return 0;
 }
+
+//=============================================================================
 
 int DLLEXPORT MSX_close(MSXproject *MSX)
 {
@@ -72,6 +88,8 @@ int DLLEXPORT MSX_close(MSXproject *MSX)
     return 0;
 }
 
+//=============================================================================
+
 int DLLEXPORT MSX_init(MSXproject *MSX)
 /**
 **  Purpose:
@@ -96,6 +114,7 @@ int DLLEXPORT MSX_init(MSXproject *MSX)
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXprintQuality(MSXproject *MSX, int type, char *id, char *species, char *fname)
 /**
@@ -136,8 +155,7 @@ int DLLEXPORT MSXprintQuality(MSXproject *MSX, int type, char *id, char *species
     return err;
 }
 
-
-
+//=============================================================================
 
 int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id)
 /**
@@ -176,6 +194,7 @@ int DLLEXPORT MSXaddNode(MSXproject *MSX, char *id)
     
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddTank(MSXproject *MSX,char *id, double initialVolume, int mixModel, double volumeMix)
 /**
@@ -229,6 +248,7 @@ int DLLEXPORT MSXaddTank(MSXproject *MSX,char *id, double initialVolume, int mix
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, int mixModel, double volumeMix)
 /**
@@ -282,6 +302,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject *MSX, char *id, double initialVolume, i
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNode, double length, double diameter, double roughness)
 /**
@@ -334,6 +355,7 @@ int DLLEXPORT MSXaddLink(MSXproject *MSX, char *id, char *startNode, char *endNo
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char *value)
 /**
@@ -407,6 +429,7 @@ int DLLEXPORT MSXaddOption(MSXproject *MSX, int optionType, char *value)
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, double aTol, double rTol)
 /**
@@ -513,6 +536,7 @@ int DLLEXPORT MSXaddSpecies(MSXproject *MSX, char *id, int type, int units, doub
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double value)
 /**
@@ -587,6 +611,8 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject *MSX, int type, char *id, double valu
     return err;
 }
 
+//=============================================================================
+
 int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
 /**
 **  Purpose:
@@ -623,6 +649,8 @@ int DLLEXPORT MSXaddTerm(MSXproject *MSX, char *id, char *equation)
     MSX->Term[i].equation = equation;
     return err;
 }
+
+//=============================================================================
 
 int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionType, char *species, char *equation)
 /**
@@ -680,6 +708,7 @@ int DLLEXPORT MSXaddExpression(MSXproject *MSX, int classType, int expressionTyp
     return err;
 }
 
+//=============================================================================
 
 int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, char *nodeId, char *speciesId, double strength, char *timePattern)
 /**
@@ -734,6 +763,8 @@ int DLLEXPORT MSXaddSource(MSXproject *MSX, int sourceType, char *nodeId, char *
     source->pat = i;
     return err;
 }
+
+//=============================================================================
 
 int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double value, char *id)
 /**
@@ -797,6 +828,8 @@ int DLLEXPORT MSXaddQuality(MSXproject *MSX, char *type, char *speciesId, double
     return err;
 }
 
+//=============================================================================
+
 int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *paramId, double value, char *id)
 /**
 **  Purpose:
@@ -840,6 +873,8 @@ int DLLEXPORT MSXaddParameter(MSXproject *MSX, char *type, char *paramId, double
     else return ERR_KEYWORD;
     return err;
 }
+
+//=============================================================================
 
 int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int precision)
 /**
@@ -898,6 +933,8 @@ int DLLEXPORT MSXsetReport(MSXproject *MSX, char *reportType, char *id, int prec
     return err;
 }
 
+//=============================================================================
+
 int DLLEXPORT MSXsetHydraulics(MSXproject *MSX, REAL4 *demands, REAL4 *heads, REAL4 *flows)
 /**
 **  Purpose:
@@ -930,16 +967,7 @@ int DLLEXPORT MSXsetHydraulics(MSXproject *MSX, REAL4 *demands, REAL4 *heads, RE
     return err;
 }
 
-
-
-
-
-
-
-
-
-
-// Below is from the legacy msxtoolkit.c
+//=============================================================================
 
 int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)
 /**
@@ -947,6 +975,7 @@ int  DLLEXPORT  MSXgetindex(MSXproject *MSX, int type, char *id, int *index)
 **    retrieves the index of a named MSX object.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = object type code
 **    id = name of water quality species.
 **
@@ -983,6 +1012,7 @@ int  DLLEXPORT  MSXgetIDlen(MSXproject *MSX, int type, int index, int *len)
 **    retrieves the number of characters in the ID name of an MSX object.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type =  object type code
 **    index = index (base 1) of the object in list of all objects of the
 **            given type.
@@ -1024,6 +1054,7 @@ int  DLLEXPORT  MSXgetID(MSXproject *MSX, int type, int index, char *id, int len
 **    retrieves the name of an object given its index.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type  = object type code
 **    index = index (base 1) of the object in list of all objects of the
 **            given type
@@ -1067,6 +1098,7 @@ int DLLEXPORT  MSXgetcount(MSXproject *MSX, int type, int *count)
 **    retrieves the number of objects of a specific type.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type =  object type code
 **
 **  Output:
@@ -1098,6 +1130,7 @@ int DLLEXPORT  MSXgetspecies(MSXproject *MSX, int index, int *type, char *units,
 **    retrieves the attributes of a chemical species.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    index = index (base 1) of the species in the list of all species.
 **
 **  Output:
@@ -1134,6 +1167,7 @@ int DLLEXPORT  MSXgetconstant(MSXproject *MSX, int index, double *value)
 **    retrieves the value of a particular reaction constant.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    index = index (base 1) of the constant in the list of all constants.
 **
 **  Output:
@@ -1159,6 +1193,7 @@ int DLLEXPORT MSXgetparameter(MSXproject *MSX, int type, int index, int param, d
 **    or tank within the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) assigned to the node or link;
 **    param = index (base 1) assigned to the reaction parameter.
@@ -1199,6 +1234,7 @@ int  DLLEXPORT MSXgetsource(MSXproject *MSX, int node, int species, int *type, d
 **    species assigned to a specific node of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    node = index number (base 1) assigned to the node of interest;
 **    species = index number (base 1) of the species of interest;
 **
@@ -1247,6 +1283,7 @@ int  DLLEXPORT  MSXgetpatternlen(MSXproject *MSX, int pat, int *len)
 **    retrieves the number of time periods within a source time pattern.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    pat = the index number (base 1) of the time pattern;
 **
 **  Output:
@@ -1272,6 +1309,7 @@ int  DLLEXPORT  MSXgetpatternvalue(MSXproject *MSX, int pat, int period, double 
 **    source time pattern.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    pat = the index number (base 1) of the time pattern;
 **    period = the index of the time period (starting from 1) whose
 **             multiplier is being sought;
@@ -1313,6 +1351,7 @@ int  DLLEXPORT  MSXgetinitqual(MSXproject *MSX, int type, int index, int species
 **    assigned to a specific node or link of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;
 **    species = index (base 1) of the specie of interest.
@@ -1350,6 +1389,7 @@ int  DLLEXPORT  MSXgetQualityByIndex(MSXproject *MSX, int type, int index, int s
 **    or link of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;.
 **    species = index (base 1) of the species of interest.
@@ -1387,6 +1427,7 @@ int  DLLEXPORT  MSXgetQualityByID(MSXproject *MSX, int type, char *id, char *spe
 **    or link of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    id = id of the node or link of interest;.
 **    species = id of the species of interest.
@@ -1434,6 +1475,7 @@ int  DLLEXPORT  MSXsetconstant(MSXproject *MSX, int index, double value)
 **    assigns a new value to a specific reaction constant.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    index = index (base 1) of the constant in the list of all constants;
 **    value = the new value to be assigned to the constant.
 **
@@ -1459,6 +1501,7 @@ int  DLLEXPORT  MSXsetparameter(MSXproject *MSX, int type, int index, int param,
 **    or tank within the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) assigned to the node or link;
 **    param = index (base 1) assigned to the reaction parameter;
@@ -1498,6 +1541,7 @@ int  DLLEXPORT  MSXsetinitqual(MSXproject *MSX, int type, int index, int species
 **    to a specific node or link of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    type = MSX_NODE (0) for a node or MSX_LINK (1) for a link;
 **    index = index (base 1) of the node or link of interest;
 **    species = index (base 1) of the species of interest.
@@ -1537,6 +1581,7 @@ int  DLLEXPORT  MSXsetsource(MSXproject *MSX, int node, int species, int type, d
 **    species to a specific node of the pipe network.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    node = index number (base 1) assigned to the node of interest;
 **    species = index number (base 1) of the species of interest;
 **    type = one of the following of external source type codes:
@@ -1607,6 +1652,7 @@ int  DLLEXPORT  MSXsetpatternvalue(MSXproject *MSX, int pat, int period, double 
 **    a given time pattern.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    pat = the index number (base 1) of the time pattern;
 **    period = the time period (starting from 1) whose multiplier is
 **             being replaced;
@@ -1652,6 +1698,7 @@ int  DLLEXPORT  MSXaddpattern(MSXproject *MSX, char *id)
 **    adds a new MSX time pattern to the project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    id = C-style character string with the ID name of the new pattern.
 **
 **  Output:
@@ -1716,6 +1763,7 @@ int  DLLEXPORT  MSXsetpattern(MSXproject *MSX, int pat, double mult[], int len)
 **    Assigns a new set of multipliers to a given time pattern.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    pat = the index number (base 1) of the time pattern;
 **    mult[] = an array of multiplier values (base 0) to replace those
 **             previously used by the pattern;
@@ -1796,3 +1844,5 @@ int  DLLEXPORT  MSXstep(MSXproject *MSX, long *t, long *tleft)
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     return MSXqual_step(MSX, t, tleft);
 }
+
+//=============================================================================

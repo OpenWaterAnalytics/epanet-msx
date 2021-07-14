@@ -6,8 +6,9 @@
 **                 operators.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **  BUG FIXES:     Problems related to '^' operator (L.Rossman, 11/03/10)
 ******************************************************************************/
 /*

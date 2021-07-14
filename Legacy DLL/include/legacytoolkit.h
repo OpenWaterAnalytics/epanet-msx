@@ -1,5 +1,5 @@
 /******************************************************************************
-**  MODULE:        legacytoolkit.h
+**  MODULE:        LEGACYTOOLKIT.H
 **  PROJECT:       EPANET-MSX
 **  DESCRIPTION:   C/C++ header file for EPANET Multi-Species Extension Toolkit
 **  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1 
-**  LAST UPDATE:   11/01/10
+**  LAST UPDATE:   Refer to git history
 *******************************************************************************/
 
 #ifndef EPANETMSX_H

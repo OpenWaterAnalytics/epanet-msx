@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
 #include <stdio.h>
@@ -25,18 +26,6 @@
 #define   UP_NODE(x)   ( (MSX.FlowDir[(x)]==POSITIVE) ? MSX.Link[(x)].n1 : MSX.Link[(x)].n2 )
 #define   DOWN_NODE(x) ( (MSX.FlowDir[(x)]==POSITIVE) ? MSX.Link[(x)].n2 : MSX.Link[(x)].n1 )
 #define   LINKVOL(k)   ( 0.785398*MSX->Link[(k)].len*SQR(MSX->Link[(k)].diam) )
-
-//  Local variables
-//-----------------
-//static Pseg           FreeSeg;         // pointer to unused pipe segment
-//static Pseg           *NewSeg;         // new segment added to each pipe
-//static char           *FlowDir;        // flow direction for each pipe
-//static double         *VolIn;          // inflow flow volume to each node
-//static double         **MassIn;        // mass inflow of each species to each node
-//static double         **X;             // work matrix
-//static char           HasWallSpecies;  // wall species indicator
-//static char           OutOfMemory;     // out of memory indicator
-//static alloc_handle_t *QualPool;       // memory pool
 
 // Stagnant flow tolerance
 const double Q_STAGNANT = 0.005 / GPMperCFS;     // 0.005 gpm = 1.114e-5 cfs
@@ -203,7 +192,7 @@ int  MSXqual_init(MSXproject *MSX)
 **     re-initializes the WQ routing system.
 **
 **  Input:
-**    none.
+**     MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (or 0 if no errors).
@@ -302,7 +291,7 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
 **    updates WQ conditions over a single WQ time step.
 **
 **  Input:
-**    none.
+**     MSX = the underlying MSXproject data struct.
 **
 **  Output:
 **    *t = current simulation time (sec)
@@ -458,6 +447,7 @@ double  MSXqual_getNodeQual(MSXproject *MSX, int j, int m)
 **     retrieves WQ for species m at node n.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     j = node index
 **     m = species index.
 **
@@ -493,6 +483,7 @@ double  MSXqual_getLinkQual(MSXproject *MSX, int k, int m)
 **     computes average quality in link k.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     k = link index
 **     m = species index.
 **
@@ -527,7 +518,7 @@ int MSXqual_close(MSXproject *MSX)
 **     closes the WQ routing system.
 **
 **   Input:
-**     none.
+**     MSX = the underlying MSXproject data struct.
 **
 **   Returns:
 **     error code (0 if no error).
@@ -569,6 +560,7 @@ int  MSXqual_isSame(MSXproject *MSX, double c1[], double c2[])
 **     checks if two sets of concentrations are the same
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     c1[] = first set of species concentrations
 **     c2[] = second set of species concentrations
 **
@@ -595,7 +587,7 @@ int  getHydVars(MSXproject *MSX)
 **     from a hydraulics file.
 **
 **   Input:
-**     none.
+**    MSX = the underlying MSXproject data struct.
 **
 **   Returns:
 **     error code
@@ -662,6 +654,7 @@ int  transport(MSXproject *MSX, long tstep)
 **    under a period of constant hydraulic conditions.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    tstep = length of current time step (sec).
 **
 **  Returns:
@@ -705,7 +698,7 @@ void  initSegs(MSXproject *MSX)
 **     initializes water quality in pipe segments.
 **
 **   Input:
-**     none.
+**     MSX = the underlying MSXproject data struct.
 */
 {
     int     j, k, m;
@@ -800,7 +793,7 @@ int  flowdirchanged(MSXproject *MSX)
 **     re-orients pipe segments (if flow reverses).
 **
 **   Input:
-**     none.
+**     MSX = the underlying MSXproject data struct.
 */
 {
     int    k, flowchanged=0;
@@ -843,6 +836,7 @@ void advectSegs(MSXproject *MSX, long dt)
 **     advects WQ segments within each pipe.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     dt = current WQ time step (sec).
 */
 {
@@ -886,6 +880,7 @@ void getNewSegWallQual(MSXproject *MSX, int k, long dt, Pseg newseg)
 **     enters a pipe from its upstream node.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = link index
 **    dt = current WQ time step (sec)
 **    newseg = pointer to a new, unused WQ segment
@@ -962,6 +957,7 @@ void shiftSegWallQual(MSXproject *MSX, int k, long dt)
 **    within a pipe after flow is advected over current time step.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = link index
 **    dt = current WQ time step (sec)
 */
@@ -1034,7 +1030,6 @@ void shiftSegWallQual(MSXproject *MSX, int k, long dt)
     }
 }
 
-
 //=============================================================================
 
 void sourceInput(MSXproject *MSX, int n, double volout, long dt)
@@ -1044,6 +1039,7 @@ void sourceInput(MSXproject *MSX, int n, double volout, long dt)
 **    sources at each node.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    n = nodeindex
 **    dt = current WQ time step (sec)
 */
@@ -1095,6 +1091,7 @@ void addSource(MSXproject *MSX, int n, Psource source, double volout, long dt)
 **    that receives external source input.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    n = index of source node
 **    source = pointer to WQ source data
 **    volout = volume of water leaving node during current time step
@@ -1159,12 +1156,12 @@ void addSource(MSXproject *MSX, int n, Psource source, double volout, long dt)
     }
 }
 
-
 //=============================================================================
 
 double  getSourceQual(MSXproject *MSX, Psource source)
 /**
 **   Input:   j = source index
+**     MSX = the underlying MSXproject data struct.
 **   Output:  returns source WQ value
 **   Purpose: determines source concentration in current time period
 */
@@ -1208,6 +1205,7 @@ void  removeAllSegs(MSXproject *MSX, int k)
 **     removes all segments in a pipe link.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     k = link index.
 */
 {
@@ -1290,11 +1288,13 @@ void topological_transport(MSXproject *MSX, long dt)
 
 }
 
+//=============================================================================
 
 void evalnodeoutflow(MSXproject *MSX, int k, double * upnodequal, long tstep)
 /**
 **--------------------------------------------------------------
 **   Input:   k = link index
+**            MSX = the underlying MSXproject data struct.
 **            c = quality from upstream node
 **            tstep = time step
 **   Output:  none
@@ -1358,11 +1358,13 @@ void evalnodeoutflow(MSXproject *MSX, int k, double * upnodequal, long tstep)
     }
 }
 
+//=============================================================================
 
 void  evalnodeinflow(MSXproject *MSX, int k, long tstep, double* volin, double* massin)
     /**
     **--------------------------------------------------------------
     **   Input:   k = link index
+    **            MSX = the underlying MSXproject data struct.
     **            tstep = quality routing time step
     **   Output:  volin = flow volume entering a node
     **            massin = constituent mass entering a node
@@ -1418,11 +1420,13 @@ void  evalnodeinflow(MSXproject *MSX, int k, long tstep, double* volin, double* 
     }
 }
 
+//=============================================================================
 
 void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double volout, long tstep)
     /**
     **--------------------------------------------------------------
     **   Input:   n = node index
+    **            MSX = the underlying MSXproject data struct.
     **            volin = flow volume entering node
     **            massin = mass entering node
     **            volout = flow volume leaving node
@@ -1515,11 +1519,13 @@ void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double v
     }
 }
 
+//=============================================================================
 
 int sortNodes(MSXproject *MSX)
 /**
 **--------------------------------------------------------------
-**   Input:   none
+**   Input: 
+**     MSX = the underlying MSXproject data struct.
 **   Output:  returns an error code
 **   Purpose: topologically sorts nodes from upstream to downstream.
 **   Note:    links with negligible flow are ignored since they can
@@ -1620,10 +1626,13 @@ int sortNodes(MSXproject *MSX)
     return errcode;
 }
 
+//=============================================================================
+
 int selectnonstacknode(MSXproject *MSX, int numsorted, int* indegree)
 /**
 **--------------------------------------------------------------
 **   Input:   numsorted = number of nodes that have been sorted
+**            MSX = the underlying MSXproject data struct.
 **            indegree = number of inflow links to each node
 **   Output:  returns a node index
 **   Purpose: selects a next node for sorting when a cycle exists.
@@ -1660,10 +1669,13 @@ int selectnonstacknode(MSXproject *MSX, int numsorted, int* indegree)
     return 0;
 }
 
+//=============================================================================
+
 void  noflowqual(MSXproject *MSX, int n)
 /**
 **--------------------------------------------------------------
 **   Input:   n = node index
+**     MSX = the underlying MSXproject data struct.
 **   Output:  quality for node n
 **   Purpose: sets the quality for a junction node that has no
 **            inflow to the average of the quality in its
@@ -1713,10 +1725,13 @@ void  noflowqual(MSXproject *MSX, int n)
             MSX->Node[n].c[m] = MSX->Node[n].c[m] / (double)kount;
 }
 
+//=============================================================================
+
 void findstoredmass(MSXproject *MSX, double * mass)
 /**
 **--------------------------------------------------------------
-**   Input:   none
+**   Input:
+**     MSX = the underlying MSXproject data struct.
 **   Output:  returns total constituent mass stored in the network
 **   Purpose: finds the current mass stored in
 **            all pipes and tanks.
@@ -1774,10 +1789,13 @@ void findstoredmass(MSXproject *MSX, double * mass)
     }
 }
 
+//=============================================================================
+
 void MSXqual_reversesegs(MSXproject *MSX, int k)
 /**
 **--------------------------------------------------------------
 **   Input:   k = link index
+**     MSX = the underlying MSXproject data struct.
 **   Output:  none
 **   Purpose: re-orients a link's segments when flow reverses.
 **--------------------------------------------------------------
@@ -1799,8 +1817,6 @@ void MSXqual_reversesegs(MSXproject *MSX, int k)
     }
 }
 
-
-
 //=============================================================================
 
 void MSXqual_removeSeg(MSXproject *MSX, Pseg seg)
@@ -1809,6 +1825,7 @@ void MSXqual_removeSeg(MSXproject *MSX, Pseg seg)
 **     places a WQ segment back into the memory pool of segments.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     seg = pointer to a WQ segment.
 */
 {
@@ -1826,6 +1843,7 @@ Pseg MSXqual_getFreeSeg(MSXproject *MSX, double v, double c[])
 **     retrieves an unused water quality volume segment from the memory pool.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     v = segment volume (ft3)
 **     c[] = segment quality
 **
@@ -1879,6 +1897,7 @@ void  MSXqual_addSeg(MSXproject *MSX, int k, Pseg seg)
 **     adds a new segment to the upstream end of a link.
 **
 **   Input:
+**     MSX = the underlying MSXproject data struct.
 **     k = link index
 **     seg = pointer to a free WQ segment.
 */
@@ -1894,3 +1913,5 @@ void  MSXqual_addSeg(MSXproject *MSX, int k, Pseg seg)
     }
     MSX->LastSeg[k] = seg;
 }
+
+//=============================================================================

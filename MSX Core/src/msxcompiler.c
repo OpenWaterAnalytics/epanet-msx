@@ -5,8 +5,9 @@
 **  COPYRIGHT:     Copyright (C) 2006 Feng Shang, Lewis Rossman, and James Uber.
 **                 All Rights Reserved. See license information in LICENSE.TXT.
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   11/01/10
+**  LAST UPDATE:   Refer to git history
 *******************************************************************************/
 
 #include <stdlib.h>
@@ -62,7 +63,7 @@ int MSXcompiler_open(MSXproject *MSX)
 **    and loads the functions into the running application
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error).
@@ -190,6 +191,7 @@ void  writeSrcFile(MSXproject *MSX, FILE* f)
 **    writes C statements to the chemistry function source code file
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    f = pointer to the source code file
 **
 **  Returns:

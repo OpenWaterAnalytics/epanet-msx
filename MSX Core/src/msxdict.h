@@ -9,7 +9,7 @@
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
 **  VERSION:       1.1.00                                               
-**  LAST UPDATE:   09/29/08
+**  LAST UPDATE:   Refer to git history
 **  Bug FIX:       Bug ID 11, Feng Shang, 01/10/2008
 				   BUG ID 8 (add roughness as hydraulic variable),  Feng Shang, 01/29/2008 
 ***********************************************************************/

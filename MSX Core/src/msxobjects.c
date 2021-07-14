@@ -1,3 +1,16 @@
+/******************************************************************************
+**  MODULE:        MSXBJECTS.C
+**  PROJECT:       EPANET-MSX
+**  DESCRIPTION:   Functions to mutate the hash table and do work with objects.         
+**  COPYRIGHT:     Copyright (C) 2007 Feng Shang, Lewis Rossman, and James Uber.
+**                 All Rights Reserved. See license information in LICENSE.TXT.
+**  AUTHORS:       L. Rossman, US EPA - NRMRL
+**                 F. Shang, University of Cincinnati
+**                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
+**  VERSION:       1.1.00
+**  LAST UPDATE:   Refer to git history
+******************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -13,6 +26,8 @@
 //-----------------
 alloc_handle_t  *HashPool;           // Memory pool for hash tables
 HTtable  *Htable[MAX_OBJECTS];       // Hash tables for object ID names
+
+//=============================================================================
 
 int addObject(int type, char *id, int n)
 /**
@@ -50,6 +65,8 @@ int addObject(int type, char *id, int n)
     return result;
 }
 
+//=============================================================================
+
 int findObject(int type, char *id)
 /**
 **  Purpose:
@@ -66,6 +83,8 @@ int findObject(int type, char *id)
     return HTfind(Htable[type], id);
 }
 
+//=============================================================================
+
 char * findID(int type, char *id)
 /**
 **  Purpose:
@@ -81,6 +100,8 @@ char * findID(int type, char *id)
 {
     return HTfindKey(Htable[type], id);
 }
+
+//=============================================================================
 
 int createHashTables()
 /**
@@ -110,6 +131,7 @@ int createHashTables()
     return 0;
 }
 
+//=============================================================================
 
 void deleteHashTables()
 /**
@@ -146,7 +168,7 @@ int setDefaults(MSXproject *MSX)
 **    assigns default values to project variables.
 **
 **  Input:
-**    MSX data struct.
+**    MSX = the underlying MSXproject data struct.
 */
 {
     int i;
@@ -198,7 +220,6 @@ int setDefaults(MSXproject *MSX)
 
 //=============================================================================
 
-
 int getVariableCode(MSXproject *MSX, char *id)
 /**
 **  Purpose:
@@ -206,6 +227,7 @@ int getVariableCode(MSXproject *MSX, char *id)
 **    parameter, or constant that appears in a math expression.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    id = ID name being sought
 **
 **  Returns:
@@ -236,7 +258,8 @@ int getVariableCode(MSXproject *MSX, char *id)
 int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ routing
 /**
 **--------------------------------------------------------------
-** Input:   none
+** Input:
+**    MSX = the underlying MSXproject data struct.
 ** Output:  returns error code
 ** Purpose: builds linked list of links adjacent to each node
 **--------------------------------------------------------------
@@ -287,11 +310,13 @@ int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ ro
     return errcode;
 }
 
+//=============================================================================
 
 void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting in WQ routing
 /**
 **--------------------------------------------------------------
-** Input:   none
+** Input:
+**    MSX = the underlying MSXproject data struct.
 ** Output:  none
 ** Purpose: frees memory used for nodal adjacency lists
 **--------------------------------------------------------------
@@ -311,7 +336,6 @@ void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting
     }
     free(MSX->Adjlist);
 }
-
 
 //=============================================================================
 
@@ -403,7 +427,7 @@ void deleteObjects(MSXproject *MSX)
 **    deletes multi-species data objects.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 */
 {
     int i;
@@ -507,7 +531,7 @@ int checkCyclicTerms(MSXproject *MSX, double **TermArray)                       
 **    and T3 = T2/T1)
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    1 if cyclic reference found or 0 if none found.
@@ -653,3 +677,5 @@ int finishInit(MSXproject *MSX)
     }
     return err;
 }
+
+//=============================================================================

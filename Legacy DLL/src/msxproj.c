@@ -8,8 +8,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **  Bug fix:       Bug ID 08, Feng Shang 01/07/2008
 **                 Memory leak fixed, T. Taxon - 9/7/10
 ******************************************************************************/
@@ -71,8 +72,6 @@ static int    createObjects(MSXproject *MSX);
 
 static int    openRptFile(MSXproject *MSX);                                               //(LR-11/20/07)
 
-
-
 //=============================================================================
 
 int  MSXproj_open(MSXproject *MSX, char *fname)
@@ -81,6 +80,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 **    opens an EPANET-MSX project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    fname = name of EPANET-MSX input file
 **
 **  Returns:
@@ -150,7 +150,7 @@ void MSXproj_close(MSXproject *MSX)
 **    closes the current EPANET-MSX project.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 */
 {
     // --- close all files
@@ -204,7 +204,7 @@ int createObjects(MSXproject *MSX)
 **    creates multi-species data objects.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error).
@@ -306,3 +306,4 @@ int openRptFile(MSXproject *MSX)
     return 0;
 }
 
+//=============================================================================

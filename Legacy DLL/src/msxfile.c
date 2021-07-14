@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   09/12/08
+**  LAST UPDATE:   Refer to git history
 **  BUG FIX:       Bug ID 10, Feng Shang, 01/08/2008
 				   
 				   In funtcion saveSources, MSX->Pattern[source->pat].id rather 
@@ -49,6 +50,7 @@ int MSXfile_save(MSXproject *MSX, FILE *f)
 **    saves current MSX project data to file.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    f = pointer to MSX file where data are saved.
 */
 {

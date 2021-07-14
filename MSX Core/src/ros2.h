@@ -4,7 +4,7 @@
 **  DESCRIPTION:   Header file for the stiff ODE solver ROS2.C.
 **  AUTHOR:        L. Rossman, US EPA - NRMRL
 **  VERSION:       1.1.00                                               
-**  LAST UPDATE:   3/1/07
+**  LAST UPDATE:   Refer to git history
 ***********************************************************************/
 
 #ifndef MAGICNUMBER

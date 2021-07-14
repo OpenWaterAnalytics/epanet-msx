@@ -8,8 +8,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   11/01/10
+**  LAST UPDATE:   Refer to git history
 **  BUG FIX:	   BUG ID 09 (add roughness as a hydraulic variable) Feng Shang 01/29/2008	
 *******************************************************************************/
 
@@ -90,7 +91,7 @@ int MSXinp_countMsxObjects(MSXproject *MSX)
 **    reads multi-species input file to determine number of system objects.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -157,7 +158,7 @@ int  MSXinp_countNetObjects(MSXproject *MSX)
 **    queries EPANET data base to determine number of network objects.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -181,7 +182,7 @@ int MSXinp_readNetData(MSXproject *MSX)
 **    retrieves required input data from the EPANET project data.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -258,7 +259,7 @@ int  MSXinp_readMsxData(MSXproject *MSX)
 **    reads multi-species data from the EPANET-MSX input file.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -334,6 +335,7 @@ void   MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units)
 **    constructs the character string for a species concentration units.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    m = species index
 **
 **  Output:
@@ -413,6 +415,7 @@ int addSpecies(MSXproject *MSX, char *line)
 **    adds a species ID name to the project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    line = line of input data
 **
 **  Returns:
@@ -438,6 +441,7 @@ int addCoeff(MSXproject *MSX, char *line)
 **    adds a coefficient ID name to the project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    line = line of input data
 **
 **  Returns:
@@ -473,6 +477,7 @@ int addTerm(MSXproject *MSX, char *id)
 **    adds an intermediate expression term ID name to the project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    id = name of an intermediate expression term 
 **
 **  Returns:
@@ -497,6 +502,7 @@ int addPattern(MSXproject *MSX, char *id)
 **    adds a time pattern ID name to the project.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    id = name of a time pattern
 **
 **  Returns:
@@ -525,6 +531,7 @@ int parseLine(MSXproject *MSX, int sect, char *line)
 **    parses the contents of a line of input data.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    sect = index of current input data section
 **    line = contents of current line of input data
 **
@@ -582,7 +589,7 @@ int parseOption(MSXproject *MSX)
 **    parses an input line containing a project option.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -656,7 +663,7 @@ int parseSpecies(MSXproject *MSX)
 **    parses an input line containing a species variable.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -709,7 +716,7 @@ int parseCoeff(MSXproject *MSX)
 **    parses an input line containing a coefficient definition.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -772,7 +779,7 @@ int parseTerm(MSXproject *MSX)
 **    parses an input line containing an intermediate expression term .
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -817,6 +824,7 @@ int parseExpression(MSXproject *MSX, int classType)
 **    parses an input line containing a math expression.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    classType = either LINK or TANK
 **
 **  Returns:
@@ -882,7 +890,7 @@ int parseQuality(MSXproject *MSX)
 **    parses an input line containing initial species concentrations.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -954,7 +962,7 @@ int parseParameter(MSXproject *MSX)
 **    parses an input line containing a parameter data.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -1002,7 +1010,7 @@ int parseSource(MSXproject *MSX)
 **    parses an input line containing a source input data.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -1081,7 +1089,7 @@ int parsePattern(MSXproject *MSX)
 **    parses an input line containing a time pattern data.
 **
 **  Input:
-**    none
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error)
@@ -1127,6 +1135,16 @@ int parsePattern(MSXproject *MSX)
 //=============================================================================
 
 int parseReport(MSXproject *MSX)
+/**
+**  Purpose:
+**    parses an input line containing report data.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**
+**  Returns:
+**    an error code (0 if no error)
+*/
 {
     int  i, j, k, err;
 
@@ -1218,6 +1236,7 @@ int  getTokens(char *s)
 **    in shared variable Tok[].
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    s = a character string
 **
 **  Returns:

@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **
 **  EPANET-MSX is an extension of the EPANET program for modeling the fate
 **  and transport of multiple interacting chemical species within a water
@@ -157,10 +158,10 @@ int example1(char *fname) {
     long t = 0;
     long tleft = 1;
     // CALL(err, MSXsaveResults(&MSX));
-    CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", ""));
+    CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", fname));
     while (tleft > 0) {
         CALL(err, MSXstep(&MSX, &t, &tleft));
-        CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", ""));
+        CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", fname));
         // if (MSX.Saveflag) {
         //     CALL(err, MSXsaveResults(&MSX));
         // }

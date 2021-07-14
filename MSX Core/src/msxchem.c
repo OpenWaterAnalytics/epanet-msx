@@ -7,8 +7,9 @@
 **  AUTHORS:       L. Rossman, US EPA - NRMRL
 **                 F. Shang, University of Cincinnati
 **                 J. Uber, University of Cincinnati
+**                 K. Arrowood, Xylem intern
 **  VERSION:       1.1.00
-**  LAST UPDATE:   2/8/11
+**  LAST UPDATE:   Refer to git history
 **  BUG FIXES  :   Bug ID 8,  Feng Shang, 01/29/2008
 *******************************************************************************/
 
@@ -105,7 +106,7 @@ int  MSXchem_open(MSXproject *MSX)
 **    opens the multi-species chemistry system.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Returns:
 **    an error code (0 if no error).
@@ -239,7 +240,7 @@ void MSXchem_close(MSXproject *MSX)
 **    closes the multi-species chemistry system.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 */
 {
     if (MSX->Compiler)	MSXcompiler_close();                                   //1.1.00
@@ -273,6 +274,7 @@ int MSXchem_react(MSXproject *MSX, long dt)
 **    computes reactions in all pipes and tanks.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    dt = current WQ time step (sec).
 **
 **  Returns:
@@ -343,6 +345,7 @@ int MSXchem_equil(MSXproject *MSX, int zone, double *c)
 **    computes equilibrium concentrations for a set of chemical species.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    zone = reaction zone (NODE or LINK)
 **    c[] = array of species concentrations
 **
@@ -431,7 +434,7 @@ void setSpeciesChemistry(MSXproject *MSX)
 **    expressions, equilibrium expressions, or simple formulas.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Output:
 **    updates arrays of different chemistry types.
@@ -490,7 +493,7 @@ void setTankChemistry(MSXproject *MSX)
 **    each chemical species.
 **
 **  Input:
-**    none.
+**    MSX = the underlying MSXproject data struct.
 **
 **  Output:
 **    updates arrays of different tank chemistry types.
@@ -524,6 +527,7 @@ void evalHydVariables(MSXproject *MSX, int k)
 **    current link being analyzed.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = link index
 **
 **  Output:
@@ -584,6 +588,7 @@ int evalPipeReactions(MSXproject *MSX, int k, long dt)
 **    after reactions occur over time step dt.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = link index
 **    dt = time step (sec).
 **
@@ -705,6 +710,7 @@ int evalTankReactions(MSXproject *MSX, int k, long dt)
 **    after reactions occur over time step dt.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    k = tank index
 **    dt = time step (sec).
 **
@@ -823,6 +829,7 @@ int evalPipeEquil(MSXproject *MSX, double *c)
 **    computes equilibrium concentrations for water in a pipe segment.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    c[] = array of starting species concentrations
 **
 **  Output:
@@ -862,6 +869,7 @@ int evalTankEquil(MSXproject *MSX, double *c)
 **    computes equilibrium concentrations for water in a tank.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    c[] = array of starting species concentrations
 **
 **  Output:
@@ -900,6 +908,7 @@ void evalPipeFormulas(MSXproject *MSX, double *c)
 **    formulas involving other known species concentrations.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    c[] = array of current species concentrations.
 **
 **  Output:
@@ -943,6 +952,7 @@ void evalTankFormulas(MSXproject *MSX, double *c)
 **    formulas involving other known species concentrations.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    c[] = array of current species concentrations.
 **
 **  Output:
@@ -986,6 +996,7 @@ double getPipeVariableValue(MSXproject *MSX, int i)
 **    the pipe link being analyzed.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    i = variable index.
 **
 **  Returns:
@@ -1055,6 +1066,7 @@ double getTankVariableValue(MSXproject *MSX, int i)
 **    the current node being analyzed.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    i = variable index.
 **
 **  Returns:
@@ -1124,6 +1136,7 @@ void getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 **    finds reaction rate (dC/dt) for each reacting species in a pipe.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    t = current time (not used)
 **    y[] = vector of reacting species concentrations
 **    n = number of reacting species.
@@ -1186,6 +1199,7 @@ void getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 **    finds reaction rate (dC/dt) for each reacting species in a tank.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    t = current time (not used)
 **    y[] = vector of reacting species concentrations
 **    n = number of reacting species.
@@ -1248,6 +1262,7 @@ void getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[])
 **    evaluates equilibrium expressions for pipe chemistry.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    t = current time (not used)
 **    y[] = vector of equilibrium species concentrations
 **    n = number of equilibrium species.
@@ -1299,6 +1314,7 @@ void getTankEquil(MSXproject *MSX, double t, double y[], int n, double f[])
 **    evaluates equilibrium expressions for tank chemistry.
 **
 **  Input:
+**    MSX = the underlying MSXproject data struct.
 **    t = current time (not used)
 **    y[] = vector of equilibrium species concentrations
 **    n = number of equilibrium species
@@ -1341,3 +1357,5 @@ void getTankEquil(MSXproject *MSX, double t, double y[], int n, double f[])
 		f[i] = MSXerr_validate(MSX, x, m, TANK, EQUIL);                             //1.1.00
     }
 }
+
+//=============================================================================
