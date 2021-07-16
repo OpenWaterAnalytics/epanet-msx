@@ -304,7 +304,6 @@ int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
 **    the MSX input file.
 */
 {
-    fflush(stdout);
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( MSX->Rptflag ) return MSXrpt_write(MSX, fname);
     else return 0;

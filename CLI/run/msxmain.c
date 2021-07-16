@@ -68,11 +68,11 @@ void main(int argc, char *argv[])
     // CALL(err, example1(argv[1]));
     // if (err != 0) printf("Error occured!\nError code: %d\n", err);
 
-    // CALL(err, batchExample(argv[1]));
-    // if (err != 0) printf("Error occured!\nError code: %d\n", err);
+    CALL(err, batchExample(argv[1]));
+    if (err != 0) printf("Error occured!\nError code: %d\n", err);
 
-    MSXproject MSX;
-    CALL(err, MSXrunLegacy(&MSX, argc, argv));
+    // MSXproject MSX;
+    // CALL(err, MSXrunLegacy(&MSX, argc, argv));
 }
 
 int example1(char *fname) {
@@ -170,6 +170,7 @@ int example1(char *fname) {
         if ( oldHour != newHour )
         {
             printf("\r  o Computing water quality at hour %-4d", newHour);
+            fflush(stdout);
             oldHour = newHour;
         }
         CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", fname));
@@ -183,6 +184,7 @@ int example1(char *fname) {
     //     if ( oldHour != newHour )
     //     {
     //         printf("\r  o Computing water quality at hour %-4d", newHour);
+    //         fflush(stdout);
     //         oldHour = newHour;
     //     }
     //     CALL(err, MSXsaveResults(&MSX));
@@ -318,6 +320,7 @@ int batchExample(char *fname) {
         if ( oldHour != newHour )
         {
             printf("\r  o Computing water quality at hour %-4d", newHour);
+            fflush(stdout);
             oldHour = newHour;
         }
         CALL(err, MSXsaveResults(&MSX));
