@@ -443,17 +443,16 @@ void deleteObjects(MSXproject *MSX)
 
         // --- free memory used by water quality sources                       //ttaxon - 9/7/10
 
-	if(MSX->Node[i].sources)
-	{ 
+        if(MSX->Node[i].sources)
+        { 
             source = MSX->Node[i].sources; 
             while (source != NULL)
-	    { 
+	        { 
                 MSX->Node[i].sources = source->next; 
                 FREE(source); 
                 source = MSX->Node[i].sources; 
             } 
         }
-
     }
     if (MSX->Link) for (i=1; i<=MSX->Nobjects[LINK]; i++)
     {
@@ -605,12 +604,11 @@ int finishInit(MSXproject *MSX)
     if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
     int err = 0;
 
-    MSX->K       = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
+    MSX->K = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
     // --- create arrays for demands, heads, & flows
     MSX->D = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
     MSX->H = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
     MSX->Q = (float *) calloc(MSX->Nobjects[LINK]+1, sizeof(float));
-    MSX->C0 = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
     int i;
     // Set parameters
     for (i=1; i<=MSX->Nobjects[PARAMETER]; i++) {

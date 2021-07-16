@@ -359,12 +359,6 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
                 }
             }
 
-        // --- report results if its time to do so
-            if (MSX->Saveflag && MSX->Qtime == MSX->Rtime)
-            {
-                MSX->Rtime += MSX->Rstep;
-                MSX->Nperiods++;
-            }
         }
 
     // --- otherwise just route WQ over the current time step
@@ -677,7 +671,7 @@ int  transport(MSXproject *MSX, long tstep)
         errcode = MSXchem_react(MSX, dt);        // react species in each pipe & tank
         if ( errcode ) return errcode;
         advectSegs(MSX, dt);                     // advect segments in each pipe
-        
+
         topological_transport(MSX, dt);          //replace accumulate, updateNodes, sourceInput and release
 
 		if (MSXerr_mathError())             // check for any math error        //1.1.00

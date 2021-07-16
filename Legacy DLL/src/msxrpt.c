@@ -85,9 +85,12 @@ int  MSXrpt_write(MSXproject *MSX, char *fname)
     int recordsize = sizeof(INT4);
 
     if (strcmp(MSX->RptFile.name, "") == 0) {
-        strcpy(MSX->RptFile.name, fname);
-        MSX->RptFile.file = fopen(MSX->RptFile.name, "wt");
-        if ( MSX->RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
+        if (fname == NULL) MSX->RptFile.file = stdout;
+        else {
+            strcpy(MSX->RptFile.name, fname);
+            MSX->RptFile.file = fopen(MSX->RptFile.name, "wt");
+            if ( MSX->RptFile.file == NULL ) return ERR_OPEN_RPT_FILE;
+        }
     }
 
 // --- check that results are available

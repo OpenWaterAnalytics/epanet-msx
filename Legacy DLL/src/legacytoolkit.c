@@ -304,6 +304,7 @@ int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
 **    the MSX input file.
 */
 {
+    fflush(stdout);
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( MSX->Rptflag ) return MSXrpt_write(MSX, fname);
     else return 0;
@@ -396,10 +397,16 @@ int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
 **    an error code (or 0 for no error).
  */
 {
-    int errcode;
+    int errcode = 0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    if (MSX->OutFile.file == NULL) errcode = MSXout_open(MSX);
-    errcode = MSXout_saveResults(MSX);
+    
+    if (MSX->Saveflag && MSX->Qtime == MSX->Rtime)
+    {
+        if (MSX->OutFile.file == NULL) errcode = MSXout_open(MSX);
+        errcode = MSXout_saveResults(MSX);
+        MSX->Rtime += MSX->Rstep;
+        MSX->Nperiods++;
+    }
     return errcode;
 }
 
@@ -420,9 +427,9 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
 **    an error code (or 0 for no error).
  */
 {
-    int errcode;
+    int errcode = 0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    errcode = MSXout_saveFinalResults(MSX);
+    if (MSX->Saveflag) errcode = MSXout_saveFinalResults(MSX);
     return errcode;
 }
 
@@ -505,6 +512,9 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
                 printf("\r  o Computing water quality at hour %-4d", newHour);
                 oldHour = newHour;
             }
+            // for (int i = 0; i < 5; i++) printf("Demands: %f\n", MSX->D[i]);
+            // for (int i = 0; i < 5; i++) printf("Flows: %f\n", MSX->Q[i]);
+            // for (int i = 0; i < 5; i++) printf("Heads: %f\n", MSX->H[i]);
             err = MSXsaveResults(MSX);
             err = MSXstep(MSX, &t, &tleft);
             newHour = t / 3600;
