@@ -77,4 +77,4 @@ In order to completely remove the dependencies of the CLI on the Legacy DLL, it 
 
 Below is a Diagram to help understand the dependencies of the repository:
 
-![Self-editing Diagram](MSXstructure.svg)
+![MSXstructure.svg](MSXstructure.svg)
