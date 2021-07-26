@@ -49,7 +49,7 @@ In order for the executable to work, the following DLL's will need to be in the 
 This repository has gone through some substantial changes that will be highlighted below.
 
 The goal behind the restructuring of EPANET-MSX was to remove dependencies on EPANET as well as dependencies
-on the specific (.inp) EPANET input file and the (.msx) MSX input files. This way users can use
+on the EPANET input file (.inp) and the MSX input file (.msx). This way users can use
 EPANET-MSX as a toolkit rather than just through the input files. However it was also an important
 feature to maintain complete backwards compatibility.
 In order to maintain backwards compatibility in the easiest way possible, the repository was split into
