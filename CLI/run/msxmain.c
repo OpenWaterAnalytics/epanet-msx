@@ -65,11 +65,10 @@ void main(int argc, char *argv[])
 */
 {
     int err = 0;
-    // CALL(err, example1(argv[1]));
-    // if (err != 0) printf("Error occured!\nError code: %d\n", err);
-
-    CALL(err, batchExample(argv[1]));
+    CALL(err, example1(argv[1]));
     if (err != 0) printf("Error occured!\nError code: %d\n", err);
+    // CALL(err, batchExample(argv[1]));
+    // if (err != 0) printf("Error occured!\nError code: %d\n", err);
 
     // MSXproject MSX;
     // CALL(err, MSXrunLegacy(&MSX, argc, argv));
@@ -166,20 +165,8 @@ int example1(char *fname) {
     int oldHour = -1;
     int newHour = 0;
 
-    while (tleft >= 0) {
-        if ( oldHour != newHour )
-        {
-            printf("\r  o Computing water quality at hour %-4d", newHour);
-            fflush(stdout);
-            oldHour = newHour;
-        }
-        CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", fname));
-        CALL(err, MSXprintQuality(&MSX, LINK, "5", "AS5s", fname));
-        CALL(err, MSXstep(&MSX, &t, &tleft));
-        newHour = t / 3600;
-    }
-
-
+    // Example of using the printQuality function in the loop rather than
+    // saving results to binary out file and then calling the MSXreport function
     // while (tleft >= 0 && err == 0) {
     //     if ( oldHour != newHour )
     //     {
@@ -187,12 +174,26 @@ int example1(char *fname) {
     //         fflush(stdout);
     //         oldHour = newHour;
     //     }
-    //     CALL(err, MSXsaveResults(&MSX));
+    //     CALL(err, MSXprintQuality(&MSX, NODE, "c", "NH2CL", fname));
+    //     CALL(err, MSXprintQuality(&MSX, LINK, "5", "AS5s", fname));
     //     CALL(err, MSXstep(&MSX, &t, &tleft));
     //     newHour = t / 3600;
     // }
-    // CALL(err, MSXsaveFinalResults(&MSX));
-    // CALL(err, MSXreport(&MSX, fname));
+
+
+    while (tleft >= 0 && err == 0) {
+        if ( oldHour != newHour )
+        {
+            printf("\r  o Computing water quality at hour %-4d", newHour);
+            fflush(stdout);
+            oldHour = newHour;
+        }
+        CALL(err, MSXsaveResults(&MSX));
+        CALL(err, MSXstep(&MSX, &t, &tleft));
+        newHour = t / 3600;
+    }
+    CALL(err, MSXsaveFinalResults(&MSX));
+    CALL(err, MSXreport(&MSX, fname));
 
 
     // Close
@@ -329,8 +330,6 @@ int batchExample(char *fname) {
     }
     CALL(err, MSXsaveFinalResults(&MSX));
 
-
-    
 
     CALL(err, MSXreport(&MSX, fname));
 

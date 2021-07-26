@@ -9,8 +9,6 @@ any simulations are done. MSX_init() also must be called before Hydraulics are s
 
 
 ## Building
-Note: as of right now the build doesn't work in Release mode, it only works in Debug mode.
-
 In order to build, it is easiest to have CMake (https://cmake.org/) installed.
 The easiest way to build quickly is to run the bash script titled "build.sh" from
 the root directory. If you can't run the bash file, the instructions will be below.

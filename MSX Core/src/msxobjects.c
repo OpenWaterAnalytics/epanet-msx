@@ -625,14 +625,16 @@ int finishInit(MSXproject *MSX)
 
     int k;
     for (i=1; i<=MSX->Nobjects[TERM]; i++) {
-        char *Tokens[100];
-        char *s = MSX->Term[i].equation;
+        char *Tokens[MAXLINE];
+        char *s = (char*) calloc(1, strlen(MSX->Term[i].equation));
+        char *f = s; //Used to free
+        strcpy(s, MSX->Term[i].equation);
         int len = (int)strlen(s);
         int m;
         int n = 0;
         while (len > 0)
         {
-            m = (int)strcspn(s," \t\n\r");              // find token length 
+            m = (int)strcspn(s," \t\n\r");              // find token length
             if (m == 0) s++;                    // no token found
             else
             {
@@ -654,6 +656,7 @@ int finishInit(MSXproject *MSX)
             k = findObject(TERM, Tokens[j]);                                  //1.1.00
             if ( k > 0 ) TermArray[i][k] = 1.0;                                    //1.1.00
         }
+        free(f);
     }
 
 

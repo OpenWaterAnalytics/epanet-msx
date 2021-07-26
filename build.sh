@@ -6,8 +6,8 @@ printf "\n\n-------- Building MSX Core --------\n\n"
 cd MSX\ Core
 rm -rf build
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake --build . --config Debug
+cmake ..
+cmake --build . --config Release
 
 cd ../..
 
@@ -17,8 +17,8 @@ printf "\n\n-------- Building Legacy DLL --------\n\n"
 cd "Legacy DLL"
 rm -rf build
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake --build . --config Debug
+cmake ..
+cmake --build . --config Release
 
 cd ../..
 
@@ -28,8 +28,8 @@ printf "\n\n-------- Building CLI --------\n\n"
 cd CLI
 rm -rf build
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake --build . --config Debug
+cmake ..
+cmake --build . --config Release
 
 cd ../..
 

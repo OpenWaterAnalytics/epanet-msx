@@ -106,12 +106,12 @@ int  MSXrpt_write(MSXproject *MSX, char *fname)
     PageNum = 1;
     LineNum = 1;
     newPage(MSX);
-    for (j=0; j<=5; j++) writeLine(MSX, Logo[j]);
+    for (j=0; j<5; j++) writeLine(MSX, Logo[j]);
     writeLine(MSX, "");
     writeLine(MSX, MSX->Title);
 
 // --- generate the appropriate type of table
-   
+
     if ( MSX->Statflag == SERIES ) createSeriesTables(MSX);
     else createStatsTables(MSX);
 
@@ -123,7 +123,7 @@ int  MSXrpt_write(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-void  MSXrptwriteLine(MSXproject *MSX, char *line)                                             //1.1.00
+void  MSXrpt_writeLine(MSXproject *MSX, char *line)                                             //1.1.00
 {                                                                              //1.1.00
     writeLine(MSX, line);                                                           //1.1.00
 }                                                                              //1.1.00
