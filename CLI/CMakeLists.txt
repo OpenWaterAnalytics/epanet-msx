@@ -38,7 +38,7 @@ IF (MSVC)
 ENDIF (MSVC)
 
 # configure file groups
-file(GLOB MSX_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
+# file(GLOB MSX_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
 
 include(FindOpenMP)
 if(OPENMP_FOUND)

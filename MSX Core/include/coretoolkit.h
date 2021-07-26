@@ -46,16 +46,6 @@
   #endif  
 #endif
 
-// --- define MSX constants
-
-// #define MSX_NODE      0
-// #define MSX_LINK      1
-// #define MSX_TANK      2
-// #define MSX_SPECIES   3
-// #define MSX_TERM      4
-// #define MSX_PARAMETER 5
-// #define MSX_CONSTANT  6
-// #define MSX_PATTERN   7
 
 #define MSX_BULK      0
 #define MSX_WALL      1
