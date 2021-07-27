@@ -12,26 +12,25 @@
 **  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
-// //  Node in a tokenized math expression list
-// struct ExprNode
-// {
-//     int    opcode;                // operator code
-//     int    ivar;                  // variable index
-//     double fvalue;                // numerical value
-//     struct ExprNode *prev;        // previous node
-//     struct ExprNode *next;        // next node
-// };
-// typedef struct ExprNode MathExpr;
+//  Node in a tokenized math expression list
+struct ExprNode
+{
+    int    opcode;                // operator code
+    int    ivar;                  // variable index
+    double fvalue;                // numerical value
+    struct ExprNode *prev;        // previous node
+    struct ExprNode *next;        // next node
+};
+typedef struct ExprNode MathExpr;
 
-#ifndef MAGICNUMBER
-#include "msxtypes.h"
-#endif
+// Opaque Pointer
+typedef struct Project *MSXproject;
 
 //  Creates a tokenized math expression from a string
-MathExpr* mathexpr_create(MSXproject *MSX, char* s, int (*getVar) (MSXproject *, char *));
+MathExpr* mathexpr_create(MSXproject MSX, char* s, int (*getVar) (MSXproject, char *));
 
 //  Evaluates a tokenized math expression
-double mathexpr_eval(MSXproject *MSX, MathExpr* expr, double (*getVal) (MSXproject*, int));
+double mathexpr_eval(MSXproject MSX, MathExpr* expr, double (*getVal) (MSXproject, int));
 
 //  Deletes a tokenized math expression
 void  mathexpr_delete(MathExpr* expr);

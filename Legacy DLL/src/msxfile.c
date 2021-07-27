@@ -30,21 +30,21 @@
 
 //  Exported functions
 //--------------------
-int MSXfile_save(MSXproject *MSX, FILE *f);
+int MSXfile_save(MSXproject MSX, FILE *f);
 
 //  Local functions
 //-----------------
-static void  saveSpecies(MSXproject *MSX, FILE *f);
-static void  saveCoeffs(MSXproject *MSX, FILE *f);
-static int   saveInpSections(MSXproject *MSX, FILE *f);
-static void  saveParams(MSXproject *MSX, FILE *f);
-static void  saveQuality(MSXproject *MSX, FILE *f);
-static void  saveSources(MSXproject *MSX, FILE *f);
-static void  savePatterns(MSXproject *MSX, FILE *f);
+static void  saveSpecies(MSXproject MSX, FILE *f);
+static void  saveCoeffs(MSXproject MSX, FILE *f);
+static int   saveInpSections(MSXproject MSX, FILE *f);
+static void  saveParams(MSXproject MSX, FILE *f);
+static void  saveQuality(MSXproject MSX, FILE *f);
+static void  saveSources(MSXproject MSX, FILE *f);
+static void  savePatterns(MSXproject MSX, FILE *f);
 
 //=============================================================================
 
-int MSXfile_save(MSXproject *MSX, FILE *f)
+int MSXfile_save(MSXproject MSX, FILE *f)
 /**
 **  Purpose:
 **    saves current MSX project data to file.
@@ -69,7 +69,7 @@ int MSXfile_save(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  saveSpecies(MSXproject *MSX, FILE *f)
+void  saveSpecies(MSXproject MSX, FILE *f)
 {
     int  i, n;
     fprintf(f, "\n[SPECIES]");
@@ -86,7 +86,7 @@ void  saveSpecies(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  saveCoeffs(MSXproject *MSX, FILE *f)
+void  saveCoeffs(MSXproject MSX, FILE *f)
 {
     int  i, n;
     fprintf(f, "\n\n[COEFFICIENTS]");
@@ -106,7 +106,7 @@ void  saveCoeffs(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-int  saveInpSections(MSXproject *MSX, FILE *f)
+int  saveInpSections(MSXproject MSX, FILE *f)
 {
     char   line[MAXLINE+1];
     char   writeLine;
@@ -144,7 +144,7 @@ int  saveInpSections(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  saveParams(MSXproject *MSX, FILE *f)
+void  saveParams(MSXproject MSX, FILE *f)
 {
     int    i, j, k;
     double x;
@@ -181,7 +181,7 @@ void  saveParams(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  saveQuality(MSXproject *MSX, FILE *f)
+void  saveQuality(MSXproject MSX, FILE *f)
 {
     int    i, j;
     char   id[MAXLINE+1];
@@ -216,7 +216,7 @@ void  saveQuality(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  saveSources(MSXproject *MSX, FILE *f)
+void  saveSources(MSXproject MSX, FILE *f)
 {
     int     i;
     Psource source;
@@ -244,7 +244,7 @@ void  saveSources(MSXproject *MSX, FILE *f)
 
 //=============================================================================
 
-void  savePatterns(MSXproject *MSX, FILE *f)
+void  savePatterns(MSXproject MSX, FILE *f)
 {
     int  i, count;
     SnumList *listItem;

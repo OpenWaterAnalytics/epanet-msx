@@ -23,7 +23,6 @@
 #include "ros2.h"
 #include "newton.h"
 #include "msxfuncs.h"                                                          //1.1.00
-#include "mathexpr.h"
 
 
 
@@ -66,41 +65,41 @@ static double *ChemC1;
 
 //  Exported functions
 //--------------------
-int    MSXchem_open(MSXproject *MSX);
-int    MSXchem_react(MSXproject *MSX, long dt);
-int    MSXchem_equil(MSXproject *MSX, int zone, double *c);
+int    MSXchem_open(MSXproject MSX);
+int    MSXchem_react(MSXproject MSX, long dt);
+int    MSXchem_equil(MSXproject MSX, int zone, double *c);
 char*  MSXchem_getVariableStr(int i, char *s);                                 //1.1.00
-void   MSXchem_close(MSXproject *MSX);
+void   MSXchem_close(MSXproject MSX);
 
 // Imported functions
 //-------------------
-int    MSXcompiler_open(MSXproject *MSX);                                                 //1.1.00
+int    MSXcompiler_open(MSXproject MSX);                                                 //1.1.00
 void   MSXcompiler_close(void);                                                //1.1.00
-double MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType);        //1.1.00
+double MSXerr_validate(MSXproject MSX, double x, int index, int element, int exprType);        //1.1.00
 
 //  Local functions
 //-----------------
-static void   setSpeciesChemistry(MSXproject *MSX);
-static void   setTankChemistry(MSXproject *MSX);
-static void   evalHydVariables(MSXproject *MSX, int k);
-static int    evalPipeReactions(MSXproject *MSX, int k, long dt);
-static int    evalTankReactions(MSXproject *MSX, int k, long dt);
-static int    evalPipeEquil(MSXproject *MSX, double *c);
-static int    evalTankEquil(MSXproject *MSX, double *c);
-static void   evalPipeFormulas(MSXproject *MSX, double *c);
-static void   evalTankFormulas(MSXproject *MSX, double *c);
-static double getPipeVariableValue(MSXproject *MSX, int i);
-static double getTankVariableValue(MSXproject *MSX, int i);
-static void   getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[]);
-static void   getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[]);
-static void   getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[]);
-static void   getTankEquil(MSXproject *MSX, double t, double y[], int n, double f[]);
+static void   setSpeciesChemistry(MSXproject MSX);
+static void   setTankChemistry(MSXproject MSX);
+static void   evalHydVariables(MSXproject MSX, int k);
+static int    evalPipeReactions(MSXproject MSX, int k, long dt);
+static int    evalTankReactions(MSXproject MSX, int k, long dt);
+static int    evalPipeEquil(MSXproject MSX, double *c);
+static int    evalTankEquil(MSXproject MSX, double *c);
+static void   evalPipeFormulas(MSXproject MSX, double *c);
+static void   evalTankFormulas(MSXproject MSX, double *c);
+static double getPipeVariableValue(MSXproject MSX, int i);
+static double getTankVariableValue(MSXproject MSX, int i);
+static void   getPipeDcDt(MSXproject MSX, double t, double y[], int n, double deriv[]);
+static void   getTankDcDt(MSXproject MSX, double t, double y[], int n, double deriv[]);
+static void   getPipeEquil(MSXproject MSX, double t, double y[], int n, double f[]);
+static void   getTankEquil(MSXproject MSX, double t, double y[], int n, double f[]);
 static int    isValidNumber(double x);                                         //(L.Rossman - 11/03/10)
 
 
 //=============================================================================
 
-int  MSXchem_open(MSXproject *MSX)
+int  MSXchem_open(MSXproject MSX)
 /**
 **  Purpose:
 **    opens the multi-species chemistry system.
@@ -234,7 +233,7 @@ int  MSXchem_open(MSXproject *MSX)
 
 //=============================================================================
 
-void MSXchem_close(MSXproject *MSX)
+void MSXchem_close(MSXproject MSX)
 /**
 **  Purpose:
 **    closes the multi-species chemistry system.
@@ -268,7 +267,7 @@ void MSXchem_close(MSXproject *MSX)
 
 //=============================================================================
 
-int MSXchem_react(MSXproject *MSX, long dt)
+int MSXchem_react(MSXproject MSX, long dt)
 /**
 **  Purpose:
 **    computes reactions in all pipes and tanks.
@@ -339,7 +338,7 @@ int MSXchem_react(MSXproject *MSX, long dt)
 
 //=============================================================================
 
-int MSXchem_equil(MSXproject *MSX, int zone, double *c)
+int MSXchem_equil(MSXproject MSX, int zone, double *c)
 /**
 **  Purpose:
 **    computes equilibrium concentrations for a set of chemical species.
@@ -427,7 +426,7 @@ char* MSXchem_getVariableStr(int i, char *s)                                   /
 
 //=============================================================================
 
-void setSpeciesChemistry(MSXproject *MSX)
+void setSpeciesChemistry(MSXproject MSX)
 /**
 **  Purpose:
 **    determines which species are described by reaction rate
@@ -486,7 +485,7 @@ void setSpeciesChemistry(MSXproject *MSX)
 
 //=============================================================================
 
-void setTankChemistry(MSXproject *MSX)
+void setTankChemistry(MSXproject MSX)
 /**
 **  Purpose:
 **    assigns pipe chemistry expressions to tank chemistry for
@@ -520,7 +519,7 @@ void setTankChemistry(MSXproject *MSX)
 
 //=============================================================================
 
-void evalHydVariables(MSXproject *MSX, int k)
+void evalHydVariables(MSXproject MSX, int k)
 /**
 **  Purpose:
 **    retrieves current values of hydraulic variables for the
@@ -581,7 +580,7 @@ void evalHydVariables(MSXproject *MSX, int k)
 
 //=============================================================================
 
-int evalPipeReactions(MSXproject *MSX, int k, long dt)
+int evalPipeReactions(MSXproject MSX, int k, long dt)
 /**
 **  Purpose:
 **    updates species concentrations in each WQ segment of a pipe
@@ -703,7 +702,7 @@ int evalPipeReactions(MSXproject *MSX, int k, long dt)
 
 //=============================================================================
 
-int evalTankReactions(MSXproject *MSX, int k, long dt)
+int evalTankReactions(MSXproject MSX, int k, long dt)
 /**
 **  Purpose:
 **    updates species concentrations in a given storage tank
@@ -823,7 +822,7 @@ int evalTankReactions(MSXproject *MSX, int k, long dt)
 
 //=============================================================================
 
-int evalPipeEquil(MSXproject *MSX, double *c)
+int evalPipeEquil(MSXproject MSX, double *c)
 /**
 **  Purpose:
 **    computes equilibrium concentrations for water in a pipe segment.
@@ -863,7 +862,7 @@ int evalPipeEquil(MSXproject *MSX, double *c)
 
 //=============================================================================
 
-int evalTankEquil(MSXproject *MSX, double *c)
+int evalTankEquil(MSXproject MSX, double *c)
 /**
 **  Purpose:
 **    computes equilibrium concentrations for water in a tank.
@@ -901,7 +900,7 @@ int evalTankEquil(MSXproject *MSX, double *c)
 
 //=============================================================================
 
-void evalPipeFormulas(MSXproject *MSX, double *c)
+void evalPipeFormulas(MSXproject MSX, double *c)
 /**
 **  Purpose:
 **    evaluates species concentrations in a pipe segment that are simple
@@ -945,7 +944,7 @@ void evalPipeFormulas(MSXproject *MSX, double *c)
 
 //=============================================================================
 
-void evalTankFormulas(MSXproject *MSX, double *c)
+void evalTankFormulas(MSXproject MSX, double *c)
 /**
 **  Purpose:
 **    evaluates species concentrations in a tank that are simple
@@ -989,7 +988,7 @@ void evalTankFormulas(MSXproject *MSX, double *c)
 
 //=============================================================================
 
-double getPipeVariableValue(MSXproject *MSX, int i)
+double getPipeVariableValue(MSXproject MSX, int i)
 /**
 **  Purpose:
 **    finds the value of a species, a parameter, or a constant for 
@@ -1059,7 +1058,7 @@ double getPipeVariableValue(MSXproject *MSX, int i)
 
 //=============================================================================
 
-double getTankVariableValue(MSXproject *MSX, int i)
+double getTankVariableValue(MSXproject MSX, int i)
 /**
 **  Purpose:
 **    finds the value of a species, a parameter, or a constant for 
@@ -1130,7 +1129,7 @@ double getTankVariableValue(MSXproject *MSX, int i)
 
 //=============================================================================
 
-void getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
+void getPipeDcDt(MSXproject MSX, double t, double y[], int n, double deriv[])
 /**
 **  Purpose:
 **    finds reaction rate (dC/dt) for each reacting species in a pipe.
@@ -1193,7 +1192,7 @@ void getPipeDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 
 //=============================================================================
 
-void getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
+void getTankDcDt(MSXproject MSX, double t, double y[], int n, double deriv[])
 /**
 **  Purpose:
 **    finds reaction rate (dC/dt) for each reacting species in a tank.
@@ -1256,7 +1255,7 @@ void getTankDcDt(MSXproject *MSX, double t, double y[], int n, double deriv[])
 
 //=============================================================================
 
-void getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[])
+void getPipeEquil(MSXproject MSX, double t, double y[], int n, double f[])
 /**
 **  Purpose:
 **    evaluates equilibrium expressions for pipe chemistry.
@@ -1308,7 +1307,7 @@ void getPipeEquil(MSXproject *MSX, double t, double y[], int n, double f[])
 
 //=============================================================================
 
-void getTankEquil(MSXproject *MSX, double t, double y[], int n, double f[])
+void getTankEquil(MSXproject MSX, double t, double y[], int n, double f[])
 /**
 **  Purpose:
 **    evaluates equilibrium expressions for tank chemistry.

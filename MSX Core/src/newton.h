@@ -12,9 +12,8 @@
 **  LAST UPDATE:   Refer to git history
 ******************************************************************************/
 
-#ifndef MAGICNUMBER
-#include "msxtypes.h"
-#endif
+// Opaque Pointer
+typedef struct Project *MSXproject;
 
 typedef struct
 {
@@ -23,7 +22,7 @@ typedef struct
     double* F;            // function & adjustment vector
     double* W;            // work vector
     double** J;           // Jacobian matrix
-}MSXNewton;
+} MSXNewton;
 
 // Opens the equation solver system
 int  newton_open(int n);
@@ -32,5 +31,5 @@ int  newton_open(int n);
 void newton_close(void);
 
 // Applies the solver to a specific system of equations
-int  newton_solve(MSXproject*MSX, double x[], int n, int maxit, int numsig,  
-                  void (*func)(MSXproject *,double, double*, int, double*));
+int  newton_solve(MSXproject MSX, double x[], int n, int maxit, int numsig,  
+                  void (*func)(MSXproject, double, double*, int, double*));

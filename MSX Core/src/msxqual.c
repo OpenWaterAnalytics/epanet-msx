@@ -31,15 +31,15 @@
 const double Q_STAGNANT = 0.005 / GPMperCFS;     // 0.005 gpm = 1.114e-5 cfs
 //  Imported functions
 //--------------------
-int    MSXchem_open(MSXproject *MSX);
-void   MSXchem_close(MSXproject *MSX);
-int    MSXchem_react(MSXproject *MSX, long dt);
-int    MSXchem_equil(MSXproject *MSX, int zone, double *c);
+int    MSXchem_open(MSXproject MSX);
+void   MSXchem_close(MSXproject MSX);
+int    MSXchem_react(MSXproject MSX, long dt);
+int    MSXchem_equil(MSXproject MSX, int zone, double *c);
 
-extern void   MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-extern void   MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-extern void   MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-extern void   MSXtank_mix4(MSXproject *MSX, int i, double vIn, double *massin, double vnet);
+extern void   MSXtank_mix1(MSXproject MSX, int i, double vin, double *massin, double vnet);
+extern void   MSXtank_mix2(MSXproject MSX, int i, double vin, double *massin, double vnet);
+extern void   MSXtank_mix3(MSXproject MSX, int i, double vin, double *massin, double vnet);
+extern void   MSXtank_mix4(MSXproject MSX, int i, double vIn, double *massin, double vnet);
 
 
 void   MSXerr_clearMathError(void);                                            //1.1.00
@@ -48,44 +48,44 @@ char*  MSXerr_writeMathErrorMsg(void);                                         /
 
 //  Exported functions
 //--------------------
-int    MSXqual_open(MSXproject *MSX);
-int    MSXqual_init(MSXproject *MSX);
-int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
-int    MSXqual_close(MSXproject *MSX);
-double MSXqual_getNodeQual(MSXproject *MSX, int j, int m);
-double MSXqual_getLinkQual(MSXproject *MSX, int k, int m);
-int    MSXqual_isSame(MSXproject *MSX, double c1[], double c2[]);
-void   MSXqual_removeSeg(MSXproject *MSX, Pseg seg);
-Pseg   MSXqual_getFreeSeg(MSXproject *MSX, double v, double c[]);
-void   MSXqual_addSeg(MSXproject *MSX, int k, Pseg seg);
-void   MSXqual_reversesegs(MSXproject *MSX, int k);
+int    MSXqual_open(MSXproject MSX);
+int    MSXqual_init(MSXproject MSX);
+int    MSXqual_step(MSXproject MSX, long *t, long *tleft);
+int    MSXqual_close(MSXproject MSX);
+double MSXqual_getNodeQual(MSXproject MSX, int j, int m);
+double MSXqual_getLinkQual(MSXproject MSX, int k, int m);
+int    MSXqual_isSame(MSXproject MSX, double c1[], double c2[]);
+void   MSXqual_removeSeg(MSXproject MSX, Pseg seg);
+Pseg   MSXqual_getFreeSeg(MSXproject MSX, double v, double c[]);
+void   MSXqual_addSeg(MSXproject MSX, int k, Pseg seg);
+void   MSXqual_reversesegs(MSXproject MSX, int k);
 
 //  Local functions
 //-----------------
-static int    getHydVars(MSXproject *MSX);
-static int    transport(MSXproject *MSX, long tstep);
-static void   initSegs(MSXproject *MSX);
-static int    flowdirchanged(MSXproject *MSX);
-static void   advectSegs(MSXproject *MSX, long dt);
-static void   getNewSegWallQual(MSXproject *MSX, int k, long dt, Pseg seg);
-static void   shiftSegWallQual(MSXproject *MSX, int k, long dt);
-static void   sourceInput(MSXproject *MSX, int n, double vout, long dt);
-static void   addSource(MSXproject *MSX, int n, Psource source, double v, long dt);
-static double getSourceQual(MSXproject *MSX, Psource source);
-static void   removeAllSegs(MSXproject *MSX, int k);
+static int    getHydVars(MSXproject MSX);
+static int    transport(MSXproject MSX, long tstep);
+static void   initSegs(MSXproject MSX);
+static int    flowdirchanged(MSXproject MSX);
+static void   advectSegs(MSXproject MSX, long dt);
+static void   getNewSegWallQual(MSXproject MSX, int k, long dt, Pseg seg);
+static void   shiftSegWallQual(MSXproject MSX, int k, long dt);
+static void   sourceInput(MSXproject MSX, int n, double vout, long dt);
+static void   addSource(MSXproject MSX, int n, Psource source, double v, long dt);
+static double getSourceQual(MSXproject MSX, Psource source);
+static void   removeAllSegs(MSXproject MSX, int k);
 
-static void topological_transport(MSXproject *MSX, long dt);
-static void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double volout, long tstep);
-static void noflowqual(MSXproject *MSX, int n);
-static void evalnodeinflow(MSXproject *MSX, int, long, double*, double*);
-static void evalnodeoutflow(MSXproject *MSX, int k, double* upnodequal, long tstep);
-static int sortNodes(MSXproject *MSX);
-static int selectnonstacknode(MSXproject *MSX, int numsorted, int* indegree);
-static void findstoredmass(MSXproject *MSX, double* mass);
+static void topological_transport(MSXproject MSX, long dt);
+static void findnodequal(MSXproject MSX, int n, double volin, double* massin, double volout, long tstep);
+static void noflowqual(MSXproject MSX, int n);
+static void evalnodeinflow(MSXproject MSX, int, long, double*, double*);
+static void evalnodeoutflow(MSXproject MSX, int k, double* upnodequal, long tstep);
+static int sortNodes(MSXproject MSX);
+static int selectnonstacknode(MSXproject MSX, int numsorted, int* indegree);
+static void findstoredmass(MSXproject MSX, double* mass);
 
 //=============================================================================
 
-int  MSXqual_open(MSXproject *MSX)
+int  MSXqual_open(MSXproject MSX)
 /**
 **   Purpose:
 **     opens the WQ routing system.
@@ -186,7 +186,7 @@ int  MSXqual_open(MSXproject *MSX)
 
 //=============================================================================
 
-int  MSXqual_init(MSXproject *MSX)
+int  MSXqual_init(MSXproject MSX)
 /**
 **  Purpose:
 **     re-initializes the WQ routing system.
@@ -285,7 +285,7 @@ int  MSXqual_init(MSXproject *MSX)
 
 //=============================================================================
 
-int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
+int MSXqual_step(MSXproject MSX, long *t, long *tleft)
 /**
 **  Purpose:
 **    updates WQ conditions over a single WQ time step.
@@ -435,7 +435,7 @@ int MSXqual_step(MSXproject *MSX, long *t, long *tleft)
 
 //=============================================================================
 
-double  MSXqual_getNodeQual(MSXproject *MSX, int j, int m)
+double  MSXqual_getNodeQual(MSXproject MSX, int j, int m)
 /**
 **   Purpose:
 **     retrieves WQ for species m at node n.
@@ -471,7 +471,7 @@ double  MSXqual_getNodeQual(MSXproject *MSX, int j, int m)
 
 //=============================================================================
 
-double  MSXqual_getLinkQual(MSXproject *MSX, int k, int m)
+double  MSXqual_getLinkQual(MSXproject MSX, int k, int m)
 /**
 **   Purpose:
 **     computes average quality in link k.
@@ -506,7 +506,7 @@ double  MSXqual_getLinkQual(MSXproject *MSX, int k, int m)
 
 //=============================================================================
 
-int MSXqual_close(MSXproject *MSX)
+int MSXqual_close(MSXproject MSX)
 /**
 **   Purpose:
 **     closes the WQ routing system.
@@ -548,7 +548,7 @@ int MSXqual_close(MSXproject *MSX)
 
 //=============================================================================
 
-int  MSXqual_isSame(MSXproject *MSX, double c1[], double c2[])
+int  MSXqual_isSame(MSXproject MSX, double c1[], double c2[])
 /**
 **   Purpose:
 **     checks if two sets of concentrations are the same
@@ -574,7 +574,7 @@ int  MSXqual_isSame(MSXproject *MSX, double c1[], double c2[])
 
 //=============================================================================
 
-int  getHydVars(MSXproject *MSX)
+int  getHydVars(MSXproject MSX)
 /**
 **   Purpose:
 **     retrieves hydraulic solution and time step for next hydraulic event
@@ -641,7 +641,7 @@ int  getHydVars(MSXproject *MSX)
 
 //=============================================================================
 
-int  transport(MSXproject *MSX, long tstep)
+int  transport(MSXproject MSX, long tstep)
 /**
 **  Purpose:
 **    transports constituent mass through pipe network
@@ -686,7 +686,7 @@ int  transport(MSXproject *MSX, long tstep)
 
 //=============================================================================
 
-void  initSegs(MSXproject *MSX)
+void  initSegs(MSXproject MSX)
 /**
 **   Purpose:
 **     initializes water quality in pipe segments.
@@ -781,7 +781,7 @@ void  initSegs(MSXproject *MSX)
 
 //=============================================================================
 
-int  flowdirchanged(MSXproject *MSX)
+int  flowdirchanged(MSXproject MSX)
 /**
 **   Purpose:
 **     re-orients pipe segments (if flow reverses).
@@ -824,7 +824,7 @@ int  flowdirchanged(MSXproject *MSX)
 
 //=============================================================================
 
-void advectSegs(MSXproject *MSX, long dt)
+void advectSegs(MSXproject MSX, long dt)
 /**
 **   Purpose:
 **     advects WQ segments within each pipe.
@@ -867,7 +867,7 @@ void advectSegs(MSXproject *MSX, long dt)
 
 //=============================================================================
 
-void getNewSegWallQual(MSXproject *MSX, int k, long dt, Pseg newseg)
+void getNewSegWallQual(MSXproject MSX, int k, long dt, Pseg newseg)
 /**
 **  Purpose:
 **     computes wall species concentrations for a new WQ segment that
@@ -944,7 +944,7 @@ void getNewSegWallQual(MSXproject *MSX, int k, long dt, Pseg newseg)
 
 //=============================================================================
 
-void shiftSegWallQual(MSXproject *MSX, int k, long dt)
+void shiftSegWallQual(MSXproject MSX, int k, long dt)
 /**
 **  Purpose:
 **    recomputes wall species concentrations in segments that remain
@@ -1026,7 +1026,7 @@ void shiftSegWallQual(MSXproject *MSX, int k, long dt)
 
 //=============================================================================
 
-void sourceInput(MSXproject *MSX, int n, double volout, long dt)
+void sourceInput(MSXproject MSX, int n, double volout, long dt)
 /**
 **  Purpose:
 **    computes contribution (if any) of mass additions from WQ
@@ -1078,7 +1078,7 @@ void sourceInput(MSXproject *MSX, int n, double volout, long dt)
 
 //=============================================================================
 
-void addSource(MSXproject *MSX, int n, Psource source, double volout, long dt)
+void addSource(MSXproject MSX, int n, Psource source, double volout, long dt)
 /**
 **  Purpose:
 **    updates concentration of particular species leaving a node
@@ -1152,7 +1152,7 @@ void addSource(MSXproject *MSX, int n, Psource source, double volout, long dt)
 
 //=============================================================================
 
-double  getSourceQual(MSXproject *MSX, Psource source)
+double  getSourceQual(MSXproject MSX, Psource source)
 /**
 **   Input:   j = source index
 **     MSX = the underlying MSXproject data struct.
@@ -1193,7 +1193,7 @@ double  getSourceQual(MSXproject *MSX, Psource source)
 
 //=============================================================================
 
-void  removeAllSegs(MSXproject *MSX, int k)
+void  removeAllSegs(MSXproject MSX, int k)
 /**
 **   Purpose:
 **     removes all segments in a pipe link.
@@ -1214,7 +1214,7 @@ void  removeAllSegs(MSXproject *MSX, int k)
     MSX->LastSeg[k] = NULL;
 }
 
-void topological_transport(MSXproject *MSX, long dt)
+void topological_transport(MSXproject MSX, long dt)
 {
     int j, n, k, m;
     double volin, volout; 
@@ -1284,7 +1284,7 @@ void topological_transport(MSXproject *MSX, long dt)
 
 //=============================================================================
 
-void evalnodeoutflow(MSXproject *MSX, int k, double * upnodequal, long tstep)
+void evalnodeoutflow(MSXproject MSX, int k, double * upnodequal, long tstep)
 /**
 **--------------------------------------------------------------
 **   Input:   k = link index
@@ -1354,7 +1354,7 @@ void evalnodeoutflow(MSXproject *MSX, int k, double * upnodequal, long tstep)
 
 //=============================================================================
 
-void  evalnodeinflow(MSXproject *MSX, int k, long tstep, double* volin, double* massin)
+void  evalnodeinflow(MSXproject MSX, int k, long tstep, double* volin, double* massin)
     /**
     **--------------------------------------------------------------
     **   Input:   k = link index
@@ -1416,7 +1416,7 @@ void  evalnodeinflow(MSXproject *MSX, int k, long tstep, double* volin, double* 
 
 //=============================================================================
 
-void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double volout, long tstep)
+void findnodequal(MSXproject MSX, int n, double volin, double* massin, double volout, long tstep)
     /**
     **--------------------------------------------------------------
     **   Input:   n = node index
@@ -1515,7 +1515,7 @@ void findnodequal(MSXproject *MSX, int n, double volin, double* massin, double v
 
 //=============================================================================
 
-int sortNodes(MSXproject *MSX)
+int sortNodes(MSXproject MSX)
 /**
 **--------------------------------------------------------------
 **   Input: 
@@ -1622,7 +1622,7 @@ int sortNodes(MSXproject *MSX)
 
 //=============================================================================
 
-int selectnonstacknode(MSXproject *MSX, int numsorted, int* indegree)
+int selectnonstacknode(MSXproject MSX, int numsorted, int* indegree)
 /**
 **--------------------------------------------------------------
 **   Input:   numsorted = number of nodes that have been sorted
@@ -1665,7 +1665,7 @@ int selectnonstacknode(MSXproject *MSX, int numsorted, int* indegree)
 
 //=============================================================================
 
-void  noflowqual(MSXproject *MSX, int n)
+void  noflowqual(MSXproject MSX, int n)
 /**
 **--------------------------------------------------------------
 **   Input:   n = node index
@@ -1721,7 +1721,7 @@ void  noflowqual(MSXproject *MSX, int n)
 
 //=============================================================================
 
-void findstoredmass(MSXproject *MSX, double * mass)
+void findstoredmass(MSXproject MSX, double * mass)
 /**
 **--------------------------------------------------------------
 **   Input:
@@ -1785,7 +1785,7 @@ void findstoredmass(MSXproject *MSX, double * mass)
 
 //=============================================================================
 
-void MSXqual_reversesegs(MSXproject *MSX, int k)
+void MSXqual_reversesegs(MSXproject MSX, int k)
 /**
 **--------------------------------------------------------------
 **   Input:   k = link index
@@ -1813,7 +1813,7 @@ void MSXqual_reversesegs(MSXproject *MSX, int k)
 
 //=============================================================================
 
-void MSXqual_removeSeg(MSXproject *MSX, Pseg seg)
+void MSXqual_removeSeg(MSXproject MSX, Pseg seg)
 /**
 **   Purpose:
 **     places a WQ segment back into the memory pool of segments.
@@ -1831,7 +1831,7 @@ void MSXqual_removeSeg(MSXproject *MSX, Pseg seg)
 
 //=============================================================================
 
-Pseg MSXqual_getFreeSeg(MSXproject *MSX, double v, double c[])
+Pseg MSXqual_getFreeSeg(MSXproject MSX, double v, double c[])
 /**
 **   Purpose:
 **     retrieves an unused water quality volume segment from the memory pool.
@@ -1885,7 +1885,7 @@ Pseg MSXqual_getFreeSeg(MSXproject *MSX, double v, double c[])
 
 //=============================================================================
 
-void  MSXqual_addSeg(MSXproject *MSX, int k, Pseg seg)
+void  MSXqual_addSeg(MSXproject MSX, int k, Pseg seg)
 /**
 **   Purpose:
 **     adds a new segment to the upstream end of a link.

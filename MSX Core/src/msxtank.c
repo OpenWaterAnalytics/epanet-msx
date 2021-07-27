@@ -20,24 +20,24 @@
 
 //  Imported functions
 //--------------------
-extern void  MSXqual_removeSeg(MSXproject *MSX, Pseg seg);
-extern Pseg  MSXqual_getFreeSeg(MSXproject *MSX, double v, double c[]);
-extern void  MSXqual_addSeg(MSXproject *MSX, int k, Pseg seg);
-extern int   MSXqual_isSame(MSXproject *MSX, double c1[], double c2[]);
-extern int   MSXchem_equil(MSXproject *MSX, int zone, double *c);
-extern void  MSXqual_reversesegs(MSXproject *MSX, int k);
+extern void  MSXqual_removeSeg(MSXproject MSX, Pseg seg);
+extern Pseg  MSXqual_getFreeSeg(MSXproject MSX, double v, double c[]);
+extern void  MSXqual_addSeg(MSXproject MSX, int k, Pseg seg);
+extern int   MSXqual_isSame(MSXproject MSX, double c1[], double c2[]);
+extern int   MSXchem_equil(MSXproject MSX, int zone, double *c);
+extern void  MSXqual_reversesegs(MSXproject MSX, int k);
 
 //  Exported functions
 //--------------------
-void   MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-void   MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-void   MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vnet);
-void   MSXtank_mix4(MSXproject *MSX, int i, double vin, double *massin, double vnet);
+void   MSXtank_mix1(MSXproject MSX, int i, double vin, double *massin, double vnet);
+void   MSXtank_mix2(MSXproject MSX, int i, double vin, double *massin, double vnet);
+void   MSXtank_mix3(MSXproject MSX, int i, double vin, double *massin, double vnet);
+void   MSXtank_mix4(MSXproject MSX, int i, double vin, double *massin, double vnet);
 
 
 //=============================================================================
 
-void  MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vnet)
+void  MSXtank_mix1(MSXproject MSX, int i, double vin, double *massin, double vnet)
 /**
 **  Purpose:
 **    computes new WQ at end of time step in a completely mixed tank
@@ -86,7 +86,7 @@ void  MSXtank_mix1(MSXproject *MSX, int i, double vin, double *massin, double vn
 
 //=============================================================================
 
-void  MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vnet)
+void  MSXtank_mix2(MSXproject MSX, int i, double vin, double *massin, double vnet)
 /**
 **   Purpose: 2-compartment tank model                      
 **
@@ -195,7 +195,7 @@ void  MSXtank_mix2(MSXproject *MSX, int i, double vin, double *massin, double vn
 
 //=============================================================================
 
-void  MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vnet)
+void  MSXtank_mix3(MSXproject MSX, int i, double vin, double *massin, double vnet)
 /**
 **   Purpose: computes concentrations in the segments that form a
 **            first-in-first-out (FIFO) tank model.
@@ -300,7 +300,7 @@ void  MSXtank_mix3(MSXproject *MSX, int i, double vin, double *massin, double vn
 
 //=============================================================================
 
-void  MSXtank_mix4(MSXproject *MSX, int i, double vin, double *massin, double vnet)
+void  MSXtank_mix4(MSXproject MSX, int i, double vin, double *massin, double vnet)
 /**
 **----------------------------------------------------------
 **   Input:   i = tank index

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "rk5.h"
+#include "msxtypes.h"
 
 #define fmin(x,y) (((x)<=(y)) ? (x) : (y))     /* minimum of x and y    */
 #define fmax(x,y) (((x)>=(y)) ? (x) : (y))     /* maximum of x and y    */
@@ -105,9 +106,9 @@ void rk5_close()
 
 //=============================================================================
 
-int rk5_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
+int rk5_integrate(MSXproject MSX, double y[], int n, double t, double tnext,
                   double* htry, double atol[], double rtol[],
-                  void (*func)(MSXproject*, double, double*, int, double*))
+                  void (*func)(MSXproject, double, double*, int, double*))
 /**
 **  Purpose:
 **    Integrates system of equations dY/dt = F(t,Y) over a

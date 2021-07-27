@@ -50,7 +50,7 @@
 #include <stdlib.h>
 #include <stdio.h>                                                             //1.1.00
 #include <math.h>
-#include "mathexpr.h"
+#include "msxtypes.h"
 
 #define MAX_STACK_SIZE  1024
 
@@ -101,20 +101,20 @@ static int        isDigit(char);
 static int        isLetter(char);
 static void       getToken(void);
 static int        getMathFunc(void);
-static int        getVariable(MSXproject *MSX);
+static int        getVariable(MSXproject MSX);
 static int        getOperand(void);
-static int        getLex(MSXproject *MSX);
+static int        getLex(MSXproject MSX);
 static double     getNumber(void);
 static ExprTree * newNode(void);
-static ExprTree * getSingleOp(MSXproject *MSX, int *);
-static ExprTree * getOp(MSXproject *MSX, int *);
-static ExprTree * getTree(MSXproject *MSX);
+static ExprTree * getSingleOp(MSXproject MSX, int *);
+static ExprTree * getOp(MSXproject MSX, int *);
+static ExprTree * getTree(MSXproject MSX);
 static void       traverseTree(ExprTree *, MathExpr **);
 static void       deleteTree(ExprTree *);
 
 // Callback functions
-static int    (*getVariableIndex) (MSXproject*, char *); // return index of named variable
-static double (*getVariableValue) (MSXproject*, int);    // return value of indexed variable
+static int    (*getVariableIndex) (MSXproject, char *); // return index of named variable
+static double (*getVariableValue) (MSXproject, int);    // return value of indexed variable
 
 //=============================================================================
 
@@ -187,7 +187,7 @@ int getMathFunc()
 
 //=============================================================================
 
-int getVariable(MSXproject *MSX)
+int getVariable(MSXproject MSX)
 {
     if ( !getVariableIndex ) return 0;
     Ivar = getVariableIndex(MSX, Token);
@@ -286,7 +286,7 @@ int getOperand()
 
 //=============================================================================
 
-int getLex(MSXproject *MSX)
+int getLex(MSXproject MSX)
 {
     int n;
 
@@ -338,7 +338,7 @@ ExprTree * newNode()
 
 //=============================================================================
 
-ExprTree * getSingleOp(MSXproject *MSX, int *lex)
+ExprTree * getSingleOp(MSXproject MSX, int *lex)
 {
     int opcode;
     ExprTree *left;
@@ -394,7 +394,7 @@ ExprTree * getSingleOp(MSXproject *MSX, int *lex)
 
 //=============================================================================
 
-ExprTree * getOp(MSXproject *MSX, int *lex)
+ExprTree * getOp(MSXproject MSX, int *lex)
 {
     int opcode;
     ExprTree *left;
@@ -439,7 +439,7 @@ ExprTree * getOp(MSXproject *MSX, int *lex)
 
 //=============================================================================
 
-ExprTree * getTree(MSXproject *MSX)
+ExprTree * getTree(MSXproject MSX)
 {
     int      lex;
     int      opcode;
@@ -511,7 +511,7 @@ void deleteTree(ExprTree *tree)
 
 //=============================================================================
 
-double mathexpr_eval(MSXproject *MSX, MathExpr *expr, double (*getVariableValue) (MSXproject*, int))
+double mathexpr_eval(MSXproject MSX, MathExpr *expr, double (*getVariableValue) (MSXproject, int))
 //  Mathematica expression evaluation using a stack
 {
     
@@ -694,7 +694,7 @@ void mathexpr_delete(MathExpr *expr)
 
 //=============================================================================
 
-MathExpr * mathexpr_create(MSXproject *MSX, char *formula, int (*getVar) (MSXproject *, char *))
+MathExpr * mathexpr_create(MSXproject MSX, char *formula, int (*getVar) (MSXproject, char *))
 {
     ExprTree *tree;
     MathExpr *expr = NULL;

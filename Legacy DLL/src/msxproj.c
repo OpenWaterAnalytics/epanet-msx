@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "msxtypes.h"
 #include "msxutils.h"
-#include "mathexpr.h"
 #include "hash.h"
 #include "msxobjects.h"
 
@@ -56,25 +56,25 @@ static char * Errmsg[] =
 
 //  Imported functions
 //--------------------
-int    MSXinp_countMsxObjects(MSXproject *MSX);
-int    MSXinp_countNetObjects(MSXproject *MSX);
-int    MSXinp_readNetData(MSXproject *MSX);
-int    MSXinp_readMsxData(MSXproject *MSX);
+int    MSXinp_countMsxObjects(MSXproject MSX);
+int    MSXinp_countNetObjects(MSXproject MSX);
+int    MSXinp_readNetData(MSXproject MSX);
+int    MSXinp_readMsxData(MSXproject MSX);
 
 //  Exported functions
 //--------------------
-int    MSXproj_open(MSXproject *MSX, char *fname);
+int    MSXproj_open(MSXproject MSX, char *fname);
 char * MSXproj_getErrmsg(int errcode);
 
 //  Local functions
 //-----------------
-static int    createObjects(MSXproject *MSX);
+static int    createObjects(MSXproject MSX);
 
-static int    openRptFile(MSXproject *MSX);                                               //(LR-11/20/07)
+static int    openRptFile(MSXproject MSX);                                               //(LR-11/20/07)
 
 //=============================================================================
 
-int  MSXproj_open(MSXproject *MSX, char *fname)
+int  MSXproj_open(MSXproject MSX, char *fname)
 /**
 **  Purpose:
 **    opens an EPANET-MSX project.
@@ -144,7 +144,7 @@ int  MSXproj_open(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-void MSXproj_close(MSXproject *MSX)
+void MSXproj_close(MSXproject MSX)
 /**
 **  Purpose:
 **    closes the current EPANET-MSX project.
@@ -198,7 +198,7 @@ char * MSXproj_getErrmsg(int errcode)
 
 //=============================================================================
 
-int createObjects(MSXproject *MSX)
+int createObjects(MSXproject MSX)
 /**
 **  Purpose:
 **    creates multi-species data objects.
@@ -298,7 +298,7 @@ int createObjects(MSXproject *MSX)
 //=============================================================================
 
 // New function added (LR-11/20/07, to fix bug 08)
-int openRptFile(MSXproject *MSX)
+int openRptFile(MSXproject MSX)
 {
     if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);
     MSX->RptFile.file = fopen(MSX->RptFile.name, "wt");

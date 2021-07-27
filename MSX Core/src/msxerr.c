@@ -64,7 +64,7 @@ void MSXerr_writeMathErrorMsg()
 
 //=============================================================================
 
-double  MSXerr_validate(MSXproject *MSX, double x, int index, int element, int exprType)
+double  MSXerr_validate(MSXproject MSX, double x, int index, int element, int exprType)
 /**
 **  Purpose:
 **    checks if a number is valid or not.

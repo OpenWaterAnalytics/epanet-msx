@@ -23,6 +23,8 @@
 #include "msxutils.h"
 #include "msxdict.h"
 #include "msxobjects.h"
+#include "msxtypes.h"
+
 // --- define WINDOWS
 
 #undef WINDOWS
@@ -455,8 +457,8 @@ void solve(double **a, int n, int *indx, double b[])
 
 //=============================================================================
 
-void jacobian(MSXproject *MSX, double *x, int n, double *f, double *w, double **a,
-              void (*func)(MSXproject*, double, double*, int, double*))
+void jacobian(MSXproject MSX, double *x, int n, double *f, double *w, double **a,
+              void (*func)(MSXproject, double, double*, int, double*))
 /**
 **  Purpose: 
 **    computes Jacobian matrix of F(t,X) at given X

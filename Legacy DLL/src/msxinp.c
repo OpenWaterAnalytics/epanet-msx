@@ -19,11 +19,10 @@
 #include <string.h>
 #include <math.h>
 
-#include "mathexpr.h"
+#include "msxtypes.h"
 #include "msxutils.h"
 #include "msxdict.h"
 #include "epanet2.h"
-
 #include "msxobjects.h"
 
 //  Constants
@@ -54,38 +53,38 @@ static char  *InpErrorTxt[INP_ERR_LAST-INP_ERR_FIRST] = {
 
 //  Exported functions
 //--------------------
-int    MSXinp_countMsxObjects(MSXproject *MSX);
-int    MSXinp_countNetObjects(MSXproject *MSX);
-int    MSXinp_readNetData(MSXproject *MSX);
-int    MSXinp_readMsxData(MSXproject *MSX);
-void   MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units);
+int    MSXinp_countMsxObjects(MSXproject MSX);
+int    MSXinp_countNetObjects(MSXproject MSX);
+int    MSXinp_readNetData(MSXproject MSX);
+int    MSXinp_readMsxData(MSXproject MSX);
+void   MSXinp_getSpeciesUnits(MSXproject MSX, int m, char *units);
 
 //  Local functions
 //-----------------
 static int    getLineLength(char *line);
 static int    getNewSection(char *tok, char *sectWords[], int *sect);
-static int    addSpecies(MSXproject *MSX, char *line);
-static int    addCoeff(MSXproject *MSX, char *line);
-static int    addTerm(MSXproject *MSX, char *id);
-static int    addPattern(MSXproject *MSX, char *id);
-static int    parseLine(MSXproject *MSX, int sect, char *line);
-static int    parseOption(MSXproject *MSX);
-static int    parseSpecies(MSXproject *MSX);
-static int    parseCoeff(MSXproject *MSX);
-static int    parseTerm(MSXproject *MSX);
-static int    parseExpression(MSXproject *MSX, int classType);
+static int    addSpecies(MSXproject MSX, char *line);
+static int    addCoeff(MSXproject MSX, char *line);
+static int    addTerm(MSXproject MSX, char *id);
+static int    addPattern(MSXproject MSX, char *id);
+static int    parseLine(MSXproject MSX, int sect, char *line);
+static int    parseOption(MSXproject MSX);
+static int    parseSpecies(MSXproject MSX);
+static int    parseCoeff(MSXproject MSX);
+static int    parseTerm(MSXproject MSX);
+static int    parseExpression(MSXproject MSX, int classType);
 static int    parseTankData(void);
-static int    parseQuality(MSXproject *MSX);
-static int    parseParameter(MSXproject *MSX);
-static int    parseSource(MSXproject *MSX);
-static int    parsePattern(MSXproject *MSX);
-static int    parseReport(MSXproject *MSX);
+static int    parseQuality(MSXproject MSX);
+static int    parseParameter(MSXproject MSX);
+static int    parseSource(MSXproject MSX);
+static int    parsePattern(MSXproject MSX);
+static int    parseReport(MSXproject MSX);
 static int    getTokens(char *s);
 static void   writeInpErrMsg(int errcode, char *sect, char *line, int lineCount);
 
 //=============================================================================
 
-int MSXinp_countMsxObjects(MSXproject *MSX)
+int MSXinp_countMsxObjects(MSXproject MSX)
 /**
 **  Purpose:
 **    reads multi-species input file to determine number of system objects.
@@ -152,7 +151,7 @@ int MSXinp_countMsxObjects(MSXproject *MSX)
 
 //=============================================================================
 
-int  MSXinp_countNetObjects(MSXproject *MSX)
+int  MSXinp_countNetObjects(MSXproject MSX)
 /**
 **  Purpose:
 **    queries EPANET data base to determine number of network objects.
@@ -176,7 +175,7 @@ int  MSXinp_countNetObjects(MSXproject *MSX)
 
 //=============================================================================
 
-int MSXinp_readNetData(MSXproject *MSX)
+int MSXinp_readNetData(MSXproject MSX)
 /**
 **  Purpose:
 **    retrieves required input data from the EPANET project data.
@@ -253,7 +252,7 @@ int MSXinp_readNetData(MSXproject *MSX)
 
 //=============================================================================
 
-int  MSXinp_readMsxData(MSXproject *MSX)
+int  MSXinp_readMsxData(MSXproject MSX)
 /**
 **  Purpose:
 **    reads multi-species data from the EPANET-MSX input file.
@@ -329,7 +328,7 @@ int  MSXinp_readMsxData(MSXproject *MSX)
 
 //=============================================================================
 
-void   MSXinp_getSpeciesUnits(MSXproject *MSX, int m, char *units)
+void   MSXinp_getSpeciesUnits(MSXproject MSX, int m, char *units)
 /**
 **  Purpose:
 **    constructs the character string for a species concentration units.
@@ -409,7 +408,7 @@ int  getNewSection(char *tok, char *sectWords[], int *sect)
 
 //=============================================================================
 
-int addSpecies(MSXproject *MSX, char *line)
+int addSpecies(MSXproject MSX, char *line)
 /**
 **  Purpose:
 **    adds a species ID name to the project.
@@ -435,7 +434,7 @@ int addSpecies(MSXproject *MSX, char *line)
 
 //=============================================================================
 
-int addCoeff(MSXproject *MSX, char *line)
+int addCoeff(MSXproject MSX, char *line)
 /**
 **  Purpose:
 **    adds a coefficient ID name to the project.
@@ -471,7 +470,7 @@ int addCoeff(MSXproject *MSX, char *line)
 
 //=============================================================================
 
-int addTerm(MSXproject *MSX, char *id)
+int addTerm(MSXproject MSX, char *id)
 /**
 **  Purpose:
 **    adds an intermediate expression term ID name to the project.
@@ -496,7 +495,7 @@ int addTerm(MSXproject *MSX, char *id)
 
 //=============================================================================
 
-int addPattern(MSXproject *MSX, char *id)
+int addPattern(MSXproject MSX, char *id)
 /**
 **  Purpose:
 **    adds a time pattern ID name to the project.
@@ -525,7 +524,7 @@ int addPattern(MSXproject *MSX, char *id)
 //=============================================================================
 
 
-int parseLine(MSXproject *MSX, int sect, char *line)
+int parseLine(MSXproject MSX, int sect, char *line)
 /**
 **  Purpose:
 **    parses the contents of a line of input data.
@@ -583,7 +582,7 @@ int parseLine(MSXproject *MSX, int sect, char *line)
 
 //=============================================================================
 
-int parseOption(MSXproject *MSX)
+int parseOption(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a project option.
@@ -657,7 +656,7 @@ int parseOption(MSXproject *MSX)
 
 //=============================================================================
 
-int parseSpecies(MSXproject *MSX)
+int parseSpecies(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a species variable.
@@ -710,7 +709,7 @@ int parseSpecies(MSXproject *MSX)
 
 //=============================================================================
 
-int parseCoeff(MSXproject *MSX)
+int parseCoeff(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a coefficient definition.
@@ -773,7 +772,7 @@ int parseCoeff(MSXproject *MSX)
 
 //=============================================================================
 
-int parseTerm(MSXproject *MSX)
+int parseTerm(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing an intermediate expression term .
@@ -818,7 +817,7 @@ int parseTerm(MSXproject *MSX)
 
 //=============================================================================
 
-int parseExpression(MSXproject *MSX, int classType)
+int parseExpression(MSXproject MSX, int classType)
 /**
 **  Purpose:
 **    parses an input line containing a math expression.
@@ -884,7 +883,7 @@ int parseExpression(MSXproject *MSX, int classType)
 
 //=============================================================================
 
-int parseQuality(MSXproject *MSX)
+int parseQuality(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing initial species concentrations.
@@ -956,7 +955,7 @@ int parseQuality(MSXproject *MSX)
 
 //=============================================================================
 
-int parseParameter(MSXproject *MSX)
+int parseParameter(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a parameter data.
@@ -1004,7 +1003,7 @@ int parseParameter(MSXproject *MSX)
 
 //=============================================================================
 
-int parseSource(MSXproject *MSX)
+int parseSource(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a source input data.
@@ -1083,7 +1082,7 @@ int parseSource(MSXproject *MSX)
 
 //=============================================================================
 
-int parsePattern(MSXproject *MSX)
+int parsePattern(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing a time pattern data.
@@ -1134,7 +1133,7 @@ int parsePattern(MSXproject *MSX)
 
 //=============================================================================
 
-int parseReport(MSXproject *MSX)
+int parseReport(MSXproject MSX)
 /**
 **  Purpose:
 **    parses an input line containing report data.

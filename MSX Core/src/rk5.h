@@ -7,9 +7,8 @@
 **  LAST UPDATE:   Refer to git history
 ***********************************************************************/
 
-#ifndef MAGICNUMBER
-#include "msxtypes.h"
-#endif
+// Opaque Pointer
+typedef struct Project *MSXproject;
 
 typedef struct
 {
@@ -33,6 +32,6 @@ int  rk5_open(int n, int itmax, int adjust);
 void rk5_close(void);
 
 // Applies the solver to integrate a specific system of ODEs
-int  rk5_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
+int  rk5_integrate(MSXproject MSX, double y[], int n, double t, double tnext,
                    double* htry, double atol[], double rtol[],
-                   void (*func)(MSXproject*,double, double*, int, double*));
+                   void (*func)(MSXproject,double, double*, int, double*));

@@ -10,10 +10,7 @@ include_directories(
 include_directories(
   ../MSX\ Core/include
 )
-# msxtypes.h is needed in the coretoolkit.h so this is required
-include_directories(
-  ../MSX\ Core/src
-)
+
 
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)

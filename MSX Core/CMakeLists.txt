@@ -3,9 +3,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(CORE_LIB LANGUAGES C)
 
-#include_directories(
-#  ../Legacy\ DLL/include
-#)
 
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)

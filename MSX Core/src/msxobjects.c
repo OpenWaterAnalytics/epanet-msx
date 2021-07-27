@@ -16,11 +16,11 @@
 #include <string.h>
 #include <malloc.h>
 
+#include "msxtypes.h"
 #include "hash.h"
 #include "msxobjects.h"
 #include "msxdict.h"
 #include "msxutils.h"
-#include "mathexpr.h"
 
 //  Local variables
 //-----------------
@@ -162,7 +162,7 @@ void deleteHashTables()
 
 //=============================================================================
 
-int setDefaults(MSXproject *MSX)
+int setDefaults(MSXproject MSX)
 /**
 **  Purpose:
 **    assigns default values to project variables.
@@ -172,6 +172,7 @@ int setDefaults(MSXproject *MSX)
 */
 {
     int i;
+    MSX->ProjectOpened = 1;     //Should only be called from opening a project
     MSX->RptFile.file = NULL;                                                   //(LR-11/20/07)
     MSX->HydFile.file = NULL;
     MSX->HydFile.mode = USED_FILE;
@@ -220,7 +221,7 @@ int setDefaults(MSXproject *MSX)
 
 //=============================================================================
 
-int getVariableCode(MSXproject *MSX, char *id)
+int getVariableCode(MSXproject MSX, char *id)
 /**
 **  Purpose:
 **    finds the index assigned to a species, intermediate term,
@@ -255,7 +256,7 @@ int getVariableCode(MSXproject *MSX, char *id)
 
 //=============================================================================
 
-int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ routing
+int  buildadjlists(MSXproject MSX)   //from epanet2.2 for node sorting in WQ routing
 /**
 **--------------------------------------------------------------
 ** Input:
@@ -312,7 +313,7 @@ int  buildadjlists(MSXproject *MSX)   //from epanet2.2 for node sorting in WQ ro
 
 //=============================================================================
 
-void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting in WQ routing
+void  freeadjlists(MSXproject MSX)            //from epanet2.2 for node sorting in WQ routing
 /**
 **--------------------------------------------------------------
 ** Input:
@@ -339,7 +340,7 @@ void  freeadjlists(MSXproject *MSX)            //from epanet2.2 for node sorting
 
 //=============================================================================
 
-int convertUnits(MSXproject *MSX)
+int convertUnits(MSXproject MSX)
 /**
 **  Purpose:
 **    converts user's units to internal EPANET units.
@@ -421,7 +422,7 @@ int convertUnits(MSXproject *MSX)
 
 //=============================================================================
 
-void deleteObjects(MSXproject *MSX)
+void deleteObjects(MSXproject MSX)
 /**
 **  Purpose:
 **    deletes multi-species data objects.
@@ -523,7 +524,7 @@ void deleteObjects(MSXproject *MSX)
 
 //=============================================================================
 
-int checkCyclicTerms(MSXproject *MSX, double **TermArray)                                                         //1.1.00
+int checkCyclicTerms(MSXproject MSX, double **TermArray)                                                         //1.1.00
 /**
 **  Purpose:
 **    checks for cyclic references in Term expressions (e.g., T1 = T2 + T3
@@ -586,7 +587,7 @@ int traceTermPath(int i, int istar, int n, double **TermArray)                  
 
 //=============================================================================
 
-int finishInit(MSXproject *MSX)
+int finishInit(MSXproject MSX)
 /**
 **  Purpose:
 **    finishes setting up the MSX data struct.
@@ -601,7 +602,7 @@ int finishInit(MSXproject *MSX)
 **    an error code (or 0 for no error).
 */
 {
-    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
     int err = 0;
 
     MSX->K = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00

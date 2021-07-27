@@ -17,6 +17,7 @@
 #include <math.h>
 #include "msxutils.h"
 #include "ros2.h"
+#include "msxtypes.h"
 
 #define fmin(x,y) (((x)<=(y)) ? (x) : (y))     /* minimum of x and y    */
 #define fmax(x,y) (((x)>=(y)) ? (x) : (y))     /* maximum of x and y    */
@@ -105,9 +106,9 @@ void ros2_close()
 
 //=============================================================================
       
-int ros2_integrate(MSXproject *MSX, double y[], int n, double t, double tnext,
+int ros2_integrate(MSXproject MSX, double y[], int n, double t, double tnext,
                    double* htry, double atol[], double rtol[],
-                   void (*func)(MSXproject*, double, double*, int, double*))
+                   void (*func)(MSXproject, double, double*, int, double*))
 /**
 **  Purpose:
 **    integrates a system of ODEs over a specified time interval.

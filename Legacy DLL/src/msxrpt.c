@@ -58,27 +58,27 @@ static char IDname[MAXLINE+1];
 
 //  Imported functions
 //--------------------
-float MSXout_getNodeQual(MSXproject *MSX, int k, int j, int m);
-float MSXout_getLinkQual(MSXproject *MSX, int k, int j, int m);
+float MSXout_getNodeQual(MSXproject MSX, int k, int j, int m);
+float MSXout_getLinkQual(MSXproject MSX, int k, int j, int m);
 
 
 //  Local functions
 //-----------------
-static void  createSeriesTables(MSXproject *MSX);
-static void  createStatsTables(MSXproject *MSX);
-static void  createTableHdr(MSXproject *MSX, int objType, int tableType);
-static void  writeTableHdr(MSXproject *MSX);
-static void  writeNodeTable(MSXproject *MSX, int j, int tableType);
-static void  writeLinkTable(MSXproject *MSX, int j, int tableType);
-static void  getHrsMins(MSXproject *MSX, int k, int *hrs, int *mins);
-static void  newPage(MSXproject *MSX);
-static void  writeLine(MSXproject *MSX, char *line);
+static void  createSeriesTables(MSXproject MSX);
+static void  createStatsTables(MSXproject MSX);
+static void  createTableHdr(MSXproject MSX, int objType, int tableType);
+static void  writeTableHdr(MSXproject MSX);
+static void  writeNodeTable(MSXproject MSX, int j, int tableType);
+static void  writeLinkTable(MSXproject MSX, int j, int tableType);
+static void  getHrsMins(MSXproject MSX, int k, int *hrs, int *mins);
+static void  newPage(MSXproject MSX);
+static void  writeLine(MSXproject MSX, char *line);
 
-static void writemassbalance(MSXproject *MSX);
+static void writemassbalance(MSXproject MSX);
 
 //=============================================================================
 
-int  MSXrpt_write(MSXproject *MSX, char *fname)
+int  MSXrpt_write(MSXproject MSX, char *fname)
 {
     INT4  magic = 0;
     int  j;
@@ -123,14 +123,14 @@ int  MSXrpt_write(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-void  MSXrpt_writeLine(MSXproject *MSX, char *line)                                             //1.1.00
+void  MSXrpt_writeLine(MSXproject MSX, char *line)                                             //1.1.00
 {                                                                              //1.1.00
     writeLine(MSX, line);                                                           //1.1.00
 }                                                                              //1.1.00
 
 //=============================================================================
 
-void createSeriesTables(MSXproject *MSX)
+void createSeriesTables(MSXproject MSX)
 {
     int  j;
 
@@ -159,7 +159,7 @@ void createSeriesTables(MSXproject *MSX)
 
 //=============================================================================
 
-void createStatsTables(MSXproject *MSX)
+void createStatsTables(MSXproject MSX)
 {
     int  j;
     int  count;
@@ -199,7 +199,7 @@ void createStatsTables(MSXproject *MSX)
 
 //=============================================================================
 
-void createTableHdr(MSXproject *MSX, int objType, int tableType)
+void createTableHdr(MSXproject MSX, int objType, int tableType)
 {
     int   m;
     char  s1[MAXLINE+1];
@@ -243,7 +243,7 @@ void createTableHdr(MSXproject *MSX, int objType, int tableType)
 
 //=============================================================================
 
-void  writeTableHdr(MSXproject *MSX)
+void  writeTableHdr(MSXproject MSX)
 {
     if ( MSX->PageSize > 0 && MSX->PageSize - LineNum < 6 ) newPage(MSX);
     writeLine(MSX, "");
@@ -256,7 +256,7 @@ void  writeTableHdr(MSXproject *MSX)
 
 //=============================================================================
 
-void  writeNodeTable(MSXproject *MSX, int j, int tableType)
+void  writeNodeTable(MSXproject MSX, int j, int tableType)
 {
     int   k, m, hrs, mins;
     char  s[MAXLINE+1];
@@ -289,7 +289,7 @@ void  writeNodeTable(MSXproject *MSX, int j, int tableType)
 
 //=============================================================================
 
-void  writeLinkTable(MSXproject *MSX, int j, int tableType)
+void  writeLinkTable(MSXproject MSX, int j, int tableType)
 {
     int   k, m, hrs, mins;
     char  s[MAXLINE+1];
@@ -321,7 +321,7 @@ void  writeLinkTable(MSXproject *MSX, int j, int tableType)
 
 //=============================================================================
 
-void getHrsMins(MSXproject *MSX, int k, int *hrs, int *mins)
+void getHrsMins(MSXproject MSX, int k, int *hrs, int *mins)
 {
     long m, h;
 
@@ -334,7 +334,7 @@ void getHrsMins(MSXproject *MSX, int k, int *hrs, int *mins)
 
 //=============================================================================
 
-void  newPage(MSXproject *MSX)
+void  newPage(MSXproject MSX)
 {
     char  s[MAXLINE+1];
     LineNum = 1;
@@ -349,7 +349,7 @@ void  newPage(MSXproject *MSX)
 
 //=============================================================================
 
-void  writeLine(MSXproject *MSX, char *line)
+void  writeLine(MSXproject MSX, char *line)
 {
     if ( LineNum == MSX->PageSize ) newPage(MSX);
     if ( MSX->RptFile.file ) fprintf(MSX->RptFile.file, "  %s\n", line);   //(modified, FS-01/07/2008)
@@ -359,7 +359,7 @@ void  writeLine(MSXproject *MSX, char *line)
 
 
 
-void writemassbalance(MSXproject *MSX)
+void writemassbalance(MSXproject MSX)
 /**
 **-------------------------------------------------------------
 **   Input:

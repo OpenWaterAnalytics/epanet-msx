@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include <float.h>
 
+#include "msxtypes.h"
 #include "msxutils.h"                                                          //1.1.00
 #include "epanet2.h"
 #include "legacytoolkit.h"
@@ -64,18 +65,18 @@
 
 //  Imported functions
 //--------------------
-int    MSXproj_open(MSXproject *MSX, char *fname);
-int    MSXproj_close(MSXproject *MSX);
+int    MSXproj_open(MSXproject MSX, char *fname);
+int    MSXproj_close(MSXproject MSX);
 char * MSXproj_getErrmsg(int errcode);
-int    MSXqual_open(MSXproject *MSX);
-int    MSXqual_init(MSXproject *MSX);
-int    MSXqual_step(MSXproject *MSX, long *t, long *tleft);
-int    MSXqual_close(MSXproject *MSX);
-int    MSXrpt_write(MSXproject *MSX, char *fname);
-int    MSXfile_save(MSXproject *MSX, FILE *f);
-int    MSXout_open(MSXproject *MSX);
-int    MSXout_saveResults(MSXproject *MSX);
-int    MSXout_saveFinalResults(MSXproject *MSX);
+int    MSXqual_open(MSXproject MSX);
+int    MSXqual_init(MSXproject MSX);
+int    MSXqual_step(MSXproject MSX, long *t, long *tleft);
+int    MSXqual_close(MSXproject MSX);
+int    MSXrpt_write(MSXproject MSX, char *fname);
+int    MSXfile_save(MSXproject MSX, FILE *f);
+int    MSXout_open(MSXproject MSX);
+int    MSXout_saveResults(MSXproject MSX);
+int    MSXout_saveFinalResults(MSXproject MSX);
 
 //=============================================================================
 
@@ -101,9 +102,10 @@ int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
         return err;
     }
     char *fname = argv[2];
-    if (!MSX->ProjectOpened) return(ERR_MSX_OPENED);
-    CALL(err, MSXproj_open(MSX, fname));
-    CALL(err, MSXqual_open(MSX));
+    struct Project *p = (struct Project *) calloc(1, sizeof(struct Project));
+    *MSX = p;
+    CALL(err, MSXproj_open(*MSX, fname));
+    CALL(err, MSXqual_open(*MSX));
 
     if ( err )
     {
@@ -116,7 +118,7 @@ int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
 
 //=============================================================================
 
-int   DLLEXPORT  MSXsolveH(MSXproject *MSX)
+int   DLLEXPORT  MSXsolveH(MSXproject MSX)
 /**
 **  Purpose:
 **    solves for system hydraulics which are written to a temporary file.
@@ -158,7 +160,7 @@ int   DLLEXPORT  MSXsolveH(MSXproject *MSX)
 
 //=============================================================================
 
-int   DLLEXPORT  MSXusehydfile(MSXproject *MSX)
+int   DLLEXPORT  MSXusehydfile(MSXproject MSX)
 /**
 **  Purpose:
 **    registers a hydraulics solution file with the MSX system.
@@ -214,7 +216,7 @@ int   DLLEXPORT  MSXusehydfile(MSXproject *MSX)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsolveQ(MSXproject *MSX)
+int  DLLEXPORT  MSXsolveQ(MSXproject MSX)
 /**
 **  Purpose:
 **    runs a MSX water quality analysis over the entire simulation period.
@@ -237,7 +239,7 @@ int  DLLEXPORT  MSXsolveQ(MSXproject *MSX)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
+int  DLLEXPORT  MSXinit(MSXproject MSX, int saveFlag)
 /**
 **  Purpose:
 **    initializes a MSX water quality analysis.
@@ -259,7 +261,7 @@ int  DLLEXPORT  MSXinit(MSXproject *MSX, int saveFlag)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
+int  DLLEXPORT  MSXsaveoutfile(MSXproject MSX, char *fname)
 /**
 **  Purpose:
 **    saves all results of the WQ simulation to a binary file.
@@ -286,7 +288,7 @@ int  DLLEXPORT  MSXsaveoutfile(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
+int  DLLEXPORT  MSXreport(MSXproject MSX, char *fname)
 /**
 **  Purpose:
 **    writes requested WQ simulation results to a text file.
@@ -311,7 +313,7 @@ int  DLLEXPORT  MSXreport(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXclose(MSXproject *MSX)
+int  DLLEXPORT  MSXclose(MSXproject MSX)
 /**
 **  Purpose:
 **    closes the EPANET-MSX toolkit system.
@@ -326,12 +328,13 @@ int  DLLEXPORT  MSXclose(MSXproject *MSX)
     MSXqual_close(MSX);
     MSXproj_close(MSX);
     ENclose();
+    free(MSX);
     return 0;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
+int  DLLEXPORT  MSXgeterror(MSXproject MSX, int code, char *msg, int len)
 /**
 **  Purpose:
 **    retrieves text of an error message.
@@ -354,7 +357,7 @@ int  DLLEXPORT  MSXgeterror(MSXproject *MSX, int code, char *msg, int len)
 
 //=============================================================================
 
-int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
+int  DLLEXPORT MSXsavemsxfile(MSXproject MSX, char *fname)
 /**
 **  Purpose:
 **      saves msx file.
@@ -381,7 +384,7 @@ int  DLLEXPORT MSXsavemsxfile(MSXproject *MSX, char *fname)
 
 //=============================================================================
 
-int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
+int  DLLEXPORT MSXsaveResults(MSXproject MSX)
 /**
 **  Purpose:
 **      saves results to the binary out file.
@@ -411,7 +414,7 @@ int  DLLEXPORT MSXsaveResults(MSXproject *MSX)
 
 //=============================================================================
 
-int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
+int  DLLEXPORT MSXsaveFinalResults(MSXproject MSX)
 /**
 **  Purpose:
 **      saves final results to the binary out file.
@@ -434,7 +437,7 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject *MSX)
 
 //=============================================================================
 
-int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
+int DLLEXPORT MSXrunLegacy(MSXproject MSX, int argc, char *argv[])
 /**
 **  Purpose:
 **      runs the legacy main method.
@@ -471,7 +474,7 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
 
     // --- open the MSX input file
         printf("\n  o Processing MSX input file   ");
-        err = MSXopen(MSX, argv);
+        err = MSXopen(&MSX, argv);
         if (err)
         {
             printf("\n\n... Cannot read EPANET-MSX file; error code = %d\n", err);
@@ -511,9 +514,6 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
                 printf("\r  o Computing water quality at hour %-4d", newHour);
                 oldHour = newHour;
             }
-            // for (int i = 0; i < 5; i++) printf("Demands: %f\n", MSX->D[i]);
-            // for (int i = 0; i < 5; i++) printf("Flows: %f\n", MSX->Q[i]);
-            // for (int i = 0; i < 5; i++) printf("Heads: %f\n", MSX->H[i]);
             err = MSXsaveResults(MSX);
             err = MSXstep(MSX, &t, &tleft);
             newHour = t / 3600;
@@ -564,7 +564,7 @@ int DLLEXPORT MSXrunLegacy(MSXproject *MSX, int argc, char *argv[])
 
 //=============================================================================
 
-int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
+int DLLEXPORT MSXsetFlowFlag(MSXproject MSX, int flag)
 /**
 **  Purpose:
 **      sets the flow flag and units flag.
@@ -582,7 +582,7 @@ int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
 {
     int err = 0;
     // Cannot modify network structure while solvers are active
-    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
 
     if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
     MSX->Flowflag = flag;
@@ -593,7 +593,7 @@ int DLLEXPORT MSXsetFlowFlag(MSXproject *MSX, int flag)
 
 //=============================================================================
 
-int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
+int DLLEXPORT MSXsetTimeParameter(MSXproject MSX, int type, long value)
 /**
 **  Purpose:
 **      sets a specified time parameter.
@@ -612,7 +612,7 @@ int DLLEXPORT MSXsetTimeParameter(MSXproject *MSX, int type, long value)
 {
     int err = 0;
     // Cannot modify network structure while solvers are active
-    if ((!MSX->ProjectOpened) || (!MSX->QualityOpened)) return ERR_MSX_NOT_OPENED;
+    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
 
     switch (type)
     {

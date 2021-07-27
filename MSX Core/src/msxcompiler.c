@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "msxtypes.h"
-#include "mathexpr.h"
 #include "msxfuncs.h"
 #include "msxutils.h"
 
@@ -47,16 +46,16 @@ char * MSXchem_getVariableStr(int i, char *s);
 
 //  Exported functions
 //--------------------
-int  MSXcompiler_open(MSXproject *MSX);
+int  MSXcompiler_open(MSXproject MSX);
 void MSXcompiler_close(void);
 
 //  Local functions
 //-----------------
-static void  writeSrcFile(MSXproject *MSX, FILE* f);
+static void  writeSrcFile(MSXproject MSX, FILE* f);
 
 //=============================================================================
 
-int MSXcompiler_open(MSXproject *MSX)
+int MSXcompiler_open(MSXproject MSX)
 /**
 **  Purpose:
 **    compiles MSX chemistry functions into a dynamic link library
@@ -185,7 +184,7 @@ void MSXcompiler_close()
 
 //=============================================================================
 
-void  writeSrcFile(MSXproject *MSX, FILE* f)
+void  writeSrcFile(MSXproject MSX, FILE* f)
 /**
 **  Purpose:
 **    writes C statements to the chemistry function source code file
