@@ -84,6 +84,7 @@ int DLLEXPORT MSXsetReport(MSXproject MSX, char *reportType, char *id, int preci
 //Hydraulic Functions
 int DLLEXPORT MSXsetHydraulics(MSXproject MSX, float *demands, float *heads, float *flows);
 
+int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size);
 
 
 // Below is from the legacy epanetmsx.h

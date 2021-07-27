@@ -185,6 +185,7 @@ int setDefaults(MSXproject MSX)
     strcpy(MSX->Title, "");
     MSX->Rptflag = 0;
     for (i=0; i<MAX_OBJECTS; i++) MSX->Nobjects[i] = 0;
+    for (i=0; i<MAX_OBJECTS; i++) MSX->Sizes[i] = 0;
     MSX->Unitsflag = US;
     MSX->Flowflag = GPM;
     MSX->Statflag = SERIES;

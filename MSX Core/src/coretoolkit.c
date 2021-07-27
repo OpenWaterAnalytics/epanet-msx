@@ -489,12 +489,8 @@ int DLLEXPORT MSXaddSpecies(MSXproject MSX, char *id, int type, int units, doubl
         MSX->C0 = (double *) calloc(nSpecies+1, sizeof(double));
     }
     else {
-        Sspecies *ptr = (Sspecies *) realloc(MSX->Species, (nSpecies+1) * sizeof(Sspecies));
-        if(!ptr) return ERR_MEMORY;
-        MSX->Species = ptr;
-        double *nptr = (double *) realloc(MSX->C0, (nSpecies+1) * sizeof(double));
-        if(!nptr) return ERR_MEMORY;
-        MSX->C0 = nptr;
+        MSX->Species = (Sspecies *) realloc(MSX->Species, (nSpecies+1) * sizeof(Sspecies));
+        MSX->C0 = (double *) realloc(MSX->C0, (nSpecies+1) * sizeof(double));
         for (int j=1; j<=nSpecies; j++) MSX->C0[j] = 0;
     } 
 
@@ -551,33 +547,21 @@ int DLLEXPORT MSXaddSpecies(MSXproject MSX, char *id, int type, int units, doubl
     }
     else {
         for (i=1; i<=MSX->Nobjects[NODE]; i++) {
-            double* ptr = (double *) realloc(MSX->Node[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Node[i].c = ptr;
+            MSX->Node[i].c = (double *) realloc(MSX->Node[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Node[i].c[j] = 0;
-            ptr = (double *) realloc(MSX->Node[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Node[i].c0 = ptr;
+            MSX->Node[i].c0 = (double *) realloc(MSX->Node[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Node[i].c0[j] = 0;
         }
         for (i=1; i<=MSX->Nobjects[TANK]; i++) {
-            double* ptr = (double *) realloc(MSX->Tank[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Tank[i].c = ptr;
+            MSX->Tank[i].c = (double *) realloc(MSX->Tank[i].c, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Tank[i].c[j] = 0;
-            ptr = (double *) realloc(MSX->Tank[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Tank[i].reacted = ptr;
+            MSX->Tank[i].reacted = (double *) realloc(MSX->Tank[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Tank[i].reacted[j] = 0;
         }
         for (i=1; i<=MSX->Nobjects[LINK]; i++) {
-            double* ptr = (double *) realloc(MSX->Link[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Link[i].c0 = ptr;
+            MSX->Link[i].c0 = (double *) realloc(MSX->Link[i].c0, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Link[i].c0[j] = 0;
-            ptr = (double *) realloc(MSX->Link[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
-            if(!ptr) return ERR_MEMORY;
-            MSX->Link[i].reacted = ptr;
+            MSX->Link[i].reacted = (double *) realloc(MSX->Link[i].reacted, (MSX->Nobjects[SPECIES]+1) * sizeof(double));
             for (int j=1; j<=MSX->Nobjects[SPECIES]; j++) MSX->Link[i].reacted[j] = 0;
         }
     }
@@ -614,11 +598,7 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value
             err = 101;  // Insufficient memory
         int nParams = MSX->Nobjects[PARAMETER]+1;
         if (nParams == 1) MSX->Param = (Sparam *) calloc(nParams+1, sizeof(Sparam));
-        else {
-            Sparam *ptr = (Sparam *) realloc(MSX->Param, (nParams+1) * sizeof(Sparam));
-            if (!ptr) return ERR_MEMORY;
-            MSX->Param = ptr;
-        }
+        else MSX->Param = (Sparam *) realloc(MSX->Param, (nParams+1) * sizeof(Sparam));
         int i = nParams;
         MSX->Param[i].id = id;
 		MSX->Param[i].value = value;
@@ -636,15 +616,11 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value
         }
         else {
             for (i=1; i<=MSX->Nobjects[TANK]; i++) {
-                double* nptr = (double *) realloc(MSX->Tank[i].param, (MSX->Nobjects[PARAMETER]+1) * sizeof(double));
-                if(!nptr) return ERR_MEMORY;
-                MSX->Tank[i].param = nptr;
+                MSX->Tank[i].param = (double *) realloc(MSX->Tank[i].param, (MSX->Nobjects[PARAMETER]+1) * sizeof(double));
                 for (int j=1; j<=MSX->Nobjects[PARAMETER]; j++) MSX->Tank[i].param[j] = 0;
             }
             for (i=1; i<=MSX->Nobjects[LINK]; i++) {
-                double* nptr = (double *) realloc(MSX->Link[i].param, (MSX->Nobjects[PARAMETER]+1) * sizeof(double));
-                if(!nptr) return ERR_MEMORY;
-                MSX->Link[i].param = nptr;
+                MSX->Link[i].param = (double *) realloc(MSX->Link[i].param, (MSX->Nobjects[PARAMETER]+1) * sizeof(double));
                 for (int j=1; j<=MSX->Nobjects[PARAMETER]; j++) MSX->Link[i].param[j] = 0;
             }
         }
@@ -657,11 +633,7 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value
             err = 101;  // Insufficient memory
         int nConsts = MSX->Nobjects[CONSTANT]+1;
         if (nConsts == 1) MSX->Const = (Sconst *) calloc(nConsts+1, sizeof(Sconst));
-        else {
-            Sconst *ptr = (Sconst *) realloc(MSX->Const, (nConsts+1) * sizeof(Sconst));
-            if (!ptr) return ERR_MEMORY;
-            MSX->Const = ptr;
-        }
+        else MSX->Const = (Sconst *) realloc(MSX->Const, (nConsts+1) * sizeof(Sconst));
         int i = nConsts;
         MSX->Const[i].id = id;
 		MSX->Const[i].value = value;
@@ -1035,6 +1007,200 @@ int DLLEXPORT MSXsetHydraulics(MSXproject MSX, float *demands, float *heads, flo
         MSX->H[i+1] = heads[i];
     }
     for (i=0; i<nLinks; i++) MSX->Q[i+1] = flows[i];
+    return err;
+}
+
+//=============================================================================
+
+int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size)
+/**
+**  Purpose:
+**    Sets the size of one of the MSXproject arrays.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    type = object type code
+**    size = number of objects.
+**
+**  Output:
+**    None.
+**
+**  Returns:
+**    an error code (or 0 for no error).
+*/
+{
+    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    int err = 0;
+
+    if (type < 0 || type >= MAX_OBJECTS) return ERR_INVALID_OBJECT_TYPE;
+    MSX->Sizes[type] = size;
+    switch (type)
+    {
+    case SPECIES:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Species = (Sspecies *) calloc(size+1, sizeof(Sspecies));
+            if (MSX->Species == NULL) return ERR_MEMORY;
+            MSX->C0 = (double *) calloc(size+1, sizeof(double));
+            if (MSX->C0 == NULL) return ERR_MEMORY;
+            // Allocate space in Node, Link, and Tank objects
+            for (i=1; i<=MSX->Sizes[NODE]; i++) {
+                MSX->Node[i].c = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Node[i].c == NULL) return ERR_MEMORY;
+                MSX->Node[i].c0 = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Node[i].c0 == NULL) return ERR_MEMORY;
+            }
+            for (i=1; i<=MSX->Sizes[TANK]; i++) {
+                MSX->Tank[i].c = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Tank[i].c == NULL) return ERR_MEMORY;
+                MSX->Tank[i].reacted = (double*) calloc(size+1, sizeof(double));
+                if (MSX->Tank[i].reacted == NULL) return ERR_MEMORY;
+            }
+            for (i=1; i<=MSX->Sizes[LINK]; i++) {
+                MSX->Link[i].c0 = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Link[i].c0 == NULL) return ERR_MEMORY;
+                MSX->Link[i].reacted = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Link[i].reacted == NULL) return ERR_MEMORY;
+            }
+        }
+        else {
+            MSX->Species = (Sspecies *) realloc(MSX->Species, (size+1) * sizeof(Sspecies));
+            if (MSX->Species == NULL) return ERR_MEMORY;
+            MSX->C0 = (double *) realloc(MSX->C0, (size+1) * sizeof(double));
+            if (MSX->C0 == NULL) return ERR_MEMORY;
+            for (int j=1; j<=size; j++) MSX->C0[j] = 0;
+            // Allocate space in Node, Link, and Tank objects
+            for (i=1; i<=MSX->Sizes[NODE]; i++) {
+                MSX->Node[i].c = (double *) realloc(MSX->Node[i].c, (size+1) * sizeof(double));
+                if (MSX->Node[i].c == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Node[i].c[j] = 0;
+                MSX->Node[i].c0 = (double *) realloc(MSX->Node[i].c0, (size+1) * sizeof(double));
+                if (MSX->Node[i].c0 == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Node[i].c0[j] = 0;
+            }
+            for (i=1; i<=MSX->Sizes[TANK]; i++) {
+                MSX->Tank[i].c = (double *) realloc(MSX->Tank[i].c, (size+1) * sizeof(double));
+                if (MSX->Tank[i].c == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Tank[i].c[j] = 0;
+                MSX->Tank[i].reacted = (double *) realloc(MSX->Tank[i].reacted, (size+1) * sizeof(double));
+                if (MSX->Tank[i].reacted == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Tank[i].reacted[j] = 0;
+            }
+            for (i=1; i<=MSX->Sizes[LINK]; i++) {
+                MSX->Link[i].c0 = (double *) realloc(MSX->Link[i].c0, (size+1) * sizeof(double));
+                if (MSX->Link[i].c0 == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Link[i].c0[j] = 0;
+                MSX->Link[i].reacted = (double *) realloc(MSX->Link[i].reacted, (size+1) * sizeof(double));
+                if (MSX->Link[i].reacted == NULL) return ERR_MEMORY;
+                for (int j=1; j<=size; j++) MSX->Link[i].reacted[j] = 0;
+            }
+        }
+        break;
+    case PARAMETER:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Param = (Sparam *) calloc(size+1, sizeof(Sparam));
+            if (MSX->Param == NULL) return ERR_MEMORY;
+            // Allocate parameter in tank and link
+            for (i=1; i<=MSX->Sizes[TANK]; i++) {
+                MSX->Tank[i].param = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Tank[i].param == NULL) return ERR_MEMORY;
+            }
+            for (i=1; i<=MSX->Sizes[LINK]; i++) {
+                MSX->Link[i].param = (double *) calloc(size+1, sizeof(double));
+                if (MSX->Link[i].param == NULL) return ERR_MEMORY;
+            }
+        }
+        else {
+            MSX->Param = (Sparam *) realloc(MSX->Param, (size+1) * sizeof(Sparam));
+            if (MSX->Param == NULL) return ERR_MEMORY;
+            // Allocate parameter in tank and link
+            for (i=1; i<=MSX->Sizes[TANK]; i++) {
+                MSX->Tank[i].param = (double *) realloc(MSX->Tank[i].param, (size+1) * sizeof(double));
+                if (MSX->Tank[i].param == NULL) return ERR_MEMORY;
+                for (int j=1; j<=MSX->Sizes[PARAMETER]; j++) MSX->Tank[i].param[j] = 0;
+            }
+            for (i=1; i<=MSX->Sizes[LINK]; i++) {
+                MSX->Link[i].param = (double *) realloc(MSX->Link[i].param, (size+1) * sizeof(double));
+                if (MSX->Link[i].param == NULL) return ERR_MEMORY;
+                for (int j=1; j<=MSX->Sizes[PARAMETER]; j++) MSX->Link[i].param[j] = 0;
+            }
+        }
+        break;
+    case CONSTANT:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Const = (Sconst *) calloc(size+1, sizeof(Sconst));
+            if (MSX->Const == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Const = (Sconst *) realloc(MSX->Const, (size+1) * sizeof(Sconst));
+            if (MSX->Const == NULL) return ERR_MEMORY;
+        }
+        break;
+    case TERM:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Term = (Sterm *) calloc(size+1, sizeof(Sterm));
+            if (MSX->Term == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Term = (Sterm *) realloc(MSX->Term, (size+1) * sizeof(Sterm));
+            if (MSX->Term == NULL) return ERR_MEMORY;
+        }
+        break;
+    case NODE:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Node = (Snode *) calloc(size+1, sizeof(Snode));
+            if (MSX->Node == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Node = (Snode *) realloc(MSX->Node, (size+1) * sizeof(Snode));
+            if (MSX->Node == NULL) return ERR_MEMORY;
+        }
+        break;
+    case LINK:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Link = (Slink *) calloc(size+1, sizeof(Slink));
+            if (MSX->Link == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Link = (Slink *) realloc(MSX->Link, (size+1) * sizeof(Slink));
+            if (MSX->Link == NULL) return ERR_MEMORY;
+        }
+        break;
+    case TANK:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Tank = (Stank *) calloc(size+1, sizeof(Stank));
+            if (MSX->Tank == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Tank = (Stank *) realloc(MSX->Tank, (size+1) * sizeof(Stank));
+            if (MSX->Tank == NULL) return ERR_MEMORY;
+        }
+        if (MSX->Sizes[NODE] == 0) {
+            MSX->Node = (Snode *) calloc(size+1, sizeof(Snode));
+            if (MSX->Node == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Node = (Snode *) realloc(MSX->Node, (size+1) * sizeof(Snode));
+            if (MSX->Node == NULL) return ERR_MEMORY;
+        }
+        MSX->Sizes[NODE] += size;
+        break;
+    case PATTERN:
+        if (MSX->Sizes[type] == 0) {
+            MSX->Pattern = (Spattern *) calloc(size+1, sizeof(Spattern));
+            if (MSX->Pattern == NULL) return ERR_MEMORY;
+        }
+        else {
+            MSX->Pattern = (Spattern *) realloc(MSX->Pattern, (size+1) * sizeof(Spattern));
+            if (MSX->Pattern == NULL) return ERR_MEMORY;
+        }
+        break;
+    default:
+        return ERR_INVALID_OBJECT_TYPE;
+        break;
+    }
+
+
+
     return err;
 }
 
@@ -1824,6 +1990,7 @@ int  DLLEXPORT  MSXaddpattern(MSXproject MSX, char *id)
     MSX->Pattern = tmpPat;
     MSX->Nobjects[PATTERN]++;
     return 0;
+    //TODO change this
 }
 
 //=============================================================================
