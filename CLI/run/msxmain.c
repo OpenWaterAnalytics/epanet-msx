@@ -239,6 +239,7 @@ int batchExample(char *fname) {
     CALL(err, MSXaddOption(MSX, ATOL_OPTION, "1.0e-8"));
 
     // Add Species
+    CALL(err, MSXsetSize(MSX, SPECIES, 14));
     CALL(err, MSXaddSpecies(MSX, "HOCL", BULK, MOLE, 0.0, 0.0));
     CALL(err, MSXaddSpecies(MSX, "NH3", BULK, MOLE, 0.0, 0.0));
     CALL(err, MSXaddSpecies(MSX, "NH2CL", BULK, MOLE, 0.0, 0.0));

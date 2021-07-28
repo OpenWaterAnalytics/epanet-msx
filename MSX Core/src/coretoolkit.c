@@ -181,7 +181,7 @@ int DLLEXPORT MSXaddNode(MSXproject MSX, char *id)
     if ( addObject(NODE, id, MSX->Nobjects[NODE]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[NODE]+1;
-    err = MSXsetSize(MSX, NODE, i);
+    if (i > MSX->Sizes[NODE]) err = MSXsetSize(MSX, NODE, i);
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
     MSX->Node[i].tank = 0;
@@ -221,7 +221,7 @@ int DLLEXPORT MSXaddTank(MSXproject MSX,char *id, double initialVolume, int mixM
     if ( addObject(NODE, id, MSX->Nobjects[NODE]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[TANK]+1;
-    err = MSXsetSize(MSX, TANK, i);
+    if (i > MSX->Sizes[TANK]) err = MSXsetSize(MSX, TANK, i);
     MSX->Tank[i].a = 1.0;
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
@@ -268,7 +268,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject MSX, char *id, double initialVolume, in
     if ( addObject(NODE, id, MSX->Nobjects[NODE]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[TANK]+1;
-    err = MSXsetSize(MSX, TANK, i);
+    if (i > MSX->Sizes[TANK]) err = MSXsetSize(MSX, TANK, i);
     MSX->Tank[i].a = 0.0;
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
@@ -323,7 +323,7 @@ int DLLEXPORT MSXaddLink(MSXproject MSX, char *id, char *startNode, char *endNod
     if ( y <= 0 ) return ERR_NAME;
 
     int i = MSX->Nobjects[LINK]+1;
-    err = MSXsetSize(MSX, LINK, i);
+    if (i > MSX->Sizes[LINK]) err = MSXsetSize(MSX, LINK, i);
     MSX->Link[i].n1 = x;
     MSX->Link[i].n2 = y;
     MSX->Link[i].diam = diameter;
@@ -441,7 +441,7 @@ int DLLEXPORT MSXaddSpecies(MSXproject MSX, char *id, int type, int units, doubl
     if ( addObject(SPECIES, id, MSX->Nobjects[SPECIES]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[SPECIES]+1;
-    err = MSXsetSize(MSX, SPECIES, i);
+    if (i > MSX->Sizes[SPECIES]) err = MSXsetSize(MSX, SPECIES, i);
     MSX->Species[i].id = id;
     MSX->Species[i].type = type;
     switch (units)
@@ -502,7 +502,7 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value
         if ( err ) return err;
         if ( addObject(PARAMETER, id, MSX->Nobjects[PARAMETER]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
         int i = MSX->Nobjects[PARAMETER]+1;
-        err = MSXsetSize(MSX, PARAMETER, i);
+        if (i > MSX->Sizes[PARAMETER]) err = MSXsetSize(MSX, PARAMETER, i);
         MSX->Param[i].id = id;
 		MSX->Param[i].value = value;
         MSX->Nobjects[PARAMETER]++;
@@ -513,7 +513,7 @@ int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value
         if ( err ) return err;
         if ( addObject(CONSTANT, id, MSX->Nobjects[CONSTANT]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
         int i = MSX->Nobjects[CONSTANT]+1;
-        err = MSXsetSize(MSX, CONSTANT, i);
+        if (i > MSX->Sizes[CONSTANT]) err = MSXsetSize(MSX, CONSTANT, i);
         MSX->Const[i].id = id;
 		MSX->Const[i].value = value;
         MSX->Nobjects[CONSTANT]++;
@@ -549,7 +549,7 @@ int DLLEXPORT MSXaddTerm(MSXproject MSX, char *id, char *equation)
     if ( addObject(TERM, id, MSX->Nobjects[TERM]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[TERM]+1;
-    err = MSXsetSize(MSX, TERM, i);
+    if (i > MSX->Sizes[TERM]) err = MSXsetSize(MSX, TERM, i);
     MSX->Term[i].id = id;
     MSX->Nobjects[TERM]++;
     MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
@@ -1833,7 +1833,7 @@ int  DLLEXPORT  MSXaddpattern(MSXproject MSX, char *id)
     if ( addObject(PATTERN, id, MSX->Nobjects[PATTERN]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
 
     int i = MSX->Nobjects[PATTERN]+1;
-    err = MSXsetSize(MSX, PATTERN, i);
+    if (i > MSX->Sizes[PATTERN]) err = MSXsetSize(MSX, PATTERN, i);
     MSX->Pattern[i].id = id;
     MSX->Pattern[i].length = 0;
     MSX->Pattern[i].first = NULL;
