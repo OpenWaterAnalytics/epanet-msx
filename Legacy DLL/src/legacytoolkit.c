@@ -437,7 +437,7 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject MSX)
 
 //=============================================================================
 
-int DLLEXPORT MSXrunLegacy(MSXproject MSX, int argc, char *argv[])
+int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
 /**
 **  Purpose:
 **      runs the legacy main method.
@@ -458,6 +458,7 @@ int DLLEXPORT MSXrunLegacy(MSXproject MSX, int argc, char *argv[])
     int done = 1;
     long   t, tleft;
     long   oldHour, newHour;
+    MSXproject MSX;
 
     // --- check command line arguments
 

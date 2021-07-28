@@ -7,9 +7,6 @@ project(CORE_LIB LANGUAGES C)
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-# Add building the command line executable from the run directory
-# add_subdirectory(run)
-
 # Sets the output directory for executables and libraries.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -38,8 +35,6 @@ if(OPENMP_FOUND)
 else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
-
-#find_library(MSX_LIB epanetmsx NAMES epanetmsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
 
 add_library(core SHARED ${CORE_SOURCES})
 add_library(core_lib STATIC ${CORE_SOURCES})

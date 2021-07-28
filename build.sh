@@ -22,6 +22,17 @@ cmake --build . --config Release
 
 cd ../..
 
+printf "\n\n-------- Building Examples --------\n\n"
+
+# Build CLI
+cd example-api
+rm -rf build
+mkdir build && cd build
+cmake ..
+cmake --build . --config Release
+
+cd ../..
+
 printf "\n\n-------- Building CLI --------\n\n"
 
 # Build CLI
@@ -39,4 +50,7 @@ cp ../EPANET/build/bin/*/epanet2.dll CLI/build/bin/*/
 
 # Copy core.dll
 cp MSX\ Core/build/bin/*/core.dll CLI/build/bin/*/
+
+# Copy examples.dll
+cp example-api/build/bin/*/examples.dll CLI/build/bin/*/
 

@@ -17,7 +17,9 @@ The easiest way to build quickly is to run the bash script titled "build.sh" fro
 the root directory. If you can't run the bash file, the instructions will be below.
 
 It is important to build all three modules (MSX Core, Legacy DLL, and CLI) in the correct order
-as some of them have dependencies on each other.
+as some of them have dependencies on each other. It is also very important that EPANET is built
+in the sam root directory as this repository, so for example a folder that contains EPANET and epanet-msx
+side by side.
 First, build the MSX Core module since it has no dependencies. Navigate into the MSX Core directory
 and create a new directory titled "build". Then navigate into that directory and run the CMake command.
 ```
@@ -26,9 +28,17 @@ cd build
 cmake ..
 cmake --build . --config Release
 ```
-Next, in order to build the Legacy DLL module, it is necessary to have a built version of the EPANET
+In order to build the Legacy DLL module, it is necessary to have a built version of the EPANET
 repository outside of the epanet-msx repository. Then follow the same steps as used in the MSX Core
 compilation.
+```
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+```
+If you want to use the examples, then you can build the example-api module, otherwise you can just modify
+the main method in order to use the toolkit. in order to build follow the same steps as the other modules above.
 ```
 mkdir build
 cd build
@@ -46,7 +56,7 @@ cmake --build . --config Release
 ```
 
 In order for the executable to work, the following DLL's will need to be in the same directory: "core.dll",
-"legacy.dll", and "epanet2.dll". The EPANET 2 DLL is required because it is linked with the Legacy DLL.
+"legacy.dll", "epanet2.dll", and "examples.dll" (if using the example-api module). The EPANET 2 DLL is required because it is linked with the Legacy DLL.
 
 ## Updates
 This repository has gone through some substantial changes that will be highlighted below.

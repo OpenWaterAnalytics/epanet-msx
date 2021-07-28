@@ -1,17 +1,14 @@
-# CMakeLists.txt - CMake configuration file for EPANETMSX
+# CMakeLists.txt - CMake configuration file for EPANETMSX 1.1
 
 cmake_minimum_required(VERSION 3.12)
-project(LEGACY LANGUAGES C)
+project(EXAMPLES LANGUAGES C)
 
 include_directories(
-  ../../EPANET/include
+  ../Legacy\ DLL/include
 )
 
 include_directories(
   ../MSX\ Core/include
-)
-include_directories(
-  ../MSX\ Core/src
 )
 
 # Append local dir to module search path
@@ -36,7 +33,7 @@ IF (MSVC)
 ENDIF (MSVC)
 
 # configure file groups
-file(GLOB MSX_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
+file(GLOB SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c)
 
 include(FindOpenMP)
 if(OPENMP_FOUND)
@@ -46,17 +43,16 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-find_library(EPANET_LIB epanet2 NAMES epanet2 PATHS ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib/* ${PROJECT_SOURCE_DIR}/../../EPANET/build/lib)
-find_library(CORE_LIB core_lib NAMES core_lib PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
+find_library(LEGACY_LIB legacy NAMES legacy PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
+find_library(CORE_LIB core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 
 
 IF(MSVC)
-  add_library(legacy SHARED ${MSX_SOURCES})
-  target_link_libraries(legacy ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  add_library(examples SHARED ${SOURCES})
+  target_link_libraries(examples ${LEGACY_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
-  add_library(legacy SHARED ${MSX_SOURCES})
-  target_link_libraries(legacy ${EPANET_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  add_library(examples SHARED ${SOURCES})
+  target_link_libraries(examples ${LEGACY_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC)
 
-target_include_directories(legacy PUBLIC ${PROJECT_SOURCE_DIR}/include)
-
+target_include_directories(examples PUBLIC ${PROJECT_SOURCE_DIR}/include)
