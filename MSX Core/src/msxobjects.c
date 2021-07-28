@@ -606,7 +606,7 @@ int finishInit(MSXproject MSX)
     if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
     int err = 0;
 
-    MSX->K = (double *)   calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
+    MSX->K = (double *) calloc(MSX->Nobjects[CONSTANT]+1, sizeof(double));  //1.1.00
     // --- create arrays for demands, heads, & flows
     MSX->D = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
     MSX->H = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
@@ -628,9 +628,11 @@ int finishInit(MSXproject MSX)
     int k;
     for (i=1; i<=MSX->Nobjects[TERM]; i++) {
         char *Tokens[MAXLINE];
-        char *s = (char*) calloc(1, strlen(MSX->Term[i].equation));
-        char *f = s; //Used to free
+        char *s = (char*) malloc(strlen(MSX->Term[i].equation)+1);
+        if (s == NULL) return ERR_MEMORY;
         strcpy(s, MSX->Term[i].equation);
+        s[strlen(MSX->Term[i].equation)] = '\0';
+        char *f = s; //Used to free
         int len = (int)strlen(s);
         int m;
         int n = 0;
@@ -653,12 +655,14 @@ int finishInit(MSXproject MSX)
             }
             len -= m+1;                         // update length of s
         }
+        s = NULL;
         for (int j=0; j<n; j++)
         {                                                                          //1.1.00
             k = findObject(TERM, Tokens[j]);                                  //1.1.00
             if ( k > 0 ) TermArray[i][k] = 1.0;                                    //1.1.00
         }
         free(f);
+        f = NULL;
     }
 
 
