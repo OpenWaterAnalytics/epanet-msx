@@ -140,14 +140,20 @@ int DLLEXPORT MSXprintQuality(MSXproject MSX, int type, char *id, char *species,
     FILE *f = NULL;
     if (fname != NULL) f = fopen(fname, "a");
     int hrs = MSX->Qtime / 3600;
-    int mins = MSX->Qtime % 3600;
+    int mins = (MSX->Qtime % 3600) / 60;
     if (type == NODE) {
         if (f != NULL) fprintf(f, "Node: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n\n", id, species, hrs, mins, value);
-        else printf("\nNode: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+        else {
+            printf("\r\nNode: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+            fflush(stdout);
+        }
     }
     else if (type == LINK) {
         if (f != NULL) fprintf(f, "Link: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n\n", id, species, hrs, mins, value);
-        else printf("\nLink: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+        else {
+            printf("\r\nLink: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+            fflush(stdout);
+        }
     }
     else return ERR_INVALID_OBJECT_TYPE;
     if (f != NULL) fclose(f);

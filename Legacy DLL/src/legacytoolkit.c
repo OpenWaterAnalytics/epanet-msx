@@ -309,7 +309,7 @@ int  DLLEXPORT  MSXclose(MSXproject MSX)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgeterror(MSXproject MSX, int code, char *msg, int len)
+int  DLLEXPORT  MSXgeterror(int code, char *msg, int len)
 /**
 **  Purpose:
 **    retrieves text of an error message.
@@ -412,7 +412,7 @@ int  DLLEXPORT MSXsaveFinalResults(MSXproject MSX)
 
 //=============================================================================
 
-int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
+void DLLEXPORT MSXrunLegacy(int argc, char *argv[])
 /**
 **  Purpose:
 **      runs the legacy main method.
@@ -440,7 +440,7 @@ int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
     if ( argc < 4 )
     {
         printf("\n Too few command line arguments.\n");
-        return err;
+        return;
     }
 
     printf("\n... EPANET-MSX Version 1.1\n");                                  //1.1.00
@@ -488,6 +488,7 @@ int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
             if ( oldHour != newHour )
             {
                 printf("\r  o Computing water quality at hour %-4d", newHour);
+                fflush(stdout);
                 oldHour = newHour;
             }
             err = MSXsaveResults(MSX);
@@ -502,6 +503,7 @@ int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
         }
         else 
             printf("\r  o Computing water quality at hour %-4d", t/3600);
+            fflush(stdout);
         
         err = MSXsaveResults(MSX);
         err = MSXsaveFinalResults(MSX);
@@ -535,7 +537,6 @@ int DLLEXPORT MSXrunLegacy(int argc, char *argv[])
     MSXclose(MSX);
     if ( !err ) printf("\n\n... EPANET-MSX completed successfully.");
     printf("\n");
-    return err;
 }
 
 //=============================================================================

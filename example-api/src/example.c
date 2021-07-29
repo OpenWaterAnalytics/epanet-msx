@@ -14,6 +14,11 @@
 #define HOUR 3600
 
 int DLLEXPORT example1(char *fname) {
+    // Removes old contents of file given
+    FILE *f = NULL;
+    if (fname != NULL) f = fopen(fname, "w");
+    if (f != NULL) fclose(f);
+
     int err = 0;
     MSXproject MSX;
     CALL(err, MSX_open(&MSX));
@@ -112,13 +117,13 @@ int DLLEXPORT example1(char *fname) {
     //     {
     //         printf("\r  o Computing water quality at hour %-4d", newHour);
     //         fflush(stdout);
+    //         CALL(err, MSXprintQuality(MSX, NODE, "1", "chloramine", fname));
     //         oldHour = newHour;
     //     }
-    //     CALL(err, MSXprintQuality(MSX, NODE, "c", "NH2CL", fname));
-    //     CALL(err, MSXprintQuality(MSX, LINK, "5", "AS5s", fname));
     //     CALL(err, MSXstep(MSX, &t, &tleft));
     //     newHour = t / 3600;
     // }
+    // printf("\n");
 
 
     while (tleft >= 0 && err == 0) {
@@ -138,6 +143,5 @@ int DLLEXPORT example1(char *fname) {
 
     // Close
     CALL(err, MSX_close(MSX));
-    //if (err == 0) printf("Simulation successfully completed.\nReport written to: %s\n", fname);
     return err;
 }

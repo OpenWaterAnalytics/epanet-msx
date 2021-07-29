@@ -57,12 +57,12 @@ int  DLLEXPORT MSXsaveoutfile(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXsavemsxfile(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXreport(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXclose(MSXproject MSX);
-int  DLLEXPORT MSXgeterror(MSXproject MSX, int code, char *msg, int len);
+int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
 
 int  DLLEXPORT MSXsaveResults(MSXproject MSX);
 int  DLLEXPORT MSXsaveFinalResults(MSXproject MSX);
 
-int DLLEXPORT MSXrunLegacy(int argc, char *argv[]);
+void DLLEXPORT MSXrunLegacy(int argc, char *argv[]);
 
 // Below are functions to setup the simulation
 //Simulation Options

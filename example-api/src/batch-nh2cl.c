@@ -17,6 +17,11 @@
 #define HOUR 3600
 
 int DLLEXPORT batchExample(char *fname) {
+    // Removes old contents of file given
+    FILE *f = NULL;
+    if (fname != NULL) f = fopen(fname, "w");
+    if (f != NULL) fclose(f);
+
     int err = 0;
     MSXproject MSX;
     CALL(err, MSX_open(&MSX));
@@ -44,7 +49,7 @@ int DLLEXPORT batchExample(char *fname) {
     CALL(err, MSXaddOption(MSX, RATE_UNITS_OPTION, "HR"));
     CALL(err, MSXaddOption(MSX, SOLVER_OPTION, "ROS2"));
     CALL(err, MSXaddOption(MSX, COUPLING_OPTION, "FULL"));
-    CALL(err, MSXaddOption(MSX, TIMESTEP_OPTION, "30"));
+    CALL(err, MSXaddOption(MSX, TIMESTEP_OPTION, "300"));
     CALL(err, MSXaddOption(MSX, RTOL_OPTION, "0.0001"));
     CALL(err, MSXaddOption(MSX, ATOL_OPTION, "1.0e-8"));
 
@@ -130,21 +135,35 @@ int DLLEXPORT batchExample(char *fname) {
     long tleft = 1;
     int oldHour = -1;
     int newHour = 0;
+    // while (tleft >= 0 && err == 0) {
+    //     if ( oldHour != newHour )
+    //     {
+    //         printf("\r  o Computing water quality at hour %-4d", newHour);
+    //         fflush(stdout);
+    //         oldHour = newHour;
+    //     }
+    //     CALL(err, MSXsaveResults(MSX));
+    //     CALL(err, MSXstep(MSX, &t, &tleft));
+    //     newHour = t / 3600;
+    // }
+    // CALL(err, MSXsaveFinalResults(MSX));
+    // CALL(err, MSXreport(MSX, fname));
+
+    // Example of using the printQuality function in the loop rather than
+    // saving results to binary out file and then calling the MSXreport function
     while (tleft >= 0 && err == 0) {
         if ( oldHour != newHour )
         {
             printf("\r  o Computing water quality at hour %-4d", newHour);
             fflush(stdout);
+            CALL(err, MSXprintQuality(MSX, NODE, "1", "chloramine", fname));
             oldHour = newHour;
         }
-        CALL(err, MSXsaveResults(MSX));
         CALL(err, MSXstep(MSX, &t, &tleft));
         newHour = t / 3600;
     }
-    CALL(err, MSXsaveFinalResults(MSX));
+    printf("\n");
 
-
-    CALL(err, MSXreport(MSX, fname));
 
     // Close
     CALL(err, MSX_close(MSX));

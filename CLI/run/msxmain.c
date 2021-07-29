@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
+#include <malloc.h>
 
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
 #include "coretoolkit.h"
@@ -62,12 +63,19 @@ void main(int argc, char *argv[])
 */
 {
     int err = 0;
-
     // Batch-nh2cl Example
     err = batchExample(argv[1]);
-    if (err != 0) printf("Error occured!\nError code: %d\n", err);
+    int bufferSize = 200;
+    char *msg = (char *) malloc(bufferSize);
+    if (err != 0) MSXgeterror(err, msg, bufferSize);
+    else msg = "Simulation ran successfully with no errors.";
+    printf("\n%s\n", msg);
+    fflush(stdout);
+    free(msg);
+
+//=============================================================================
 
     // Running the legacy code Example
-    // err = MSXrunLegacy(argc, argv);
+    // MSXrunLegacy(argc, argv);
 }
 

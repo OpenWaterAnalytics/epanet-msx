@@ -8,8 +8,6 @@ rm -rf build
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
-# cmake -DCMAKE_BUILD_TYPE=Debug ..
-# cmake --build . --config Debug
 
 cd ../..
 
@@ -21,8 +19,6 @@ rm -rf build
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
-# cmake -DCMAKE_BUILD_TYPE=Debug ..
-# cmake --build . --config Debug
 
 cd ../..
 
@@ -34,8 +30,6 @@ rm -rf build
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
-# cmake -DCMAKE_BUILD_TYPE=Debug ..
-# cmake --build . --config Debug
 
 cd ../..
 
@@ -47,8 +41,6 @@ rm -rf build
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
-# cmake -DCMAKE_BUILD_TYPE=Debug ..
-# cmake --build . --config Debug
 
 cd ../..
 
