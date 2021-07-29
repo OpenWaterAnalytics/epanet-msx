@@ -4,8 +4,27 @@ The multi-species extension to the EPANET hydraulic analysis engine.
 
 ## Core Toolkit Usage
 Notes:
+Makes sure that MSX_open() is called first before anything else and that MSX_close() is
+called at the end to close out everything.
 Make sure that MSX_init() is called after everything is added, this must be done before
 any simulations are done. MSX_init() also must be called before Hydraulics are set.
+Hydraulics must be set before any calls to MSXstep().
+
+Basic Example:
+```
+MSXproject MSX;
+MSX_open(&MSX);
+// Set Time Options
+// Add Network
+// Add Species
+MSX_init(MSX);
+// Set Hydraulics
+while (timeLeft >= 0) {
+    // Either print current quality or save results
+    MSXstep(MSX, &time, &timeleft);
+}
+MSX_close(MSX);
+```
 
 Make sure that the in cases where an object is being added to another, that 
 the object being added to is already created. For example when adding an
