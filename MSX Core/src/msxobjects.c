@@ -611,7 +611,24 @@ int finishInit(MSXproject MSX)
     MSX->D = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
     MSX->H = (float *) calloc(MSX->Nobjects[NODE]+1, sizeof(float));
     MSX->Q = (float *) calloc(MSX->Nobjects[LINK]+1, sizeof(float));
+
+    // Allocate space in Node, Link, and Tank objects
     int i;
+    for (i=1; i<=MSX->Nobjects[NODE]; i++) {
+        MSX->Node[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        if (MSX->Node[i].c == NULL) return ERR_MEMORY;
+    }
+    for (i=1; i<=MSX->Nobjects[TANK]; i++) {
+        MSX->Tank[i].c = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        if (MSX->Tank[i].c == NULL) return ERR_MEMORY;
+        MSX->Tank[i].reacted = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        if (MSX->Tank[i].reacted == NULL) return ERR_MEMORY;
+    }
+    for (i=1; i<=MSX->Nobjects[LINK]; i++) {
+        MSX->Link[i].reacted = (double *) calloc(MSX->Nobjects[SPECIES]+1, sizeof(double));
+        if (MSX->Link[i].reacted == NULL) return ERR_MEMORY;
+    }
+
     // Set parameters
     for (i=1; i<=MSX->Nobjects[PARAMETER]; i++) {
         double x = MSX->Param[i].value;
@@ -630,8 +647,8 @@ int finishInit(MSXproject MSX)
         char *Tokens[MAXLINE];
         char *s = (char*) malloc(strlen(MSX->Term[i].equation)+1);
         if (s == NULL) return ERR_MEMORY;
-        strcpy(s, MSX->Term[i].equation);
-        s[strlen(MSX->Term[i].equation)] = '\0';
+        strncpy(s, MSX->Term[i].equation, strlen(MSX->Term[i].equation)+1);
+        if (s[strlen(MSX->Term[i].equation)] != '\0') return ERR_MEMORY;
         char *f = s; //Used to free
         int len = (int)strlen(s);
         int m;

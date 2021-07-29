@@ -1,5 +1,3 @@
-
-
 // --- define WINDOWS
 
 #undef WINDOWS
@@ -12,20 +10,19 @@
 
 // --- define DLLEXPORT
 
-#ifndef DLLEXPORT                                                              // ttaxon - 9/7/10
-  #ifdef WINDOWS
-    #ifdef __cplusplus
-    #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
-    #else
-    #define DLLEXPORT __declspec(dllexport) __stdcall
-    #endif
+#undef DLLEXPORT
+#ifdef WINDOWS
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C" __declspec(dllexport) __stdcall
   #else
-    #ifdef __cplusplus
-    #define DLLEXPORT extern "C"
-    #else
-    #define DLLEXPORT
-    #endif
-  #endif  
+  #define DLLEXPORT __declspec(dllexport) __stdcall
+  #endif
+#else
+  #ifdef __cplusplus
+  #define DLLEXPORT extern "C"
+  #else
+  #define DLLEXPORT
+  #endif
 #endif
 
 int DLLEXPORT example1(char *fname);

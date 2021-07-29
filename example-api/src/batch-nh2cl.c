@@ -32,7 +32,6 @@ int DLLEXPORT batchExample(char *fname) {
     CALL(err, MSXsetTimeParameter(MSX, PATTERNSTEP, 1*HOUR));
     CALL(err, MSXsetTimeParameter(MSX, PATTERNSTART, 0));
 
-
     // Add nodes
     CALL(err, MSXaddNode(MSX, "2"));
     CALL(err, MSXaddTank(MSX, "1", 19634.953125,0,39269.906250));

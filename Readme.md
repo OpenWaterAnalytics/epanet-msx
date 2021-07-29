@@ -6,9 +6,12 @@ The multi-species extension to the EPANET hydraulic analysis engine.
 Notes:
 Make sure that MSX_init() is called after everything is added, this must be done before
 any simulations are done. MSX_init() also must be called before Hydraulics are set.
-It is important that when calling the add functions or the set size function that
-the network related calls (addNode, addTank, addLink, etc.) are called before the species
-related calls (addSpecies, addParameter, addTerm, etc.).
+
+Make sure that the in cases where an object is being added to another, that 
+the object being added to is already created. For example when adding an
+expression make sure that the species that it is being added to already exists.
+Another example is when adding a quality make sure that the nodes or links
+already exist.
 
 
 ## Building

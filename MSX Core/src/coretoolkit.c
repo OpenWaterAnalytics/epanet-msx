@@ -229,6 +229,7 @@ int DLLEXPORT MSXaddTank(MSXproject MSX,char *id, double initialVolume, int mixM
     MSX->Tank[i].id = id;
     MSX->Tank[i].node = MSX->Nobjects[NODE]+1;
     i = MSX->Nobjects[NODE]+1;
+    if (i > MSX->Sizes[NODE]) err = MSXsetSize(MSX, NODE, i);
     MSX->Node[i].tank = MSX->Nobjects[TANK]+1;
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
@@ -276,6 +277,7 @@ int DLLEXPORT MSXaddReservoir(MSXproject MSX, char *id, double initialVolume, in
     MSX->Tank[i].id = id;
     MSX->Tank[i].node = MSX->Nobjects[NODE]+1;
     i = MSX->Nobjects[NODE]+1;
+    if (i > MSX->Sizes[NODE]) err = MSXsetSize(MSX, NODE, i);
     MSX->Node[i].tank = MSX->Nobjects[TANK]+1;
     MSX->Node[i].rpt = 0;
     MSX->Node[i].id = id;
@@ -330,7 +332,6 @@ int DLLEXPORT MSXaddLink(MSXproject MSX, char *id, char *startNode, char *endNod
     MSX->Link[i].len = length;
     MSX->Link[i].roughness = roughness;
     MSX->Link[i].rpt = 0;
-    MSX->Link[i].param = NULL;    
     MSX->Link[i].id = id;    
     MSX->Nobjects[LINK]++;
     return err;
@@ -917,22 +918,12 @@ int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size)
             // Allocate space in Node, Link, and Tank objects
             int i;
             for (i=1; i<=MSX->Sizes[NODE]; i++) {
-                MSX->Node[i].c = (double *) calloc(size+1, sizeof(double));
-                if (MSX->Node[i].c == NULL) return ERR_MEMORY;
                 MSX->Node[i].c0 = (double *) calloc(size+1, sizeof(double));
                 if (MSX->Node[i].c0 == NULL) return ERR_MEMORY;
-            }
-            for (i=1; i<=MSX->Sizes[TANK]; i++) {
-                MSX->Tank[i].c = (double *) calloc(size+1, sizeof(double));
-                if (MSX->Tank[i].c == NULL) return ERR_MEMORY;
-                MSX->Tank[i].reacted = (double*) calloc(size+1, sizeof(double));
-                if (MSX->Tank[i].reacted == NULL) return ERR_MEMORY;
             }
             for (i=1; i<=MSX->Sizes[LINK]; i++) {
                 MSX->Link[i].c0 = (double *) calloc(size+1, sizeof(double));
                 if (MSX->Link[i].c0 == NULL) return ERR_MEMORY;
-                MSX->Link[i].reacted = (double *) calloc(size+1, sizeof(double));
-                if (MSX->Link[i].reacted == NULL) return ERR_MEMORY;
             }
         }
         else {
@@ -944,28 +935,14 @@ int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size)
             // Allocate space in Node, Link, and Tank objects
             int i;
             for (i=1; i<=MSX->Sizes[NODE]; i++) {
-                MSX->Node[i].c = (double *) realloc(MSX->Node[i].c, (size+1) * sizeof(double));
-                if (MSX->Node[i].c == NULL) return ERR_MEMORY;
-                for (int j=1; j<=size; j++) MSX->Node[i].c[j] = 0;
                 MSX->Node[i].c0 = (double *) realloc(MSX->Node[i].c0, (size+1) * sizeof(double));
                 if (MSX->Node[i].c0 == NULL) return ERR_MEMORY;
                 for (int j=1; j<=size; j++) MSX->Node[i].c0[j] = 0;
-            }
-            for (i=1; i<=MSX->Sizes[TANK]; i++) {
-                MSX->Tank[i].c = (double *) realloc(MSX->Tank[i].c, (size+1) * sizeof(double));
-                if (MSX->Tank[i].c == NULL) return ERR_MEMORY;
-                for (int j=1; j<=size; j++) MSX->Tank[i].c[j] = 0;
-                MSX->Tank[i].reacted = (double *) realloc(MSX->Tank[i].reacted, (size+1) * sizeof(double));
-                if (MSX->Tank[i].reacted == NULL) return ERR_MEMORY;
-                for (int j=1; j<=size; j++) MSX->Tank[i].reacted[j] = 0;
             }
             for (i=1; i<=MSX->Sizes[LINK]; i++) {
                 MSX->Link[i].c0 = (double *) realloc(MSX->Link[i].c0, (size+1) * sizeof(double));
                 if (MSX->Link[i].c0 == NULL) return ERR_MEMORY;
                 for (int j=1; j<=size; j++) MSX->Link[i].c0[j] = 0;
-                MSX->Link[i].reacted = (double *) realloc(MSX->Link[i].reacted, (size+1) * sizeof(double));
-                if (MSX->Link[i].reacted == NULL) return ERR_MEMORY;
-                for (int j=1; j<=size; j++) MSX->Link[i].reacted[j] = 0;
             }
         }
         break;
@@ -1025,40 +1002,77 @@ int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size)
         if (MSX->Sizes[type] == 0) {
             MSX->Node = (Snode *) calloc(size+1, sizeof(Snode));
             if (MSX->Node == NULL) return ERR_MEMORY;
+            for (int i=1; i<size+1; i++) MSX->Node[i].c0 = NULL;
+            if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Node[i].c0 != NULL) free(MSX->Node[i].c0);
+                MSX->Node[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
+            }
         }
         else {
             MSX->Node = (Snode *) realloc(MSX->Node, (size+1) * sizeof(Snode));
             if (MSX->Node == NULL) return ERR_MEMORY;
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Node[i].c0 = NULL;
+            if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Node[i].c0 != NULL) free(MSX->Node[i].c0);
+                MSX->Node[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
+            }
         }
         break;
     case LINK:
         if (MSX->Sizes[type] == 0) {
             MSX->Link = (Slink *) calloc(size+1, sizeof(Slink));
             if (MSX->Link == NULL) return ERR_MEMORY;
+            //Initialize the initial concentration
+            for (int i=1; i<size+1; i++) MSX->Link[i].c0 = NULL;
+            if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Link[i].c0 != NULL) free(MSX->Link[i].c0);
+                MSX->Link[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
+            }
+            //Initialize the paramaters
+            for (int i=1; i<size+1; i++) MSX->Link[i].param = NULL;
+            if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Link[i].param != NULL) free(MSX->Link[i].param);
+                MSX->Link[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
+            }
         }
         else {
             MSX->Link = (Slink *) realloc(MSX->Link, (size+1) * sizeof(Slink));
             if (MSX->Link == NULL) return ERR_MEMORY;
+            //Initialize the initial concentration
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Link[i].c0 = NULL;
+            if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Link[i].c0 != NULL) free(MSX->Link[i].c0);
+                MSX->Link[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
+            }
+            //Initialize the paramaters
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Link[i].param = NULL;
+            if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Link[i].param != NULL) free(MSX->Link[i].param);
+                MSX->Link[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
+            }
         }
         break;
     case TANK:
         if (MSX->Sizes[type] == 0) {
             MSX->Tank = (Stank *) calloc(size+1, sizeof(Stank));
             if (MSX->Tank == NULL) return ERR_MEMORY;
+            //Initialize the paramaters
+            for (int i=1; i<size+1; i++) MSX->Tank[i].param = NULL;
+            if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Tank[i].param != NULL) free(MSX->Tank[i].param);
+                MSX->Tank[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
+            }
         }
         else {
             MSX->Tank = (Stank *) realloc(MSX->Tank, (size+1) * sizeof(Stank));
             if (MSX->Tank == NULL) return ERR_MEMORY;
+            //Initialize the paramaters
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Tank[i].param = NULL;
+            if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
+                if (MSX->Tank[i].param != NULL) free(MSX->Tank[i].param);
+                MSX->Tank[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
+            }
         }
-        if (MSX->Sizes[NODE] == 0) {
-            MSX->Node = (Snode *) calloc(size+1, sizeof(Snode));
-            if (MSX->Node == NULL) return ERR_MEMORY;
-        }
-        else {
-            MSX->Node = (Snode *) realloc(MSX->Node, (size+MSX->Sizes[NODE]+1) * sizeof(Snode));
-            if (MSX->Node == NULL) return ERR_MEMORY;
-        }
-        MSX->Sizes[NODE] += size;
         break;
     case PATTERN:
         if (MSX->Sizes[type] == 0) {
