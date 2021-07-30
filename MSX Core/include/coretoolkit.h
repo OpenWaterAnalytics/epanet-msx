@@ -60,58 +60,60 @@ typedef struct Project *MSXproject;
 int DLLEXPORT MSX_open(MSXproject *MSX);
 int DLLEXPORT MSX_close(MSXproject MSX);
 int DLLEXPORT MSX_init(MSXproject MSX);
-int DLLEXPORT MSXprintQuality(MSXproject MSX, int type, char *id, char *species, char *fname);
+int DLLEXPORT MSX_printQuality(MSXproject MSX, int type, char *id, char *species, char *fname);
 
 
 //Network building functions
-int DLLEXPORT MSXaddNode(MSXproject MSX, char *id);
-int DLLEXPORT MSXaddTank(MSXproject MSX, char *id, double initialVolume, int mixModel, double volumeMix);
-int DLLEXPORT MSXaddReservoir(MSXproject MSX, char *id, double initialVolume, int mixModel, double volumeMix);
-int DLLEXPORT MSXaddLink(MSXproject MSX, char *id, char *startNode, char *endNode, double length, double diameter, double roughness);
+int DLLEXPORT MSX_addNode(MSXproject MSX, char *id);
+int DLLEXPORT MSX_addTank(MSXproject MSX, char *id, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSX_addReservoir(MSXproject MSX, char *id, double initialVolume, int mixModel, double volumeMix);
+int DLLEXPORT MSX_addLink(MSXproject MSX, char *id, char *startNode, char *endNode, double length, double diameter, double roughness);
 
 //Species/Chemistry option functions
-int DLLEXPORT MSXaddOption(MSXproject MSX, int optionType, char * value);
-int DLLEXPORT MSXaddSpecies(MSXproject MSX, char *id, int type, int units, double aTol, double rTol);
-int DLLEXPORT MSXaddCoefficeint(MSXproject MSX, int type, char *id, double value);
-int DLLEXPORT MSXaddTerm(MSXproject MSX, char *id, char *equation);
-int DLLEXPORT MSXaddExpression(MSXproject MSX, int classType, int expressionType, char *species, char *equation);
-int DLLEXPORT MSXaddSource(MSXproject MSX, int sourceType, char *nodeId, char *speciesId, double strength, char *timePattern);
-int DLLEXPORT MSXaddQuality(MSXproject MSX, char *type, char *speciesId, double value, char *id);
-int DLLEXPORT MSXaddParameter(MSXproject MSX, char *type, char *paramId, double value, char *id);
-int DLLEXPORT MSXsetReport(MSXproject MSX, char *reportType, char *id, int precision);
+int DLLEXPORT MSX_addOption(MSXproject MSX, int optionType, char * value);
+int DLLEXPORT MSX_addSpecies(MSXproject MSX, char *id, int type, int units, double aTol, double rTol);
+int DLLEXPORT MSX_addCoefficeint(MSXproject MSX, int type, char *id, double value);
+int DLLEXPORT MSX_addTerm(MSXproject MSX, char *id, char *equation);
+int DLLEXPORT MSX_addExpression(MSXproject MSX, int classType, int expressionType, char *species, char *equation);
+int DLLEXPORT MSX_addSource(MSXproject MSX, int sourceType, char *nodeId, char *speciesId, double strength, char *timePattern);
+int DLLEXPORT MSX_addQuality(MSXproject MSX, char *type, char *speciesId, double value, char *id);
+int DLLEXPORT MSX_addParameter(MSXproject MSX, char *type, char *paramId, double value, char *id);
+int DLLEXPORT MSX_setReport(MSXproject MSX, char *reportType, char *id, int precision);
 
 //Hydraulic Functions
-int DLLEXPORT MSXsetHydraulics(MSXproject MSX, float *demands, float *heads, float *flows);
+int DLLEXPORT MSX_setHydraulics(MSXproject MSX, float *demands, float *heads, float *flows);
 
-int DLLEXPORT MSXsetSize(MSXproject MSX, int type, int size);
+int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size);
 
 
 // Below is from the legacy epanetmsx.h
 
-int  DLLEXPORT MSXgetindex(MSXproject MSX, int type, char *id, int *index);
-int  DLLEXPORT MSXgetIDlen(MSXproject MSX, int type, int index, int *len);
-int  DLLEXPORT MSXgetID(MSXproject MSX, int type, int index, char *id, int len);
-int  DLLEXPORT MSXgetcount(MSXproject MSX, int type, int *count);
-int  DLLEXPORT MSXgetspecies(MSXproject MSX, int index, int *type, char *units, double *aTol,
+int  DLLEXPORT MSX_getindex(MSXproject MSX, int type, char *id, int *index);
+int  DLLEXPORT MSX_getIDlen(MSXproject MSX, int type, int index, int *len);
+int  DLLEXPORT MSX_getID(MSXproject MSX, int type, int index, char *id, int len);
+int  DLLEXPORT MSX_getcount(MSXproject MSX, int type, int *count);
+int  DLLEXPORT MSX_getspecies(MSXproject MSX, int index, int *type, char *units, double *aTol,
                double *rTol);
-int  DLLEXPORT MSXgetconstant(MSXproject MSX, int index, double *value);
-int  DLLEXPORT MSXgetparameter(MSXproject MSX, int type, int index, int param, double *value);
-int  DLLEXPORT MSXgetsource(MSXproject MSX, int node, int species, int *type, double *level,
+int  DLLEXPORT MSX_getconstant(MSXproject MSX, int index, double *value);
+int  DLLEXPORT MSX_getparameter(MSXproject MSX, int type, int index, int param, double *value);
+int  DLLEXPORT MSX_getsource(MSXproject MSX, int node, int species, int *type, double *level,
                int *pat);
-int  DLLEXPORT MSXgetpatternlen(MSXproject MSX, int pat, int *len);
-int  DLLEXPORT MSXgetpatternvalue(MSXproject MSX, int pat, int period, double *value);
-int  DLLEXPORT MSXgetinitqual(MSXproject MSX, int type, int index, int species, double *value);
-int  DLLEXPORT MSXgetQualityByIndex(MSXproject MSX, int type, int index, int species, double *value);
-int  DLLEXPORT MSXgetQualityByID(MSXproject MSX, int type, char *id, char *species, double *value);
-int  DLLEXPORT MSXsetconstant(MSXproject MSX, int index, double value);
-int  DLLEXPORT MSXsetparameter(MSXproject MSX, int type, int index, int param, double value);
-int  DLLEXPORT MSXsetinitqual(MSXproject MSX, int type, int index, int species, double value);
-int  DLLEXPORT MSXsetsource(MSXproject MSX, int node, int species, int type, double level,
+int  DLLEXPORT MSX_getpatternlen(MSXproject MSX, int pat, int *len);
+int  DLLEXPORT MSX_getpatternvalue(MSXproject MSX, int pat, int period, double *value);
+int  DLLEXPORT MSX_getinitqual(MSXproject MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSX_getQualityByIndex(MSXproject MSX, int type, int index, int species, double *value);
+int  DLLEXPORT MSX_getQualityByID(MSXproject MSX, int type, char *id, char *species, double *value);
+int  DLLEXPORT MSX_setconstant(MSXproject MSX, int index, double value);
+int  DLLEXPORT MSX_setparameter(MSXproject MSX, int type, int index, int param, double value);
+int  DLLEXPORT MSX_setinitqual(MSXproject MSX, int type, int index, int species, double value);
+int  DLLEXPORT MSX_setsource(MSXproject MSX, int node, int species, int type, double level,
                int pat);
-int  DLLEXPORT MSXsetpatternvalue(MSXproject MSX, int pat, int period, double value);
-int  DLLEXPORT MSXaddpattern(MSXproject MSX, char *id);
-int  DLLEXPORT MSXsetpattern(MSXproject MSX, int pat, double mult[], int len);
+int  DLLEXPORT MSX_setpatternvalue(MSXproject MSX, int pat, int period, double value);
+int  DLLEXPORT MSX_addpattern(MSXproject MSX, char *id);
+int  DLLEXPORT MSX_setpattern(MSXproject MSX, int pat, double mult[], int len);
 
-int DLLEXPORT MSXstep(MSXproject MSX, long *t, long *tleft);
-int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
+int DLLEXPORT MSX_step(MSXproject MSX, long *t, long *tleft);
 
+//Simulation Options
+int DLLEXPORT MSX_setFlowFlag(MSXproject MSX, int flag);
+int DLLEXPORT MSX_setTimeParameter(MSXproject MSX, int type, long value);

@@ -1,7 +1,7 @@
 # CMakeLists.txt - CMake configuration file for EPANETMSX
 
 cmake_minimum_required(VERSION 3.12)
-project(CORE_LIB LANGUAGES C)
+project(MSXCORE_LIB LANGUAGES C)
 
 
 # Append local dir to module search path
@@ -36,11 +36,11 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-add_library(core SHARED ${CORE_SOURCES})
-add_library(core_lib STATIC ${CORE_SOURCES})
-target_link_libraries(core OpenMP::OpenMP_C)
-target_link_libraries(core_lib OpenMP::OpenMP_C)
+add_library(msxcore SHARED ${CORE_SOURCES})
+add_library(msxcore_lib STATIC ${CORE_SOURCES})
+target_link_libraries(msxcore OpenMP::OpenMP_C)
+target_link_libraries(msxcore_lib OpenMP::OpenMP_C)
 
 
-target_include_directories(core PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(core_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(msxcore PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(msxcore_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)

@@ -34,11 +34,10 @@
 #include <malloc.h>
 
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
-#include "coretoolkit.h"
+// #include "coretoolkit.h"
+#include "msxtoolkit.h"
 
-
-int example1(char *fname);
-int batchExample(char *fname);
+#include "examples.h"
 
 void main(int argc, char *argv[])
 /**
@@ -63,7 +62,7 @@ void main(int argc, char *argv[])
 */
 {
     // Batch-nh2cl Example
-    int err = example1(argv[1]);
+    int err = newBatchExample(argv[1]);
     int bufferSize = 200;
     char *msg = (char *) malloc(bufferSize);
     if (err != 0) MSXgeterror(err, msg, bufferSize);
@@ -75,6 +74,6 @@ void main(int argc, char *argv[])
 //=============================================================================
 
     // Running the legacy code Example
-    // MSXrunLegacy(argc, argv);
+    MSXrunLegacy(argc, argv);
 }
 

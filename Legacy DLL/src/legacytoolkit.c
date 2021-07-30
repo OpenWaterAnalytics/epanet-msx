@@ -35,6 +35,7 @@
 #include "epanet2.h"
 #include "legacytoolkit.h"
 #include "coretoolkit.h"
+#include "msxtoolkit.h"
 #include "msxobjects.h"
 
 
@@ -55,7 +56,7 @@ int    MSXout_saveFinalResults(MSXproject MSX);
 
 //=============================================================================
 
-int  DLLEXPORT  MSXopen(MSXproject *MSX, char *argv[])
+int  DLLEXPORT  Legacyopen(MSXproject *MSX, char *argv[])
 /**
 **  Purpose:
 **    opens the EPANET-MSX toolkit system.
@@ -206,15 +207,15 @@ int  DLLEXPORT  MSXsolveQ(MSXproject MSX)
     long t, tleft = 0;
     int err = 0;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
-    CALL(err, MSXinit(MSX, 1));
-    do CALL(err, MSXstep(MSX, &t, &tleft));
+    CALL(err, Legacyinit(MSX, 1));
+    do CALL(err, MSXstep(&t, &tleft));
     while (tleft > 0 && err == 0);
     return err;
 }
 
 //=============================================================================
 
-int  DLLEXPORT  MSXinit(MSXproject MSX, int saveFlag)
+int  DLLEXPORT  Legacyinit(MSXproject MSX, int saveFlag)
 /**
 **  Purpose:
 **    initializes a MSX water quality analysis.
@@ -288,7 +289,7 @@ int  DLLEXPORT  MSXreport(MSXproject MSX, char *fname)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXclose(MSXproject MSX)
+int  DLLEXPORT  Legacyclose(MSXproject MSX)
 /**
 **  Purpose:
 **    closes the EPANET-MSX toolkit system.
@@ -427,7 +428,7 @@ void DLLEXPORT MSXrunLegacy(int argc, char *argv[])
 
     // --- open the MSX input file
         printf("\n  o Processing MSX input file   ");
-        err = MSXopen(&MSX, argv);
+        err = Legacyopen(&MSX, argv);
         if (err)
         {
             printf("\n\n... Cannot read EPANET-MSX file; error code = %d\n", err);
@@ -447,7 +448,7 @@ void DLLEXPORT MSXrunLegacy(int argc, char *argv[])
     //--- Initialize the multi-species analysis
 
         printf("\n  o Initializing network water quality");
-        err = MSXinit(MSX, 1);
+        err = Legacyinit(MSX, 1);
         if (err)
         {
             printf("\n\n... Cannot initialize EPANET-MSX; error code = %d\n", err);
@@ -469,7 +470,7 @@ void DLLEXPORT MSXrunLegacy(int argc, char *argv[])
                 oldHour = newHour;
             }
             err = MSXsaveResults(MSX);
-            err = MSXstep(MSX, &t, &tleft);
+            err = MSX_step(MSX, &t, &tleft);
             newHour = t / 3600;
 
         } while (!err && tleft > 0);
@@ -511,94 +512,9 @@ void DLLEXPORT MSXrunLegacy(int argc, char *argv[])
 
 //--- Close both the multi-species & EPANET systems
 
-    MSXclose(MSX);
+    Legacyclose(MSX);
     if ( !err ) printf("\n\n... EPANET-MSX completed successfully.");
     printf("\n");
-}
-
-//=============================================================================
-
-int DLLEXPORT MSXsetFlowFlag(MSXproject MSX, int flag)
-/**
-**  Purpose:
-**      sets the flow flag and units flag.
-**
-**  Input:
-**      MSX = the underlying MSXproject data struct.
-**      flag = the flag to set, for example CMH for cubic meters per hour.
-** 
-**  Output:
-**    None
-**
-**  Returns:
-**    an error code (or 0 for no error).
- */
-{
-    int err = 0;
-    // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
-
-    if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
-    MSX->Flowflag = flag;
-    if ( MSX->Flowflag >= LPS ) MSX->Unitsflag = SI;
-    else                        MSX->Unitsflag = US;
-    return 0;
-}
-
-//=============================================================================
-
-int DLLEXPORT MSXsetTimeParameter(MSXproject MSX, int type, long value)
-/**
-**  Purpose:
-**      sets a specified time parameter.
-**
-**  Input:
-**      MSX = the underlying MSXproject data struct.
-**      type = the type of time parameter
-**      value = that actual value to set.
-** 
-**  Output:
-**    None
-**
-**  Returns:
-**    an error code (or 0 for no error).
- */
-{
-    int err = 0;
-    // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
-
-    switch (type)
-    {
-    case DURATION:
-        MSX->Dur = value;
-        break;
-    case HYDSTEP:
-        MSX->Hstep = value;
-        break;
-    case QUALSTEP:
-        MSX->Qstep = value;
-        break;
-    case PATTERNSTEP:
-        MSX->Pstep = value;
-        break;
-    case PATTERNSTART:
-        MSX->Pstart = value;
-        break;
-    case REPORTSTEP:
-        MSX->Rstep = value;
-        break;
-    case REPORTSTART:
-        MSX->Rstart = value;
-        break;
-    case STATISTIC:
-        MSX->Statflag = value;
-        break;
-    default:
-        return ERR_INVALID_OBJECT_TYPE;
-        break;
-    }
-    return 0;
 }
 
 //=============================================================================

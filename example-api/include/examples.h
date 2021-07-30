@@ -27,3 +27,4 @@
 
 int DLLEXPORT example1(char *fname);
 int DLLEXPORT batchExample(char *fname);
+int DLLEXPORT newBatchExample(char *fname);

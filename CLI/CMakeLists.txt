@@ -11,6 +11,10 @@ include_directories(
   ../MSX\ Core/include
 )
 
+include_directories(
+  ../example-api/include
+)
+
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -41,8 +45,8 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-find_library(LEGACY_LIB legacy NAMES legacy PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
-find_library(CORE_LIB core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
+find_library(LEGACYMSX_LIB legacymsx NAMES legacymsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
+find_library(MSXCORE_LIB msxcore NAMES msxcore PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 find_library(EXAMPLES_LIB examples NAMES examples PATHS ${PROJECT_SOURCE_DIR}/../example-api/build/lib/* ${PROJECT_SOURCE_DIR}/../example-api/build/lib)
 
 

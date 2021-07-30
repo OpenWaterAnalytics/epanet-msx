@@ -43,16 +43,16 @@ else(OPENMP_FOUND)
   message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
-find_library(LEGACY_LIB legacy NAMES legacy PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
-find_library(CORE_LIB core NAMES core PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
+find_library(LEGACYMSX_LIB legacymsx NAMES legacymsx PATHS ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib/* ${PROJECT_SOURCE_DIR}/../Legacy\ DLL/build/lib)
+find_library(MSXCORE_LIB msxcore NAMES msxcore PATHS ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib/* ${PROJECT_SOURCE_DIR}/../MSX\ Core/build/lib)
 
 
 IF(MSVC)
   add_library(examples SHARED ${SOURCES})
-  target_link_libraries(examples ${LEGACY_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(examples ${LEGACYMSX_LIB} ${MSXCORE_LIB} OpenMP::OpenMP_C)
 ELSE(TRUE)
   add_library(examples SHARED ${SOURCES})
-  target_link_libraries(examples ${LEGACY_LIB} ${CORE_LIB} OpenMP::OpenMP_C)
+  target_link_libraries(examples ${LEGACYMSX_LIB} ${MSXCORE_LIB} OpenMP::OpenMP_C)
 ENDIF(MSVC)
 
 target_include_directories(examples PUBLIC ${PROJECT_SOURCE_DIR}/include)

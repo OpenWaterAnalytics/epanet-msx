@@ -44,12 +44,12 @@ cmake --build . --config Release
 
 cd ../..
 
-# Copy legacy.dll and epanet2.dll
-cp "Legacy DLL"/build/bin/*/legacy.dll CLI/build/bin/*/
+# Copy legacymsx.dll and epanet2.dll
+cp "Legacy DLL"/build/bin/*/legacymsx.dll CLI/build/bin/*/
 cp ../EPANET/build/bin/*/epanet2.dll CLI/build/bin/*/
 
-# Copy core.dll
-cp MSX\ Core/build/bin/*/core.dll CLI/build/bin/*/
+# Copy msxcore.dll
+cp MSX\ Core/build/bin/*/msxcore.dll CLI/build/bin/*/
 
 # Copy examples.dll
 cp example-api/build/bin/*/examples.dll CLI/build/bin/*/
