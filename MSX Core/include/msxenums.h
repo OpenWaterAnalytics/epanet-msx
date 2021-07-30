@@ -194,7 +194,9 @@
            ERR_OPEN_RPT_FILE,          // 521                                  //(LR-11/20/07, to fix bug 08)
            ERR_COMPILE_FAILED,         // 522                                  //1.1.00
            ERR_COMPILED_LOAD,          // 523                                  //1.1.00
-		   ERR_ILLEGAL_MATH,           // 524                                  //1.1.00
+		       ERR_ILLEGAL_MATH,           // 524                                  //1.1.00
+           ERR_HYD,
+           ERR_INIT,
            ERR_MAX};
 
 /// Time parameters (From EPANET)

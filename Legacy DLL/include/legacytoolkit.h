@@ -57,7 +57,6 @@ int  DLLEXPORT MSXsaveoutfile(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXsavemsxfile(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXreport(MSXproject MSX, char *fname);
 int  DLLEXPORT MSXclose(MSXproject MSX);
-int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
 
 int  DLLEXPORT MSXsaveResults(MSXproject MSX);
 int  DLLEXPORT MSXsaveFinalResults(MSXproject MSX);

@@ -62,9 +62,8 @@ void main(int argc, char *argv[])
 **       contain water quality results in binary format.
 */
 {
-    int err = 0;
     // Batch-nh2cl Example
-    err = batchExample(argv[1]);
+    int err = example1(argv[1]);
     int bufferSize = 200;
     char *msg = (char *) malloc(bufferSize);
     if (err != 0) MSXgeterror(err, msg, bufferSize);

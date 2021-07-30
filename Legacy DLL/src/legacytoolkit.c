@@ -309,29 +309,6 @@ int  DLLEXPORT  MSXclose(MSXproject MSX)
 
 //=============================================================================
 
-int  DLLEXPORT  MSXgeterror(int code, char *msg, int len)
-/**
-**  Purpose:
-**    retrieves text of an error message.
-**
-**  Input:
-**    MSX = the underlying MSXproject data struct.
-**    code = error code number
-**    len = maximum length of string errmsg.
-**
-**  Output:
-**    msg  = text of error message.
-**
-**  Returns:
-**    an error code which is always 0.
-*/
-{
-    strncpy(msg, MSXproj_getErrmsg(code), len);
-    return 0;
-}
-
-//=============================================================================
-
 int  DLLEXPORT MSXsavemsxfile(MSXproject MSX, char *fname)
 /**
 **  Purpose:

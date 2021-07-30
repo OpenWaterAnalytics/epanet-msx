@@ -113,4 +113,5 @@ int  DLLEXPORT MSXaddpattern(MSXproject MSX, char *id);
 int  DLLEXPORT MSXsetpattern(MSXproject MSX, int pat, double mult[], int len);
 
 int DLLEXPORT MSXstep(MSXproject MSX, long *t, long *tleft);
+int  DLLEXPORT MSXgeterror(int code, char *msg, int len);
 

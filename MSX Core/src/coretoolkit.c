@@ -877,6 +877,8 @@ int DLLEXPORT MSXsetHydraulics(MSXproject MSX, float *demands, float *heads, flo
 */
 {
     if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if (MSX->D == NULL || MSX->H == NULL || MSX->Q == NULL) return ERR_INIT;
+    MSX->HydOffset = 1;
     int err = 0;    
     int nNodes = MSX->Nobjects[NODE];
     int nLinks = MSX->Nobjects[LINK];
@@ -1949,7 +1951,72 @@ int  DLLEXPORT  MSXstep(MSXproject MSX, long *t, long *tleft)
 */
 {
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
+    if (MSX->HydOffset == 0) return ERR_HYD;
     return MSXqual_step(MSX, t, tleft);
+}
+
+//=============================================================================
+
+int  DLLEXPORT  MSXgeterror(int code, char *msg, int len)
+/**
+**  Purpose:
+**    retrieves text of an error message.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+**    code = error code number
+**    len = maximum length of string errmsg.
+**
+**  Output:
+**    msg  = text of error message.
+**
+**  Returns:
+**    an error code which is always 0.
+*/
+{
+    // Error codes
+    static char * Errmsg[] =
+    {"unknown error code.",
+     "Error 501 - insufficient memory available.",
+     "Error 502 - no EPANET data file supplied.",
+     "Error 503 - could not open MSX input file.",
+     "Error 504 - could not open hydraulic results file.",
+     "Error 505 - could not read hydraulic results file.",
+     "Error 506 - could not read MSX input file.",
+     "Error 507 - too few pipe reaction expressions.",
+     "Error 508 - too few tank reaction expressions.",
+     "Error 509 - could not open differential equation solver.",
+     "Error 510 - could not open algebraic equation solver.",
+     "Error 511 - could not open binary results file.",
+     "Error 512 - read/write error on binary results file.",
+     "Error 513 - could not integrate reaction rate expressions.",
+     "Error 514 - could not solve reaction equilibrium expressions.",
+     "Error 515 - reference made to an unknown type of object.",
+     "Error 516 - reference made to an illegal object index.",
+     "Error 517 - reference made to an undefined object ID.",
+     "Error 518 - invalid property values were specified.",
+     "Error 519 - an MSX project was not opened.",
+     "Error 520 - an MSX project is already opened.",
+     "Error 521 - could not open MSX report file.",                            //(LR-11/20/07)
+     "Error 522 - could not compile chemistry functions.",                     //1.1.00
+     "Error 523 - could not load functions from compiled chemistry file.",     //1.1.00
+	 "Error 524 - illegal math operation.",                                    //1.1.00
+     "Error 525 - No hydraulics given",
+     "Error 526 - MSX project not initialized",
+     "Error 401 - (too many characters)",
+     "Error 402 - (too few input items)",
+     "Error 403 - (invalid keyword)",
+     "Error 404 - (invalid numeric value)",
+     "Error 405 - (reference to undefined object)",
+     "Error 406 - (illegal use of a reserved name)",
+     "Error 407 - (name already used by another object)",
+     "Error 408 - (species already assigned an expression)", 
+     "Error 409 - (illegal math expression)"}; 
+
+    if (code <= ERR_FIRST && code >= 400) strncpy(msg, Errmsg[code-400+24], len);
+    if ( code <= ERR_FIRST || code >= ERR_MAX ) strncpy(msg, Errmsg[0], len);
+    else strncpy(msg, Errmsg[code - ERR_FIRST], len);
+    return 0;
 }
 
 //=============================================================================
