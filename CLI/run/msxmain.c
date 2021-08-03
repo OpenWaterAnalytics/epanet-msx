@@ -34,7 +34,6 @@
 #include <malloc.h>
 
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
-// #include "coretoolkit.h"
 #include "msxtoolkit.h"
 
 #include "examples.h"
@@ -74,6 +73,6 @@ void main(int argc, char *argv[])
 //=============================================================================
 
     // Running the legacy code Example
-    MSXrunLegacy(argc, argv);
+    // MSXrunLegacy(argc, argv);
 }
 

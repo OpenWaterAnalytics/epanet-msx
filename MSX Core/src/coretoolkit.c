@@ -63,6 +63,8 @@ int DLLEXPORT MSX_close(MSXproject MSX)
 
     // --- close all files
 
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( MSX->RptFile.file ) fclose(MSX->RptFile.file);                          //(LR-11/20/07, to fix bug 08)
     if ( MSX->HydFile.file ) fclose(MSX->HydFile.file);
     if ( MSX->TmpOutFile.file && MSX->TmpOutFile.file != MSX->OutFile.file )
@@ -106,7 +108,8 @@ int DLLEXPORT MSX_init(MSXproject MSX)
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     err = finishInit(MSX);
     if (!err) err = MSXqual_open(MSX);
@@ -132,6 +135,7 @@ int DLLEXPORT MSX_printQuality(MSXproject MSX, int type, char *id, char *species
 **
 */
 {
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     double value = 0.0;
@@ -180,7 +184,8 @@ int DLLEXPORT MSX_addNode(MSXproject MSX, char *id)
 */
 {
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(NODE, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     int err = checkID(id);
     if ( err ) return err;
@@ -219,7 +224,8 @@ int DLLEXPORT MSX_addTank(MSXproject MSX,char *id, double initialVolume, int mix
 */
 {
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(TANK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     int err = checkID(id);
     if ( err ) return err;
@@ -267,7 +273,8 @@ int DLLEXPORT MSX_addReservoir(MSXproject MSX, char *id, double initialVolume, i
 */
 {
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(TANK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     int err = checkID(id);
     if ( err ) return err;
@@ -317,7 +324,8 @@ int DLLEXPORT MSX_addLink(MSXproject MSX, char *id, char *startNode, char *endNo
 */
 {
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     
     if ( findObject(LINK, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     int err = checkID(id);
@@ -364,7 +372,8 @@ int DLLEXPORT MSX_addOption(MSXproject MSX, int optionType, char *value)
 {
     int err = 0;
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int k;
     switch (optionType)
     {
@@ -440,7 +449,8 @@ int DLLEXPORT MSX_addSpecies(MSXproject MSX, char *id, int type, int units, doub
 */
 {
     if (!(type == BULK || type == WALL)) return ERR_KEYWORD;
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(SPECIES, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
 
     int err = checkID(id);
@@ -501,7 +511,8 @@ int DLLEXPORT MSX_addCoefficeint(MSXproject MSX, int type, char *id, double valu
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     if (type == PARAMETER) {
         if ( findObject(PATTERN, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
@@ -548,7 +559,8 @@ int DLLEXPORT MSX_addTerm(MSXproject MSX, char *id, char *equation)
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(TERM, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     int err = 0;
     err = checkID(id);
@@ -594,7 +606,8 @@ int DLLEXPORT MSX_addExpression(MSXproject MSX, int classType, int expressionTyp
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     // --- determine expression type 
     if ( expressionType < 0 || expressionType > 3 ) return ERR_KEYWORD;
@@ -653,7 +666,8 @@ int DLLEXPORT MSX_addSource(MSXproject MSX, int sourceType, char *nodeId, char *
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     // --- determine source type 
     if ( sourceType < 0 || sourceType > 3 ) return ERR_KEYWORD;
@@ -708,7 +722,8 @@ int DLLEXPORT MSX_addQuality(MSXproject MSX, char *type, char *speciesId, double
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     int i = 0;
     if      ( MSXutils_match(type, "GLOBAL") ) i = 1;
@@ -772,7 +787,8 @@ int DLLEXPORT MSX_addParameter(MSXproject MSX, char *type, char *paramId, double
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
 
     // --- get parameter name
@@ -817,7 +833,8 @@ int DLLEXPORT MSX_setReport(MSXproject MSX, char *reportType, char *id, int prec
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     int k = MSXutils_findmatch(reportType, ReportWords);
     if ( k < 0 ) return ERR_KEYWORD;
@@ -876,7 +893,8 @@ int DLLEXPORT MSX_setHydraulics(MSXproject MSX, float *demands, float *heads, fl
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if (MSX->D == NULL || MSX->H == NULL || MSX->Q == NULL) return ERR_INIT;
     MSX->HydOffset = 1;
     int err = 0;    
@@ -911,7 +929,8 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
 **    an error code (or 0 for no error).
 */
 {
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     int err = 0;
     if (type < 0 || type >= MAX_OBJECTS) return ERR_INVALID_OBJECT_TYPE;
     if (size < 0) return ERR_INVALID_OBJECT_PARAMS;
@@ -1122,6 +1141,7 @@ int  DLLEXPORT MSX_getindex(MSXproject MSX, int type, char *id, int *index)
 {
     int i;
     *index = 0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
@@ -1160,6 +1180,7 @@ int  DLLEXPORT MSX_getIDlen(MSXproject MSX, int type, int index, int *len)
 {
     int i;
     *len = 0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
@@ -1203,6 +1224,7 @@ int  DLLEXPORT MSX_getID(MSXproject MSX, int type, int index, char *id, int len)
 {
     int i;
     strcpy(id, "");
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
@@ -1243,6 +1265,7 @@ int DLLEXPORT MSX_getcount(MSXproject MSX, int type, int *count)
 */
 {
     *count = 0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     switch(type)
     {
@@ -1284,6 +1307,7 @@ int DLLEXPORT MSX_getspecies(MSXproject MSX, int index, int *type, char *units,
     strcpy(units, "");
     *aTol  = 0.0;
     *rTol  = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( index < 1 || index > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     *type  = MSX->Species[index].type;
@@ -1312,6 +1336,7 @@ int DLLEXPORT MSX_getconstant(MSXproject MSX, int index, double *value)
 */
 {
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( index < 1 || index > MSX->Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
     *value = MSX->Const[index].value;
@@ -1341,6 +1366,7 @@ int DLLEXPORT MSX_getparameter(MSXproject MSX, int type, int index, int param, d
 {
     int j;
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == NODE )
@@ -1391,6 +1417,7 @@ int  DLLEXPORT MSX_getsource(MSXproject MSX, int node, int species, int *type, d
     *type  = MSX_NOSOURCE;
     *level = 0.0;
     *pat   = 0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( node < 1 || node > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
@@ -1428,6 +1455,7 @@ int  DLLEXPORT MSX_getpatternlen(MSXproject MSX, int pat, int *len)
 */
 {
     *len = 0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     *len = MSX->Pattern[pat].length;
@@ -1457,6 +1485,7 @@ int  DLLEXPORT MSX_getpatternvalue(MSXproject MSX, int pat, int period, double *
 {
     int n = 1;
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( period <= MSX->Pattern[pat].length )
@@ -1498,6 +1527,7 @@ int  DLLEXPORT MSX_getinitqual(MSXproject MSX, int type, int index, int species,
 */
 {
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == NODE )
@@ -1536,6 +1566,7 @@ int  DLLEXPORT MSX_getQualityByIndex(MSXproject MSX, int type, int index, int sp
 */
 {
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == NODE )
@@ -1574,6 +1605,7 @@ int  DLLEXPORT MSX_getQualityByID(MSXproject MSX, int type, char *id, char *spec
 */
 {
     *value = 0.0;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( type == NODE )
     {
@@ -1620,6 +1652,7 @@ int  DLLEXPORT MSX_setconstant(MSXproject MSX, int index, double value)
 **    an error code or 0 for no error.
 */
 {
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( index < 1 || index > MSX->Nobjects[CONSTANT] ) return ERR_INVALID_OBJECT_INDEX;
     MSX->Const[index].value = value;
@@ -1649,6 +1682,7 @@ int  DLLEXPORT MSX_setparameter(MSXproject MSX, int type, int index, int param, 
 */
 {
     int j;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( param < 1 || param > MSX->Nobjects[PARAMETER] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == NODE )
@@ -1688,6 +1722,7 @@ int  DLLEXPORT MSX_setinitqual(MSXproject MSX, int type, int index, int species,
 **    an error code (or 0 for no error).
 */
 {
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( type == NODE )
@@ -1739,6 +1774,7 @@ int  DLLEXPORT MSX_setsource(MSXproject MSX, int node, int species, int type, do
 
 // --- check for valid source parameters
 
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( node < 1 || node > MSX->Nobjects[NODE] ) return ERR_INVALID_OBJECT_INDEX;
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
@@ -1803,6 +1839,7 @@ int  DLLEXPORT MSX_setpatternvalue(MSXproject MSX, int pat, int period, double v
 
 // --- check that pattern & period exists
 
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( period <= 0 || period > MSX->Pattern[pat].length )
@@ -1848,6 +1885,7 @@ int  DLLEXPORT MSX_addpattern(MSXproject MSX, char *id)
     int err = 0;
 // --- check if a pattern with same id already exists
 
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( findObject(PATTERN, id) >= 1 ) return ERR_INVALID_OBJECT_PARAMS;
     err = checkID(id);
@@ -1890,6 +1928,7 @@ int  DLLEXPORT MSX_setpattern(MSXproject MSX, int pat, double mult[], int len)
 
 // --- check that pattern exists
 
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if ( pat < 1 || pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( len < 0) len = 0;
@@ -1950,6 +1989,7 @@ int  DLLEXPORT MSX_step(MSXproject MSX, long *t, long *tleft)
 **    an error code (or 0 for no error).
 */
 {
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
     if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
     if (MSX->HydOffset == 0) return ERR_HYD;
     return MSXqual_step(MSX, t, tleft);
@@ -1975,7 +2015,8 @@ int DLLEXPORT MSX_setFlowFlag(MSXproject MSX, int flag)
 {
     int err = 0;
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
 
     if (flag > 9) return ERR_INVALID_OBJECT_TYPE;
     MSX->Flowflag = flag;
@@ -2005,7 +2046,8 @@ int DLLEXPORT MSX_setTimeParameter(MSXproject MSX, int type, long value)
 {
     int err = 0;
     // Cannot modify network structure while solvers are active
-    if (!MSX->ProjectOpened) return ERR_MSX_NOT_OPENED;
+    if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
+    if ( !MSX->ProjectOpened ) return ERR_MSX_NOT_OPENED;
 
     switch (type)
     {
