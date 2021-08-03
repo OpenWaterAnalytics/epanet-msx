@@ -97,8 +97,8 @@ int  DLLEXPORT MSXgetindex(int type, char *id, int *index) {
 int  DLLEXPORT MSXgetIDlen(int type, int index, int *len) {
     return MSX_getIDlen(*(project), type, index, len);
 }
-int  DLLEXPORT MSXgetID(int type, int index, char *id, int len) {
-    return MSX_getID(*(project), type, index, id, len);
+int  DLLEXPORT MSXgetID(int type, int index, char *result, int len) {
+    return MSX_getID(*(project), type, index, result, len);
 }
 int  DLLEXPORT MSXgetcount(int type, int *count) {
     return MSX_getcount(*(project), type, count);

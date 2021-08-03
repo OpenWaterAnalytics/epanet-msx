@@ -78,7 +78,7 @@ int DLLEXPORT MSXsetSize(int type, int size);
 
 int  DLLEXPORT MSXgetindex(int type, char *id, int *index);
 int  DLLEXPORT MSXgetIDlen(int type, int index, int *len);
-int  DLLEXPORT MSXgetID(int type, int index, char *id, int len);
+int  DLLEXPORT MSXgetID(int type, int index, char *result, int len);
 int  DLLEXPORT MSXgetcount(int type, int *count);
 int  DLLEXPORT MSXgetspecies(int index, int *type, char *units, double *aTol,
                double *rTol);
