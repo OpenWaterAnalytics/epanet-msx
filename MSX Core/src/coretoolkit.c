@@ -1160,8 +1160,9 @@ int  DLLEXPORT MSX_getindex(MSXproject MSX, int type, char *id, int *index)
         case CONSTANT:  i = findObject(CONSTANT, id);  break;
         case PARAMETER: i = findObject(PARAMETER, id); break;
         case PATTERN:   i = findObject(PATTERN, id);   break;
-        case NODE:      i = findObject(NODE, id);      break;
         case LINK:      i = findObject(LINK, id);      break;
+        case NODE:      i = findObject(NODE, id);      break;
+        case TANK:      i = findObject(TANK, id);      break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( i < 1 ) return ERR_UNDEFINED_OBJECT_ID;
@@ -1199,6 +1200,9 @@ int  DLLEXPORT MSX_getIDlen(MSXproject MSX, int type, int index, int *len)
         case CONSTANT:  i = CONSTANT;  break;
         case PARAMETER: i = PARAMETER; break;
         case PATTERN:   i = PATTERN;   break;
+        case LINK:   i = LINK;   break;
+        case NODE:   i = NODE;   break;
+        case TANK:   i = TANK;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
@@ -1208,6 +1212,9 @@ int  DLLEXPORT MSX_getIDlen(MSXproject MSX, int type, int index, int *len)
         case CONSTANT:  *len = (int) strlen(MSX->Const[index].id);   break;
         case PARAMETER: *len = (int) strlen(MSX->Param[index].id);   break;
         case PATTERN:   *len = (int) strlen(MSX->Pattern[index].id); break;
+        case LINK:   *len = (int) strlen(MSX->Link[index].id); break;
+        case NODE:   *len = (int) strlen(MSX->Node[index].id); break;
+        case TANK:   *len = (int) strlen(MSX->Tank[index].id); break;
     }
     return 0;
 }
@@ -1243,6 +1250,9 @@ int  DLLEXPORT MSX_getID(MSXproject MSX, int type, int index, char *id, int len)
         case CONSTANT:  i = CONSTANT;  break;
         case PARAMETER: i = PARAMETER; break;
         case PATTERN:   i = PATTERN;   break;
+        case LINK:   i = LINK;   break;
+        case NODE:   i = NODE;   break;
+        case TANK:   i = TANK;   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     if ( index < 1 || index > MSX->Nobjects[i] ) return ERR_INVALID_OBJECT_INDEX;
@@ -1252,6 +1262,9 @@ int  DLLEXPORT MSX_getID(MSXproject MSX, int type, int index, char *id, int len)
         case CONSTANT:  strncpy(id, MSX->Const[index].id, len);   break;
         case PARAMETER: strncpy(id, MSX->Param[index].id, len);   break;
         case PATTERN:   strncpy(id, MSX->Pattern[index].id, len); break;
+        case LINK:   strncpy(id, MSX->Link[index].id, len); break;
+        case NODE:   strncpy(id, MSX->Node[index].id, len); break;
+        case TANK:   strncpy(id, MSX->Tank[index].id, len); break;
     }
 	id[len] = '\0';                                                            //(L. Rossman - 11/01/10)
     return 0;
@@ -1284,6 +1297,9 @@ int DLLEXPORT MSX_getcount(MSXproject MSX, int type, int *count)
         case CONSTANT:  *count = MSX->Nobjects[CONSTANT];  break;
         case PARAMETER: *count = MSX->Nobjects[PARAMETER]; break;
         case PATTERN:   *count = MSX->Nobjects[PATTERN];   break;
+        case LINK:   *count = MSX->Nobjects[LINK];   break;
+        case NODE:   *count = MSX->Nobjects[NODE];   break;
+        case TANK:   *count = MSX->Nobjects[TANK];   break;
         default:            return ERR_INVALID_OBJECT_TYPE;
     }
     return 0;
