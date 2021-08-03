@@ -62,9 +62,8 @@ void main(int argc, char *argv[])
 {
     // Batch-nh2cl Example
     int err = newBatchExample(argv[1]);
-    int bufferSize = 200;
-    char *msg = (char *) malloc(bufferSize);
-    if (err != 0) MSXgeterror(err, msg, bufferSize);
+    char *msg = (char *) malloc(MAXMSG);
+    if (err != 0) MSXgeterror(err, msg, MAXMSG);
     else msg = "Simulation ran successfully with no errors.";
     printf("\n%s\n", msg);
     fflush(stdout);

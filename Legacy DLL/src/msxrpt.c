@@ -33,7 +33,7 @@
 //-----------------
 static char *Logo[] =
     {"******************************************************************",
-     "*                          New MSX API                           *",
+     "*                     MSX Water Quality Engine                   *",
      "*                   Multi-Species Water Quality                  *",
      "*                   Analysis for Pipe  Networks                  *",
      "******************************************************************"};

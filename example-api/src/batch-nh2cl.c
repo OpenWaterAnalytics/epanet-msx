@@ -1,7 +1,3 @@
-
-
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
@@ -150,22 +146,6 @@ int DLLEXPORT batchExample(char *fname) {
     CALL(err, MSXsaveFinalResults(MSX));
     CALL(err, MSXreport(MSX, fname));
 
-    // Example of using the printQuality function in the loop rather than
-    // saving results to binary out file and then calling the MSXreport function
-    // while (tleft >= 0 && err == 0) {
-    //     if ( oldHour != newHour )
-    //     {
-    //         printf("\r  o Computing water quality at hour %-4d", newHour);
-    //         fflush(stdout);
-    //         CALL(err, MSXprintQuality(MSX, NODE, "1", "chloramine", fname));
-    //         oldHour = newHour;
-    //     }
-    //     CALL(err, MSXstep(MSX, &t, &tleft));
-    //     newHour = t / 3600;
-    // }
-    // printf("\n");
-
-
     // Close
     CALL(err, MSX_close(MSX));
     return err;
@@ -272,10 +252,6 @@ int DLLEXPORT newBatchExample(char *fname) {
     CALL(err, MSXaddQuality("GLOBAL", "NH2CL", 0.05E-3, ""));
     CALL(err, MSXaddQuality("GLOBAL", "ALK", 0.004, ""));
     CALL(err, MSXaddQuality("GLOBAL", "H", 2.82e-8, ""));
-
-    //Setup Report
-    CALL(err, MSXsetReport("NODE", "1", 0));
-    CALL(err, MSXsetReport("SPECIE", "chloramine", 4));
 
     // Finish Setup
     CALL(err, MSXinit());

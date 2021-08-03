@@ -213,13 +213,17 @@ typedef enum {
   PATTERNSTART,  //!< Time when time patterns begin
   REPORTSTEP,  //!< Reporting time step
   REPORTSTART,  //!< Time when reporting starts
-//   RULESTEP,  //!< Rule-based control evaluation time step
   STATISTIC,  //!< Reporting statistic code
-//   PERIODS ,  //!< Number of reporting time periods (read only)
-//   STARTTIME, //!< Simulation starting time of day
   HTIME, //!< Elapsed time of current hydraulic solution (read only)
   QTIME, //!< Elapsed time of current quality solution (read only)
-//   HALTFLAG, //!< Flag indicating if the simulation was halted (read only)
-//   NEXTEVENT, //!< Shortest time until a tank becomes empty or full (read only)
-//   NEXTEVENTTANK  //!< Index of tank with shortest time to become empty or full (read only)
 } TimeParameter;
+
+/// Size Limts
+/**
+Limits on the size of character arrays used to store ID names
+and text messages.
+*/
+typedef enum {
+  MAXID   = 31,     //!< Max. # characters in ID name
+  MAXMSG  = 255     //!< Max. # characters in message text
+} SizeLimits;

@@ -24,8 +24,6 @@
 MSXproject _project;
 MSXproject *project = &_project;
 
-//TODO
-
 //Project Functions
 int DLLEXPORT MSXopen(void) {
     return MSX_open(project);

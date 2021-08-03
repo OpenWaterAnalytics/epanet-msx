@@ -145,17 +145,28 @@ int DLLEXPORT MSX_printQuality(MSXproject MSX, int type, char *id, char *species
     if (fname != NULL) f = fopen(fname, "a");
     int hrs = MSX->Qtime / 3600;
     int mins = (MSX->Qtime % 3600) / 60;
+    char units[MAXLINE+1];
+    int i;
+    err = MSX_getindex(MSX, SPECIES, species, &i);
+    strcpy(units, MSX->Species[i].units);
+    strcat(units, "/");
+    if ( MSX->Species[i].type == BULK ) strcat(units, "L");
+    else strcat(units, AreaUnitsWords[MSX->AreaUnits]);
     if (type == NODE) {
-        if (f != NULL) fprintf(f, "Node: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n\n", id, species, hrs, mins, value);
+        if (f != NULL) fprintf(f, "<<< Node: %s >>>\nTime          %15s\nhr:min        %15s\n"
+        "-------       ---------------\n%4d:%02d              %f\n\n", id, species, units, hrs, mins, value);
         else {
-            printf("\r\nNode: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+            printf("\r\n<<< Node: %s >>>\nTime          %15s\nhr:min        %15s\n"
+        "-------       ---------------\n%4d:%02d              %f\n\n", id, species, units, hrs, mins, value);
             fflush(stdout);
         }
     }
     else if (type == LINK) {
-        if (f != NULL) fprintf(f, "Link: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n\n", id, species, hrs, mins, value);
+        if (f != NULL) fprintf(f, "<<< Link: %s >>>\nTime          %15s\nhr:min        %15s\n"
+        "-------       ---------------\n%4d:%02d              %f\n\n", id, species, units, hrs, mins, value);
         else {
-            printf("\r\nLink: %s     Species: %6s     Time: %4d:%02d\nConcentration: %f\n", id, species, hrs, mins, value);
+            printf("\r\n<<< Link: %s >>>\nTime          %15s\nhr:min        %15s\n"
+        "-------       ---------------\n%4d:%02d              %f\n\n", id, species, units, hrs, mins, value);
             fflush(stdout);
         }
     }

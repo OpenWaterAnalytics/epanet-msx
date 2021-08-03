@@ -88,11 +88,12 @@ int DLLEXPORT example1(char *fname) {
     //Setup Report
     CALL(err, MSX_setReport(MSX, "NODE", "c", 2));
     CALL(err, MSX_setReport(MSX, "NODE", "e", 2));
+    CALL(err, MSX_setReport(MSX, "LINK", "4", 2));
     CALL(err, MSX_setReport(MSX, "LINK", "5", 2));
     CALL(err, MSX_setReport(MSX, "SPECIE", "AStot", 2));
     CALL(err, MSX_setReport(MSX, "SPECIE", "AS3", 2));
     CALL(err, MSX_setReport(MSX, "SPECIE", "AS5", 2));
-    CALL(err, MSX_setReport(MSX, "SPECIE", "AS5s", 2));
+    CALL(err, MSX_setReport(MSX, "SPECIE", "AS5s", 5));
     CALL(err, MSX_setReport(MSX, "SPECIE", "NH2CL", 2));
 
     // Finish Setup
