@@ -110,22 +110,6 @@ int DLLEXPORT example1(char *fname) {
     int oldHour = -1;
     int newHour = 0;
 
-    // Example of using the printQuality function in the loop rather than
-    // saving results to binary out file and then calling the MSXreport function
-    // while (tleft >= 0 && err == 0) {
-    //     if ( oldHour != newHour )
-    //     {
-    //         printf("\r  o Computing water quality at hour %-4d", newHour);
-    //         fflush(stdout);
-    //         CALL(err, MSX_printQuality(MSX, NODE, "1", "chloramine", fname));
-    //         oldHour = newHour;
-    //     }
-    //     CALL(err, MSX_step(MSX, &t, &tleft));
-    //     newHour = t / 3600;
-    // }
-    // printf("\n");
-
-
     while (tleft >= 0 && err == 0) {
         if ( oldHour != newHour )
         {
