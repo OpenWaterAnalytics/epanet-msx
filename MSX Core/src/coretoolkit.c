@@ -73,7 +73,6 @@ int DLLEXPORT MSX_close(MSXproject MSX)
 
     // --- delete all temporary files
 
-    // if ( MSX->HydFile.mode == SCRATCH_FILE ) remove(MSX->HydFile.name);
     if ( MSX->OutFile.mode == SCRATCH_FILE ) remove(MSX->OutFile.name);
     remove(MSX->TmpOutFile.name);
 
@@ -83,7 +82,7 @@ int DLLEXPORT MSX_close(MSXproject MSX)
     MSX->HydFile.file = NULL;
     MSX->OutFile.file = NULL;
     MSX->TmpOutFile.file = NULL;
-    MSXqual_close(MSX);
+    if (MSX->QualityOpened) MSXqual_close(MSX);
     freeIDs(MSX);
     deleteObjects(MSX);
     deleteHashTables();
@@ -1061,7 +1060,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
         if (MSX->Sizes[type] == 0) {
             MSX->Node = (Snode *) calloc(size+1, sizeof(Snode));
             if (MSX->Node == NULL) return ERR_MEMORY;
-            for (int i=1; i<size+1; i++) MSX->Node[i].c0 = NULL;
+            for (int i=1; i<size+1; i++) {
+                MSX->Node[i].c0 = NULL;
+                MSX->Node[i].c = NULL;
+            }
             if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Node[i].c0 != NULL) free(MSX->Node[i].c0);
                 MSX->Node[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
@@ -1070,7 +1072,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
         else {
             MSX->Node = (Snode *) realloc(MSX->Node, (size+1) * sizeof(Snode));
             if (MSX->Node == NULL) return ERR_MEMORY;
-            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Node[i].c0 = NULL;
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) {
+                MSX->Node[i].c0 = NULL;
+                MSX->Node[i].c = NULL;
+            }
             if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Node[i].c0 != NULL) free(MSX->Node[i].c0);
                 MSX->Node[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
@@ -1082,7 +1087,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
             MSX->Link = (Slink *) calloc(size+1, sizeof(Slink));
             if (MSX->Link == NULL) return ERR_MEMORY;
             //Initialize the initial concentration
-            for (int i=1; i<size+1; i++) MSX->Link[i].c0 = NULL;
+            for (int i=1; i<size+1; i++) {
+                MSX->Link[i].c0 = NULL;
+                MSX->Link[i].reacted = NULL;
+            }
             if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Link[i].c0 != NULL) free(MSX->Link[i].c0);
                 MSX->Link[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
@@ -1098,7 +1106,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
             MSX->Link = (Slink *) realloc(MSX->Link, (size+1) * sizeof(Slink));
             if (MSX->Link == NULL) return ERR_MEMORY;
             //Initialize the initial concentration
-            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Link[i].c0 = NULL;
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) {
+                MSX->Link[i].c0 = NULL;
+                MSX->Link[i].reacted = NULL;
+            }
             if (MSX->Sizes[SPECIES] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Link[i].c0 != NULL) free(MSX->Link[i].c0);
                 MSX->Link[i].c0 = (double *) calloc(MSX->Sizes[SPECIES]+1, sizeof(double));
@@ -1116,7 +1127,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
             MSX->Tank = (Stank *) calloc(size+1, sizeof(Stank));
             if (MSX->Tank == NULL) return ERR_MEMORY;
             //Initialize the paramaters
-            for (int i=1; i<size+1; i++) MSX->Tank[i].param = NULL;
+            for (int i=1; i<size+1; i++) {
+                MSX->Tank[i].param = NULL;
+                MSX->Tank[i].c = NULL;
+            }
             if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Tank[i].param != NULL) free(MSX->Tank[i].param);
                 MSX->Tank[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
@@ -1126,7 +1140,10 @@ int DLLEXPORT MSX_setSize(MSXproject MSX, int type, int size)
             MSX->Tank = (Stank *) realloc(MSX->Tank, (size+1) * sizeof(Stank));
             if (MSX->Tank == NULL) return ERR_MEMORY;
             //Initialize the paramaters
-            for (int i=MSX->Sizes[type]+1; i<size+1; i++) MSX->Tank[i].param = NULL;
+            for (int i=MSX->Sizes[type]+1; i<size+1; i++) {
+                MSX->Tank[i].param = NULL;
+                MSX->Tank[i].c = NULL;
+            }
             if (MSX->Sizes[PARAMETER] != 0) for (int i=1; i < size+1; i++) {
                 if (MSX->Tank[i].param != NULL) free(MSX->Tank[i].param);
                 MSX->Tank[i].param = (double *) calloc(MSX->Sizes[PARAMETER]+1, sizeof(double));
