@@ -26,6 +26,7 @@ int  buildadjlists(MSXproject MSX);
 void  freeadjlists(MSXproject MSX);
 int convertUnits(MSXproject MSX);
 void deleteObjects(MSXproject MSX);
+void freeIDs(MSXproject MSX);
 int checkCyclicTerms(MSXproject MSX, double **TermArray);
 int traceTermPath(int i, int istar, int n, double **TermArray);
 int finishInit(MSXproject MSX);

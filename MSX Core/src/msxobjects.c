@@ -525,6 +525,28 @@ void deleteObjects(MSXproject MSX)
 
 //=============================================================================
 
+void freeIDs(MSXproject MSX)
+/**
+**  Purpose:
+**    frees the IDs of all of the objects.
+**
+**  Input:
+**    MSX = the underlying MSXproject data struct.
+*/
+{
+    int i;
+    for (i=1; i<=MSX->Nobjects[NODE]; i++) FREE(MSX->Node[i].id);
+    for (i=1; i<=MSX->Nobjects[TANK]; i++) FREE(MSX->Tank[i].id);
+    for (i=1; i<=MSX->Nobjects[LINK]; i++) FREE(MSX->Link[i].id);
+    for (i=1; i<=MSX->Nobjects[SPECIES]; i++) FREE(MSX->Species[i].id);
+    for (i=1; i<=MSX->Nobjects[PARAMETER]; i++) FREE(MSX->Param[i].id);
+    for (i=1; i<=MSX->Nobjects[CONSTANT]; i++) FREE(MSX->Const[i].id);
+    for (i=1; i<=MSX->Nobjects[TERM]; i++) FREE(MSX->Term[i].id);
+    for (i=1; i<=MSX->Nobjects[PATTERN]; i++) FREE(MSX->Pattern[i].id);
+}
+
+//=============================================================================
+
 int checkCyclicTerms(MSXproject MSX, double **TermArray)                                                         //1.1.00
 /**
 **  Purpose:

@@ -84,6 +84,7 @@ int DLLEXPORT MSX_close(MSXproject MSX)
     MSX->OutFile.file = NULL;
     MSX->TmpOutFile.file = NULL;
     MSXqual_close(MSX);
+    freeIDs(MSX);
     deleteObjects(MSX);
     deleteHashTables();
     MSX->ProjectOpened = FALSE;
@@ -205,7 +206,9 @@ int DLLEXPORT MSX_addNode(MSXproject MSX, char *id)
     int i = MSX->Nobjects[NODE]+1;
     if (i > MSX->Sizes[NODE]) err = MSX_setSize(MSX, NODE, i);
     MSX->Node[i].rpt = 0;
-    MSX->Node[i].id = id;
+    MSX->Node[i].id = calloc(1, MAXID+1);
+    if (MSX->Node[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Node[i].id, id, MAXID);
     MSX->Node[i].tank = 0;
     MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
@@ -249,13 +252,17 @@ int DLLEXPORT MSX_addTank(MSXproject MSX,char *id, double initialVolume, int mix
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
     MSX->Tank[i].vMix = volumeMix;
-    MSX->Tank[i].id = id;
+    MSX->Tank[i].id = calloc(1, MAXID+1);
+    if (MSX->Tank[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Tank[i].id, id, MAXID);
     MSX->Tank[i].node = MSX->Nobjects[NODE]+1;
     i = MSX->Nobjects[NODE]+1;
     if (i > MSX->Sizes[NODE]) err = MSX_setSize(MSX, NODE, i);
     MSX->Node[i].tank = MSX->Nobjects[TANK]+1;
     MSX->Node[i].rpt = 0;
-    MSX->Node[i].id = id;
+    MSX->Node[i].id = calloc(1, MAXID+1);
+    if (MSX->Node[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Node[i].id, id, MAXID);
     MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
     MSX->Nobjects[TANK]++;
@@ -298,13 +305,17 @@ int DLLEXPORT MSX_addReservoir(MSXproject MSX, char *id, double initialVolume, i
     MSX->Tank[i].v0 = initialVolume;
     MSX->Tank[i].mixModel = mixModel;
     MSX->Tank[i].vMix = volumeMix;
-    MSX->Tank[i].id = id;
+    MSX->Tank[i].id = calloc(1, MAXID+1);
+    if (MSX->Tank[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Tank[i].id, id, MAXID);
     MSX->Tank[i].node = MSX->Nobjects[NODE]+1;
     i = MSX->Nobjects[NODE]+1;
     if (i > MSX->Sizes[NODE]) err = MSX_setSize(MSX, NODE, i);
     MSX->Node[i].tank = MSX->Nobjects[TANK]+1;
     MSX->Node[i].rpt = 0;
-    MSX->Node[i].id = id;
+    MSX->Node[i].id = calloc(1, MAXID+1);
+    if (MSX->Node[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Node[i].id, id, MAXID);
     MSX->Node[i].sources = NULL;
     MSX->Nobjects[NODE]++;
     MSX->Nobjects[TANK]++;
@@ -357,7 +368,9 @@ int DLLEXPORT MSX_addLink(MSXproject MSX, char *id, char *startNode, char *endNo
     MSX->Link[i].len = length;
     MSX->Link[i].roughness = roughness;
     MSX->Link[i].rpt = 0;
-    MSX->Link[i].id = id;    
+    MSX->Link[i].id = calloc(1, MAXID+1);
+    if (MSX->Link[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Link[i].id, id, MAXID);    
     MSX->Nobjects[LINK]++;
     return err;
 }
@@ -470,7 +483,9 @@ int DLLEXPORT MSX_addSpecies(MSXproject MSX, char *id, int type, int units, doub
 
     int i = MSX->Nobjects[SPECIES]+1;
     if (i > MSX->Sizes[SPECIES]) err = MSX_setSize(MSX, SPECIES, i);
-    MSX->Species[i].id = id;
+    MSX->Species[i].id = calloc(1, MAXID+1);
+    if (MSX->Species[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Species[i].id, id, MAXID);
     MSX->Species[i].type = type;
     switch (units)
     {
@@ -532,7 +547,9 @@ int DLLEXPORT MSX_addCoefficeint(MSXproject MSX, int type, char *id, double valu
         if ( addObject(PARAMETER, id, MSX->Nobjects[PARAMETER]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
         int i = MSX->Nobjects[PARAMETER]+1;
         if (i > MSX->Sizes[PARAMETER]) err = MSX_setSize(MSX, PARAMETER, i);
-        MSX->Param[i].id = id;
+        MSX->Param[i].id = calloc(1, MAXID+1);
+        if (MSX->Param[i].id == NULL) return ERR_MEMORY;
+        strncpy(MSX->Param[i].id, id, MAXID);
 		MSX->Param[i].value = value;
         MSX->Nobjects[PARAMETER]++;
     }
@@ -543,7 +560,9 @@ int DLLEXPORT MSX_addCoefficeint(MSXproject MSX, int type, char *id, double valu
         if ( addObject(CONSTANT, id, MSX->Nobjects[CONSTANT]+1) < 0 ) err = ERR_MEMORY;  // Insufficient memory
         int i = MSX->Nobjects[CONSTANT]+1;
         if (i > MSX->Sizes[CONSTANT]) err = MSX_setSize(MSX, CONSTANT, i);
-        MSX->Const[i].id = id;
+        MSX->Const[i].id = calloc(1, MAXID+1);
+        if (MSX->Const[i].id == NULL) return ERR_MEMORY;
+        strncpy(MSX->Const[i].id, id, MAXID);
 		MSX->Const[i].value = value;
         MSX->Nobjects[CONSTANT]++;
     }
@@ -580,7 +599,9 @@ int DLLEXPORT MSX_addTerm(MSXproject MSX, char *id, char *equation)
 
     int i = MSX->Nobjects[TERM]+1;
     if (i > MSX->Sizes[TERM]) err = MSX_setSize(MSX, TERM, i);
-    MSX->Term[i].id = id;
+    MSX->Term[i].id = calloc(1, MAXID+1);
+    if (MSX->Term[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Term[i].id, id, MAXID);
     MSX->Nobjects[TERM]++;
     MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
     if ( expr == NULL ) return ERR_MATH_EXPR;
@@ -1921,7 +1942,9 @@ int  DLLEXPORT MSX_addpattern(MSXproject MSX, char *id)
 
     int i = MSX->Nobjects[PATTERN]+1;
     if (i > MSX->Sizes[PATTERN]) err = MSX_setSize(MSX, PATTERN, i);
-    MSX->Pattern[i].id = id;
+    MSX->Pattern[i].id = calloc(1, MAXID+1);
+    if (MSX->Pattern[i].id == NULL) return ERR_MEMORY;
+    strncpy(MSX->Pattern[i].id, id, MAXID);
     MSX->Pattern[i].length = 0;
     MSX->Pattern[i].first = NULL;
     MSX->Pattern[i].current = NULL;
