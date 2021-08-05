@@ -195,8 +195,8 @@ int  DLLEXPORT MSXgeterror(int code, char *msg, int len) {
      "Error 408 - (species already assigned an expression)", 
      "Error 409 - (illegal math expression)"}; 
 
-    if (code <= ERR_FIRST && code >= 400) strncpy(msg, Errmsg[code-400+24], len);
-    if ( code <= ERR_FIRST || code >= ERR_MAX ) strncpy(msg, Errmsg[0], len);
+    if (code <= ERR_FIRST && code >= 400) strncpy(msg, Errmsg[code-400+26], len);
+    else if ( code <= ERR_FIRST || code >= ERR_MAX ) strncpy(msg, Errmsg[0], len);
     else strncpy(msg, Errmsg[code - ERR_FIRST], len);
     return 0;
 }
