@@ -605,7 +605,9 @@ int DLLEXPORT MSX_addTerm(MSXproject MSX, char *id, char *equation)
     MathExpr *expr = mathexpr_create(MSX, equation, getVariableCode);
     if ( expr == NULL ) return ERR_MATH_EXPR;
     MSX->Term[i].expr = expr;
-    MSX->Term[i].equation = equation;
+    MSX->Term[i].equation = calloc(1, MAXLINE+1);
+    if (MSX->Term[i].equation == NULL) return ERR_MEMORY;
+    strncpy(MSX->Term[i].equation, equation, MAXLINE);
     //Updates the ivar values since they are dependent on the number of terms
     for (int m = 1; m < MSX->Nobjects[TERM]; m++) 
      {

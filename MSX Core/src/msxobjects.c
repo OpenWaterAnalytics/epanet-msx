@@ -541,7 +541,10 @@ void freeIDs(MSXproject MSX)
     for (i=1; i<=MSX->Nobjects[SPECIES]; i++) FREE(MSX->Species[i].id);
     for (i=1; i<=MSX->Nobjects[PARAMETER]; i++) FREE(MSX->Param[i].id);
     for (i=1; i<=MSX->Nobjects[CONSTANT]; i++) FREE(MSX->Const[i].id);
-    for (i=1; i<=MSX->Nobjects[TERM]; i++) FREE(MSX->Term[i].id);
+    for (i=1; i<=MSX->Nobjects[TERM]; i++) {
+        FREE(MSX->Term[i].id);
+        FREE(MSX->Term[i].equation);
+    }
     for (i=1; i<=MSX->Nobjects[PATTERN]; i++) FREE(MSX->Pattern[i].id);
 }
 
