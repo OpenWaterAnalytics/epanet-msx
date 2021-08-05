@@ -1467,11 +1467,11 @@ int  DLLEXPORT MSX_getsource(MSXproject MSX, int node, int species, int *type, d
 **
 **  Output:
 **    type = one of the following of external source type codes:
-**           MSX_NOSOURCE  = -1 for no source,
-**           MSX_CONCEN    =  0 for a concentration source,
-**           MSX_MASS      =  1 for a mass booster source,
-**           MSX_SETPOINT  =	2 for a setpoint source,
-**           MSX_FLOWPACED =	3 for a flow paced source;
+**           NOSOURCE  = -1 for no source,
+**           CONCEN    =  0 for a concentration source,
+**           MASS      =  1 for a mass booster source,
+**           SETPOINT  =	2 for a setpoint source,
+**           FLOWPACED =	3 for a flow paced source;
 **    level = the baseline concentration (or mass flow rate) of the species
 **            in the source;
 **    pat = the index of the time pattern assigned to the species at the source
@@ -1481,7 +1481,7 @@ int  DLLEXPORT MSX_getsource(MSXproject MSX, int node, int species, int *type, d
 */
 {
     Psource source;
-    *type  = MSX_NOSOURCE;
+    *type  = NOSOURCE;
     *level = 0.0;
     *pat   = 0;
     if ( MSX == NULL ) return ERR_MSX_NOT_OPENED;
@@ -1821,11 +1821,11 @@ int  DLLEXPORT MSX_setsource(MSXproject MSX, int node, int species, int type, do
 **    node = index number (base 1) assigned to the node of interest;
 **    species = index number (base 1) of the species of interest;
 **    type = one of the following of external source type codes:
-**           MSX_NOSOURCE  = -1 for no source,
-**           MSX_CONCEN    =  0 for a concentration source,
-**           MSX_MASS      =  1 for a mass booster source,
-**           MSX_SETPOINT  =	2 for a setpoint source,
-**           MSX_FLOWPACED =	3 for a flow paced source;
+**           NOSOURCE  = -1 for no source,
+**           CONCEN    =  0 for a concentration source,
+**           MASS      =  1 for a mass booster source,
+**           SETPOINT  =	2 for a setpoint source,
+**           FLOWPACED =	3 for a flow paced source;
 **    level = the baseline concentration (or mass flow rate) of the species
 **            in the source;
 **    pat = the index of the time pattern assigned to the species at the source
@@ -1847,8 +1847,8 @@ int  DLLEXPORT MSX_setsource(MSXproject MSX, int node, int species, int type, do
     if ( species < 1 || species > MSX->Nobjects[SPECIES] ) return ERR_INVALID_OBJECT_INDEX;
     if ( pat > MSX->Nobjects[PATTERN] ) return ERR_INVALID_OBJECT_INDEX;
     if ( pat < 0 ) pat = 0;
-    if ( type < MSX_NOSOURCE ||
-         type > MSX_FLOWPACED ) return ERR_INVALID_OBJECT_PARAMS;
+    if ( type < NOSOURCE ||
+         type > FLOWPACED ) return ERR_INVALID_OBJECT_PARAMS;
     if ( MSX->Species[species].type != BULK ) return ERR_INVALID_OBJECT_PARAMS;
     if ( level < 0.0 ) return ERR_INVALID_OBJECT_PARAMS;
 

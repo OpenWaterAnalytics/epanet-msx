@@ -29,12 +29,6 @@
                  MAX_OBJECTS,
                  };
 
- enum SourceType                       // Type of source quality input
-                {CONCEN,               //    inflow concentration
-                 MASS,                 //    mass inflow booster
-                 SETPOINT,             //    setpoint booster
-                 FLOWPACED};           //    flow paced booster
-
  enum UnitSystemType                   // Unit system:
                  {US,                  //   US
                   SI};                 //   SI (metric)
@@ -227,3 +221,12 @@ typedef enum {
   MAXID   = 31,     //!< Max. # characters in ID name
   MAXMSG  = 255     //!< Max. # characters in message text
 } SizeLimits;
+
+typedef enum {  // Type of source quality input
+  NOSOURCE  = -1,
+  CONCEN    = 0,  //    inflow concentration
+  MASS      = 1,  //    mass inflow booster
+  SETPOINT  = 2,  //    setpoint booster
+  FLOWPACED = 3   //    flow paced booster
+} SourceTypes;
+     

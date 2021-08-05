@@ -43,16 +43,6 @@
   #endif
 #endif
 
-
-#define MSX_BULK      0
-#define MSX_WALL      1
-
-#define MSX_NOSOURCE  -1
-#define MSX_CONCEN     0
-#define MSX_MASS       1
-#define MSX_SETPOINT   2
-#define MSX_FLOWPACED  3
-
 // Opaque Pointer
 typedef struct Project *MSXproject;
 
