@@ -122,7 +122,7 @@ int MSXcompiler_open(MSXproject MSX)
     }
     else return ERR_COMPILE_FAILED;
 #else
-    if ( MSX.Compiler == GC )
+    if ( MSX->Compiler == GC )
     {
         sprintf(cmd, "gcc -c -fPIC -O3 %s", srcFile);
         err = system(cmd);
