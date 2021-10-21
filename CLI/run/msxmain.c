@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
-#include <malloc.h>
 
 #include "legacytoolkit.h"                 // EPANET-MSX toolkit header file
 #include "msxtoolkit.h"
